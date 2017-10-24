@@ -1,4 +1,4 @@
-The original concept for evolv\.io comes from **[carykh](https://www.youtube.com/watch?v=OLnv8QaEDL0)**
+The original concept for *evolv\.io* comes from **[carykh](https://www.youtube.com/watch?v=OLnv8QaEDL0)**
 
 # Summary
 This version of *evolv\.io* is made with **[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)** and **[HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)**
