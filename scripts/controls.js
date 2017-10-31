@@ -17,9 +17,16 @@ let mouse = {
     isdown: false
 };
 
+function getMousePos(e) {
+    return [
+        (e.clientX - viewport.getBoundingClientRect().left) * (viewport.width / zoomLevel / viewport.clientWidth),
+        (e.clientY - viewport.getBoundingClientRect().top) * (viewport.height / zoomLevel / viewport.clientHeight)
+    ];
+}
+
 window.onmousedown = function(e) {
-    mouse.down.x = (e.clientX - viewport.getBoundingClientRect().left) * (viewport.width / viewport.clientWidth);
-    mouse.down.y = (e.clientY - viewport.getBoundingClientRect().top) * (viewport.height / viewport.clientHeight);
+    mouse.down.x = getMousePos(e)[0];
+    mouse.down.y = getMousePos(e)[1];
 
     mouse.isdown = true;
 
@@ -33,15 +40,15 @@ window.onmousedown = function(e) {
 };
 
 window.onmouseup = function(e) {
-    mouse.up.x = (e.clientX - viewport.getBoundingClientRect().left) * (viewport.width / viewport.clientWidth);
-    mouse.up.y = (e.clientY - viewport.getBoundingClientRect().top) * (viewport.height / viewport.clientHeight);
+    mouse.up.x = getMousePos(e)[0];
+    mouse.up.y = getMousePos(e)[1];
 
     mouse.isdown = false;
 };
 
 window.onmousemove = function(e) {
-    mouse.current.x = (e.clientX - viewport.getBoundingClientRect().left) * (viewport.width / viewport.clientWidth);
-    mouse.current.y = (e.clientY - viewport.getBoundingClientRect().top) * (viewport.height / viewport.clientHeight);
+    mouse.current.x = getMousePos(e)[0];
+    mouse.current.y = getMousePos(e)[1];
 
     if (mouse.isdown) {
         cropx += lcx - mouse.current.x;
@@ -53,21 +60,18 @@ window.onmousemove = function(e) {
 };
 
 window.onmousewheel = function(e) {
-    viewport.width -= e.wheelDelta;
-    viewport.height -= e.wheelDelta * 0.5625;
+    zoomLevel += e.wheelDelta / zoomSpeed / (2400 / zoomLevel);
 
-    if (viewport.width > minZoomLevel) {
-        viewport.width = minZoomLevel;
-        viewport.height = minZoomLevel * 0.5625;
+    if (zoomLevel < minZoomLevel) {
+        zoomLevel = minZoomLevel;
     }
 
-    if (viewport.width < maxZoomLevel) {
-        viewport.width = maxZoomLevel;
-        viewport.height = maxZoomLevel * 0.5625;
+    if (zoomLevel > maxZoomLevel) {
+        zoomLevel = maxZoomLevel;
     }
 
-    mouse.current.x = (e.clientX - viewport.getBoundingClientRect().left) * (viewport.width / viewport.clientWidth);
-    mouse.current.y = (e.clientY - viewport.getBoundingClientRect().top) * (viewport.height / viewport.clientHeight);
+    mouse.current.x = getMousePos(e)[0];
+    mouse.current.y = getMousePos(e)[1];
 
     cropx += lcx - mouse.current.x;
     cropy += lcy - mouse.current.y;

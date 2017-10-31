@@ -76,8 +76,8 @@ function update() {
         clampSize(creature);
 
         if (creature == selectedCreature) {
-            cropx -= (cropx - (creature.x - viewport.width / 2)) / 50;
-            cropy -= (cropy - (creature.y - viewport.height / 2)) / 50;
+            cropx -= (cropx - (creature.x - viewport.width / zoomLevel / 2)) / (50 / zoomLevel);
+            cropy -= (cropy - (creature.y - viewport.height / zoomLevel / 2)) / (50 / zoomLevel);
         }
     }
 
@@ -116,7 +116,7 @@ function render() {
         ctx.fillCircle(creature.x, creature.y, creature.size, true);
     }
 
-    ctz.drawImage(display, cropx, cropy, viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
+    ctz.drawImage(display, cropx, cropy, viewport.width / zoomLevel, viewport.height / zoomLevel, 0, 0, viewport.width, viewport.height);
     ctz.lineWidth = 5;
     if (selectedCreature !== null) {
         ctz.beginPath();
