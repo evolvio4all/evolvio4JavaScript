@@ -40,3 +40,12 @@ Creature.prototype.reproduce = function(t) {
 		}
 	}
 };
+
+Creature.prototype.die = function() {
+    if (population <= minCreatures) {
+        this.randomize();
+    } else {
+        let pos = creatures.indexOf(this);
+        creatures.splice(pos, 1);
+    }
+};

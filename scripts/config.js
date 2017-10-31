@@ -14,11 +14,18 @@ const nnui = {
     minLineSize: 5
 };
 
+const maxZoomLevel = window.innerWidth;
+const minZoomLevel = display.height / 0.5625;
+
+const maxColorChange = 10;
+
+const selectSizeAddition = 20;
+
 const numChildren = 2;
 
 const maxCreatureSpeed = 5;
 
-let seed = null;
+seed = seed;
 
 const mapSize = 40;
 const minCreatures = 10;
@@ -44,3 +51,10 @@ const minReproduceTime = 1000;
 
 const mutability = 10;
 const totalProbability = (Math.log(1 - mutability / 100) / Math.log(0.99)) / mutability;
+
+
+const controls = {
+  fastForward: "right",
+  slowDown: "left",
+  stop: "down"
+};

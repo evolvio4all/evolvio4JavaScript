@@ -1,6 +1,6 @@
 let map = [];
 
-function generate() {
+function generateMap() {
 	for (let i = 0; i < mapSize; i++) {
 		map.push([]);
 		for (let j = 0; j < mapSize; j++) {
@@ -8,5 +8,3 @@ function generate() {
 		}
 	}
 }
-
-generate();

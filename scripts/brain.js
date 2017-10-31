@@ -1,33 +1,3 @@
-function Creature(x, y, s, c) {
-	this.x = x || Math.random() * display.width;
-	this.y = y || Math.random() * display.height;
-
-	this.size = s || Math.random() * (maxCreatureSize - minCreatureSize) + minCreatureSize;
-	this.energy = 100;
-	
-	this.age = 0;
-	this.reproduceTime = 0;
-	
-	this.color = c || newColor();
-	
-	this.genes = [this.color];
-	
-	this.maxSpeed = maxCreatureSpeed;
-	
-	this.output = [0, 0, 0];
-	
-	this.network = {};
-	this.createNeuralNetwork();
-	
-	this.select = function() {
-		if (mouse.up.x > this.x - cropx - this.size && mouse.up.x < this.x - cropx + this.size && mouse.up.y < this.y - cropy + this.size && mouse.up.y > this.y - cropy - this.size) {
-			return true;
-		}
-		
-		return false;
-	};
-}
-
 // Creature.prototype creates a neural network composed of layers and axons
 Creature.prototype.createNeuralNetwork = function() {
 	this.network.layers = layers; // Creature.prototype creates layers based on the parameters I provide in the layers letiable
@@ -86,21 +56,20 @@ Creature.prototype.mutate = function() {
 	let tempcolor = this.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
 	let rand = Math.random() * 100;
 	
-	if (rand < 30) {
-		tempcolor[0] = parseInt(tempcolor[0]) + Math.floor(Math.random() * 60 - 30);
+	if (rand < 10) {
+		tempcolor[0] = parseInt(tempcolor[0]) + Math.floor(Math.random() * maxColorChange * 2 - maxColorChange);
 		
 		if (tempcolor[0] < 0) tempcolor[0] = 0;
 		if (tempcolor[0] > 356) tempcolor[0] = 356;
-	} else if (rand >= 30 && rand <= 60) {
-		tempcolor[1] = parseInt(tempcolor[1]) + Math.floor(Math.random() * 60 - 30);
+	} else if (rand < 20) {
+		tempcolor[1] = parseInt(tempcolor[1]) + Math.floor(Math.random() * maxColorChange * 2 - maxColorChange);
 		
 		if (tempcolor[1] < 0) tempcolor[1] = 0;
 		if (tempcolor[1] > 100) tempcolor[1] = 100;
 		
 		tempcolor[1] += "%";
-	} else {
-		
-		tempcolor[2] = parseInt(tempcolor[2]) + Math.floor(Math.random() * 60 - 30);
+	} else if (rand < 30) {
+		tempcolor[2] = parseInt(tempcolor[2]) + Math.floor(Math.random() * maxColorChange * 2 - maxColorChange);
 		if (tempcolor[2] < 0) tempcolor[2] = 0;
 		if (tempcolor[2] > 100) tempcolor[2] = 100;
 		
