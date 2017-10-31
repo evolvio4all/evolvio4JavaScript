@@ -36,10 +36,10 @@ const eatSpeed = 5;
 const eatSize = 0.08;
 
 const energy = {
-	eat: 0.01,
-	metabolism: 0.01,
-	move: 0.01,
-	birth: 0.5
+    eat: 0.01,
+    metabolism: 0.01,
+    move: 0.01,
+    birth: 0.5
 };
 
 const foodRegrowRate = 0.4;
@@ -52,9 +52,8 @@ const minReproduceTime = 1000;
 const mutability = 10;
 const totalProbability = (Math.log(1 - mutability / 100) / Math.log(0.99)) / mutability;
 
-
 const controls = {
-  fastForward: "right",
-  slowDown: "left",
-  stop: "down"
+    fastForward: "right",
+    slowDown: "left",
+    stop: "down"
 };
