@@ -1,7 +1,7 @@
 Creature.prototype.eat = function(p) {
     let pos = p || this.getPosition();
     let tile = map[pos[0]][pos[1]];
-    this.size -= energy.eat * this.output[2];
+    this.size -= energy.eat;
 
     this.maxSpeed = maxCreatureSpeed * this.output[2];
 
@@ -15,7 +15,7 @@ Creature.prototype.eat = function(p) {
 };
 
 Creature.prototype.metabolize = function() {
-    this.size -= energy.metabolism * (this.age / reproduceAge);
+    this.size -= energy.metabolism * (this.age / reproduceAge) * (this.size / maxCreatureSize);
 };
 
 Creature.prototype.move = function() {

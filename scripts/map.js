@@ -8,3 +8,9 @@ function generateMap() {
         }
     }
 }
+
+function Tile() {
+    this.type = Math.floor(seededNoise() * 3) % 2;
+    this.food = maxTileFood / 1.2;
+    if (this.type === 0) this.food = 0;
+}

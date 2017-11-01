@@ -3,8 +3,8 @@ const minCreatureSize = 10; // Minimum Creature Size
 
 const offset = 0; // Amount to offset the value of a neuron
 
-let zoomLevel = 1;
-
+let zoomLevel = 1 / 3.7;
+let oldest = 0;
 const nnui = {
     xoffset: 1920 - 300,
     yoffset: 100,
@@ -29,7 +29,7 @@ const numChildren = 2;
 
 const maxCreatureSpeed = 5;
 
-seed = seed;
+const seed = newSeed();
 
 const mapSize = 40;
 const minCreatures = 10;
@@ -50,7 +50,7 @@ const foodRegrowRate = 0.4;
 
 const maxTileFood = 1000;
 
-const reproduceAge = 1000;
+const reproduceAge = 2000;
 const minReproduceTime = 1000;
 
 const mutability = 10;
@@ -58,6 +58,7 @@ const totalProbability = (Math.log(1 - mutability / 100) / Math.log(0.99)) / mut
 
 const controls = {
     fastForward: "right",
-    slowDown: "left",
-    stop: "down"
+    speedUp: "up",
+    stop: "left",
+    play: "down"
 };

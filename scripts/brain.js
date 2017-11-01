@@ -24,7 +24,7 @@ Creature.prototype.initAxons = function() {
         for (let j = 0; j < this.network.neurons[i].length; j++) {
             let neuronWeights = [];
             for (let k = 0; k < neuronsInPreviousLayer; k++) {
-                neuronWeights.push(Math.random() * 2 - 1);
+                neuronWeights.push(seededNoise(tick * creatures.length + 1 * i * j, -creatures.length) * 2 - 1);
             }
             layerWeights.push(neuronWeights);
         }
@@ -54,22 +54,22 @@ Creature.prototype.feedForward = function(inputs) {
 // Modifies weights of the axons
 Creature.prototype.mutate = function() {
     let tempcolor = this.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
-    let rand = Math.random() * 100;
+    let rand = (seededNoise(tick / 5, 23) % 1) * 100;
 
     if (rand < 10) {
-        tempcolor[0] = parseInt(tempcolor[0]) + Math.floor(Math.random() * maxColorChange * 2 - maxColorChange);
+        tempcolor[0] = parseInt(tempcolor[0]) + Math.floor(seededNoise(tick, 12) * maxColorChange * 2 - maxColorChange);
 
         if (tempcolor[0] < 0) tempcolor[0] = 0;
         if (tempcolor[0] > 356) tempcolor[0] = 356;
     } else if (rand < 20) {
-        tempcolor[1] = parseInt(tempcolor[1]) + Math.floor(Math.random() * maxColorChange * 2 - maxColorChange);
+        tempcolor[1] = parseInt(tempcolor[1]) + Math.floor(seededNoise(143, tick) * maxColorChange * 2 - maxColorChange);
 
         if (tempcolor[1] < 0) tempcolor[1] = 0;
         if (tempcolor[1] > 100) tempcolor[1] = 100;
 
         tempcolor[1] += "%";
     } else if (rand < 30) {
-        tempcolor[2] = parseInt(tempcolor[2]) + Math.floor(Math.random() * maxColorChange * 2 - maxColorChange);
+        tempcolor[2] = parseInt(tempcolor[2]) + Math.floor(seededNoise(66 * tick, 123) * maxColorChange * 2 - maxColorChange);
         if (tempcolor[2] < 0) tempcolor[2] = 0;
         if (tempcolor[2] > 100) tempcolor[2] = 100;
 
@@ -83,19 +83,19 @@ Creature.prototype.mutate = function() {
             for (let k = 0; k < this.network.axons[i][j].length; k++) {
                 for (let l = 0; l < mutability; l++) {
                     let weight = this.network.axons[i][j][k];
-                    let randomNumber = Math.random() * 100;
+                    let randomNumber = seededNoise(tick * 5, tick * 6) * 100;
                     const numMutations = 5;
 
                     if (randomNumber < totalProbability * 1 / numMutations) {
-                        weight *= Math.random();
+                        weight *= seededNoise(tick * 5, 32);
                     } else if (randomNumber < totalProbability * 2 / numMutations) {
-                        weight /= Math.random();
+                        weight /= seededNoise(5000, tick);
                     } else if (randomNumber < totalProbability * 3 / numMutations) {
                         weight *= -1;
                     } else if (randomNumber < totalProbability * 4 / numMutations) {
-                        weight -= Math.random() * 0.25;
+                        weight -= seededNoise(tick, 89) * 0.25;
                     } else if (randomNumber < totalProbability * 5 / numMutations) {
-                        weight += Math.random() * 0.25;
+                        weight += seededNoise(tick, 2 * tick) * 0.25;
                     }
 
                     this.network.axons[i][j][k] = weight;
