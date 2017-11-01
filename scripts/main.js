@@ -46,6 +46,7 @@ function update() {
     population = creatures.length;
 
     for (let creature of creatures) {
+        if (creature.age > oldest) oldest = creature.age;
         creature.maxSpeed = maxCreatureSpeed;
         wallLock(creature);
 
@@ -119,17 +120,17 @@ function render() {
     ctz.drawImage(display, cropx, cropy, viewport.width / zoomLevel, viewport.height / zoomLevel, 0, 0, viewport.width, viewport.height);
     ctz.lineWidth = 5;
     if (selectedCreature !== null) {
-        ctz.beginPath();
         for (let i = 0; i < layers.length; i++) {
             for (let j = 0; j < layers[i]; j++) {
                 for (let k = 0; k < layers[i - 1]; k++) {
-                    //ctz.strokeStyle = "hsl(0, 0%, " + Math.floor(creatures[selectedCreature].network.axons[i - 1][j][k] * 100) + "%)";
+                    ctz.beginPath();
+                    ctz.strokeStyle = "hsl(0, 0%, " + Math.floor(selectedCreature.network.axons[i - 1][j][k] * 100) + "%)";
                     ctz.moveTo((i - 1) * (nnui.size * 2 + nnui.xspacing) + nnui.xoffset, k * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset);
                     ctz.lineTo(i * (nnui.size * 2 + nnui.xspacing) + nnui.xoffset, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset);
+                    ctz.stroke();
                 }
             }
         }
-        ctz.stroke();
 
         ctz.fillStyle = "#222222";
         ctz.font = "24px Calibri";
