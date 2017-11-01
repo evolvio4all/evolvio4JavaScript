@@ -3,6 +3,8 @@ const minCreatureSize = 10; // Minimum Creature Size
 
 const offset = 0; // Amount to offset the value of a neuron
 
+let zoomLevel = 1;
+
 const nnui = {
     xoffset: 1920 - 300,
     yoffset: 100,
@@ -14,11 +16,20 @@ const nnui = {
     minLineSize: 5
 };
 
+const zoomSpeed = 1;
+
+const maxZoomLevel = 2;
+const minZoomLevel = 1 / 3.7;
+
+const maxColorChange = 10;
+
+const selectSizeAddition = 20;
+
 const numChildren = 2;
 
 const maxCreatureSpeed = 5;
 
-let seed = null;
+seed = seed;
 
 const mapSize = 40;
 const minCreatures = 10;
@@ -29,10 +40,10 @@ const eatSpeed = 5;
 const eatSize = 0.08;
 
 const energy = {
-	eat: 0.01,
-	metabolism: 0.01,
-	move: 0.01,
-	birth: 0.5
+    eat: 0.01,
+    metabolism: 0.01,
+    move: 0.01,
+    birth: 0.5
 };
 
 const foodRegrowRate = 0.4;
@@ -44,3 +55,9 @@ const minReproduceTime = 1000;
 
 const mutability = 10;
 const totalProbability = (Math.log(1 - mutability / 100) / Math.log(0.99)) / mutability;
+
+const controls = {
+    fastForward: "right",
+    slowDown: "left",
+    stop: "down"
+};
