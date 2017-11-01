@@ -37,17 +37,19 @@ Creature.prototype.randomize = function() {
     this.x = seededNoise() * display.width;
     this.y = seededNoise() * display.height;
 
-    this.age = 0;
-    this.reproduceTime = 0;
-
     this.size = seededNoise() * (maxCreatureSize - minCreatureSize) + minCreatureSize;
     this.energy = 100;
+
+    this.age = 0;
+    this.reproduceTime = 0;
 
     this.color = newColor();
 
     this.genes = [this.color];
 
     this.maxSpeed = maxCreatureSpeed;
+
+    this.output = [0, 0, 0];
 
     this.network = {};
     this.createNeuralNetwork();

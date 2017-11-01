@@ -54,7 +54,7 @@ Creature.prototype.feedForward = function(inputs) {
 // Modifies weights of the axons
 Creature.prototype.mutate = function() {
 	let tempcolor = this.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
-	let rand = (seededNoise(tick / 5, 23) % 1) * 100;
+	let rand = seededNoise() * 100;
 
 	if (rand < 10) {
 		tempcolor[0] = parseInt(tempcolor[0]) + Math.floor(seededNoise() * maxColorChange * 2 - maxColorChange);
@@ -89,7 +89,7 @@ Creature.prototype.mutate = function() {
 					if (randomNumber < totalProbability * 1 / numMutations) {
 						weight *= seededNoise();
 					} else if (randomNumber < totalProbability * 2 / numMutations) {
-						weight /= seededNoise();
+						weight /= seededNoise() + 1e-10;
 					} else if (randomNumber < totalProbability * 3 / numMutations) {
 						weight *= -1;
 					} else if (randomNumber < totalProbability * 4 / numMutations) {

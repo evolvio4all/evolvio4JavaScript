@@ -3,6 +3,10 @@ const ctx = display.getContext("2d", {
 	alpha: false
 });
 
+let timeUp = 0;
+let firstError = true;
+let brokeCreature;
+
 const viewport = document.getElementById("viewport");
 const ctz = viewport.getContext("2d", {
 	alpha: false

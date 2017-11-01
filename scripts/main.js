@@ -47,7 +47,6 @@ function update() {
 
 	for (let creature of creatures) {
 		if (creature.age > oldest) oldest = creature.age;
-
 		creature.maxSpeed = maxCreatureSpeed;
 		wallLock(creature);
 
@@ -55,7 +54,26 @@ function update() {
 		let y = creature.y / display.height;
 		let size = (creature.size - minCreatureSize) / (maxCreatureSize - minCreatureSize);
 		let pos = creature.getPosition();
-		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
+		try {
+		    var tileFood = map[pos[0]][pos[1]].food / maxTileFood;
+		} catch (e) {
+		    if (firstError) {
+		        console.error("BROKEN CREATURE?!");
+		        console.log(creature);
+		        
+		        brokeCreature = creature;
+		        
+		        brokeCreature.x = 100;
+		        brokeCreature.y = 100;
+		        
+		        brokeCreature.size = 30;
+		        
+		        firstError = false;
+		        timescale = 0;
+		    }
+		    
+		    return;
+		}
 		let eatPower = creature.output[2];
 		let age = creature.age / reproduceAge;
 		let reproduceTime = creature.reproduceTime / minReproduceTime;

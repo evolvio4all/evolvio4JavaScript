@@ -1,17 +1,20 @@
 function keyEvents() {
 	if (keyDown(controls.play)) {
 		timescale = 1;
+		timeUp = 0;
 		timetoggle = false;
-	} else if (timetoggle) {
-		timescale = 250;
+	} else if (timetoggle && firstError) {
+		timescale = 250 * timeUp;
 	} else if (keyDown(controls.fastForward)) {
 		timescale = 50;
 	} else if (keyDown(controls.stop)) {
 		timescale = 0;
 	} else if (keyDown(controls.speedUp)) {
 		timetoggle = true;
-	} else {
+	} else if (firstError) {
 		timescale = 1;
+	} else {
+	    timescale = 0;
 	}
 }
 
@@ -87,6 +90,10 @@ window.onmousewheel = function(e) {
 
 window.onkeydown = function(e) {
 	activeKeys.push(e.keyCode);
+	
+	if (keyDown(controls.speedUp)) {
+	    timeUp += 1;
+	}
 };
 
 window.onkeyup = function(e) {

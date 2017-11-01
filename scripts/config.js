@@ -29,7 +29,7 @@ const numChildren = 2;
 
 const maxCreatureSpeed = 5;
 
-const seed = newSeed();
+const seed = 814756;
 
 const mapSize = 40;
 const minCreatures = 10;
