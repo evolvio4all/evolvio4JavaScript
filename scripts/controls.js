@@ -3,7 +3,7 @@ function keyEvents() {
 		timescale = 1;
 		timeUp = 0;
 		timetoggle = false;
-	} else if (timetoggle && firstError) {
+	} else if (timetoggle) {
 		timescale = 250 * timeUp;
 	} else if (keyDown(controls.fastForward)) {
 		timescale = 50;
@@ -11,10 +11,8 @@ function keyEvents() {
 		timescale = 0;
 	} else if (keyDown(controls.speedUp)) {
 		timetoggle = true;
-	} else if (firstError) {
-		timescale = 1;
 	} else {
-	    timescale = 0;
+	    timescale = 1;
 	}
 }
 

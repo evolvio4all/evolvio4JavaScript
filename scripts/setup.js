@@ -3,9 +3,6 @@ const ctx = display.getContext("2d", {
 	alpha: false
 });
 
-let timeUp = 0;
-let firstError = true;
-let brokeCreature;
 
 const viewport = document.getElementById("viewport");
 const ctz = viewport.getContext("2d", {
@@ -20,6 +17,7 @@ let tick = 0;
 let tc = 0;
 
 let timescale = 1;
+let timeUp = 0;
 let creatures = [];
 
 let grv = 1;
