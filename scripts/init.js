@@ -1,7 +1,6 @@
 for (let i = 0; i < minCreatures; i++) {
-    creatures.push(new Creature(seededNoise(i, 3) * (mapSize * tileSize) + 1, seededNoise(i, i / 3) * (mapSize * tileSize) + 1, seededNoise(i + 3, i) * maxCreatureSize + minCreatureSize));
+	creatures.push(new Creature(seededNoise() * (mapSize * tileSize) + 1, seededNoise() * (mapSize * tileSize) + 1, seededNoise() * maxCreatureSize + minCreatureSize));
 }
-
 
 generateMap();
 
