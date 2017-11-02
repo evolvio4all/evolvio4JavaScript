@@ -101,9 +101,16 @@ function render() {
     for (let i in map) {
         for (let j in map[i]) {
             if (map[i][j].type === 0) continue;
-            ctx.fillStyle = "hsl(90," + Math.round(map[i][j].food / maxTileFood * 100) + "%, 40%)";
+            ctx.fillStyle = "hsl(90," + Math.round(map[i][j].food / maxTileFood * 100) + "%, 32%)";
             ctx.fillRect(i * tileSize, j * tileSize, tileSize, tileSize);
         }
+    }
+
+    for (let i in outline) {
+        ctx.beginPath();
+        ctx.moveTo(outline[i][0], outline[i][1]);
+        ctx.lineTo(outline[i][2], outline[i][3]);
+        ctx.stroke();
     }
 
     ctx.lineWidth = 5;
@@ -134,6 +141,8 @@ function render() {
 
         ctz.fillStyle = "#222222";
         ctz.font = "24px Calibri";
+        ctz.strokeStyle = "hsl(0, 0%, 100%)";
+        ctz.lineWidth = 3;
         for (let i = 0; i < layers.length; i++) {
             for (let j = 0; j < layers[i]; j++) {
                 ctz.fillCircle(i * (nnui.size * 2 + nnui.xspacing) + nnui.xoffset, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
