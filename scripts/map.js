@@ -23,7 +23,7 @@ function generateOutline() {
                 outline.push([(i + 1) * tileSize, j * tileSize, (i + 1) * tileSize, (j + 1) * tileSize]);
             }
 
-            if (i > 1 && map[i - 1][j].type === 0) {
+            if (i > 0 && map[i - 1][j].type === 0) {
                 outline.push([i * tileSize, j * tileSize, i * tileSize, (j + 1) * tileSize]);
             }
 
@@ -31,7 +31,7 @@ function generateOutline() {
                 outline.push([i * tileSize, (j + 1) * tileSize, (i + 1) * tileSize, (j + 1) * tileSize]);
             }
 
-            if (j > 1 && map[i][j - 1].type === 0) {
+            if (j > 0 && map[i][j - 1].type === 0) {
                 outline.push([i * tileSize, j * tileSize, (i + 1) * tileSize, j * tileSize]);
             }
         }
