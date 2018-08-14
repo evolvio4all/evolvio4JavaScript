@@ -4,17 +4,24 @@ const ctx = display.getContext("2d", {
 });
 
 
-const viewport = document.getElementById("viewport");
+const viewport = document.getElementById("neuralnet");
 const ctz = viewport.getContext("2d", {
-	alpha: false
+	alpha: true
 });
 
 // VARIABLES //
+const outputs = 7;
+const inputs = 10;
 
-const layers = [10, 6, 4];
+const layers = [inputs + outputs, (inputs + outputs * 2) / 2, outputs];
+const forgetLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, outputs];
+const decideLayers = [inputs + outputs, (inputs + outputs * 2) / 2, outputs];
+const modifyLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, outputs];
 
 let tick = 0;
 let tc = 0;
+
+let pause = false;
 
 let timescale = 1;
 let timeUp = 0;
@@ -28,15 +35,23 @@ let timetoggle = false;
 
 let selectedCreature = null;
 
-let cropx = -1550;
-let cropy = 0;
+let cropx = -40;
+let cropy = -40;
+
+let season = 0;
+let seasonUp = true;
+
+let specieslist = {};
+let prefixes = ["Feles", "Canis", "Elephantus", "Porcus", "Vacca", "Apis", "Lupus", "Cervus", "Cerva", "Equus", "Leo", "Avis", "Serpentis", "Vulpes", "Polypus", "Apris", "Formica", "Ovis", "Sciurus", "Neotoma", "Dipodomys"];
+let suffixes = ["Unus", "Duo", "Tribus", "Quattuor", "Quinque", "Sex", "Septem", "Novem", "Decem", "Maximus"];
+
 
 // FUNCTIONS //
 
 function newColor() {
 	let h = Math.floor(seededNoise() * 360);
-	let s = Math.floor(seededNoise() * 100);
-	let l = Math.floor(seededNoise() * 100);
+	let s = Math.floor(seededNoise() * 60 + 20);
+	let l = Math.floor(seededNoise() * 60 + 20);
 
 	return "hsl(" + h + ", " + s + "%, " + l + "%)";
 }
@@ -46,9 +61,16 @@ function newSeed() {
 }
 
 function seededNoise() {
-	let date = new Date();
 	grv++;
-	return (Math.abs(Math.sin(seed) + seed * grv * Math.tan(grv) * Math.cos(grv) / Math.cos(seed / 5) + Math.tan(seed))) % 1;
+	return Math.abs(seed * Math.tan(grv / Math.sin(grv * seed))) % 1;
+}
+
+function strDifference(str1, str2) {
+  let value = 0;
+  for (let i = 2; i < str1.length; i++) {
+    value += Math.abs(str1[i] - str2[i]);
+  }
+  return value;
 }
 
 CanvasRenderingContext2D.prototype.fillCircle = function(x, y, r, s) {

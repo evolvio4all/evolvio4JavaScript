@@ -1,119 +1,406 @@
 // Creature.prototype creates a neural network composed of layers and axons
-Creature.prototype.createNeuralNetwork = function() {
-	this.network.layers = layers; // Creature.prototype creates layers based on the parameters I provide in the layers letiable
+Creature.prototype.createNeuralNetwork = function () {
+  this.network.main = {};
+	this.network.main.layers = layers;
+	this.network.forget = {};
+	this.network.forget.layers = forgetLayers;
+	this.network.decide = {};
+	this.network.decide.layers = decideLayers;
+	this.network.modify = {};
+	this.network.modify.layers = modifyLayers;
+	
 	this.initNeurons(); // Creature.prototype initializes the neurons, creating them, Neurons contain a value and are the connection point for axons
 	this.initAxons(); // Axons are basically lines that connect Neurons, each one has a weight, and each neuron has a value, the axon takes the value and multiplies it by the weight
+	
+  this.network.cellState = [];
+  for (let i = 0; i < outputs; i++) this.network.cellState.push(0);
 };
 
-Creature.prototype.initNeurons = function() {
-	this.network.neurons = [];
+Creature.prototype.initNeurons = function () {
+	this.network.main.neurons = [];
 	for (let i = 0; i < layers.length; i++) {
-		this.network.neurons.push([]);
+		this.network.main.neurons.push([]);
 
 		for (let j = 0; j < layers[i]; j++) {
-			this.network.neurons[i].push(0);
+			this.network.main.neurons[i].push(0);
+		}
+	}
+	
+	this.network.forget.neurons = [];
+	for (let i = 0; i < forgetLayers.length; i++) {
+		this.network.forget.neurons.push([]);
+
+		for (let j = 0; j < forgetLayers[i]; j++) {
+			this.network.forget.neurons[i].push(0);
+		}
+	}
+	
+	this.network.decide.neurons = [];
+	for (let i = 0; i < decideLayers.length; i++) {
+		this.network.decide.neurons.push([]);
+
+		for (let j = 0; j < decideLayers[i]; j++) {
+			this.network.decide.neurons[i].push(0);
+		}
+	}
+	
+	this.network.modify.neurons = [];
+	for (let i = 0; i < modifyLayers.length; i++) {
+		this.network.modify.neurons.push([]);
+
+		for (let j = 0; j < modifyLayers[i]; j++) {
+			this.network.modify.neurons[i].push(0);
 		}
 	}
 };
 
-Creature.prototype.initAxons = function() {
-	this.network.axons = [];
-	for (let i = 1; i < this.network.layers.length; i++) {
+Creature.prototype.initAxons = function () {
+	this.network.main.axons = [];
+	for (let i = 1; i < this.network.main.layers.length; i++) {
 		let layerWeights = [];
-		let neuronsInPreviousLayer = this.network.layers[i - 1];
-		for (let j = 0; j < this.network.neurons[i].length; j++) {
+		let neuronsInPreviousLayer = this.network.main.layers[i - 1];
+		for (let j = 0; j < this.network.main.neurons[i].length; j++) {
 			let neuronWeights = [];
 			for (let k = 0; k < neuronsInPreviousLayer; k++) {
 				neuronWeights.push(seededNoise() * 2 - 1);
 			}
 			layerWeights.push(neuronWeights);
 		}
-		this.network.axons.push(layerWeights);
+		this.network.main.axons.push(layerWeights);
+	}
+	
+	this.network.forget.axons = [];
+	for (let i = 1; i < this.network.forget.layers.length; i++) {
+		let layerWeights = [];
+		let neuronsInPreviousLayer = this.network.forget.layers[i - 1];
+		for (let j = 0; j < this.network.forget.neurons[i].length; j++) {
+			let neuronWeights = [];
+			for (let k = 0; k < neuronsInPreviousLayer; k++) {
+				neuronWeights.push(seededNoise() * 2 - 1);
+			}
+			layerWeights.push(neuronWeights);
+		}
+		this.network.forget.axons.push(layerWeights);
+	}
+	
+	this.network.decide.axons = [];
+	for (let i = 1; i < this.network.decide.layers.length; i++) {
+		let layerWeights = [];
+		let neuronsInPreviousLayer = this.network.decide.layers[i - 1];
+		for (let j = 0; j < this.network.decide.neurons[i].length; j++) {
+			let neuronWeights = [];
+			for (let k = 0; k < neuronsInPreviousLayer; k++) {
+				neuronWeights.push(seededNoise() * 2 - 1);
+			}
+			layerWeights.push(neuronWeights);
+		}
+		this.network.decide.axons.push(layerWeights);
+	}
+	
+	this.network.modify.axons = [];
+	for (let i = 1; i < this.network.modify.layers.length; i++) {
+		let layerWeights = [];
+		let neuronsInPreviousLayer = this.network.modify.layers[i - 1];
+		for (let j = 0; j < this.network.modify.neurons[i].length; j++) {
+			let neuronWeights = [];
+			for (let k = 0; k < neuronsInPreviousLayer; k++) {
+				neuronWeights.push(seededNoise() * 2 - 1);
+			}
+			layerWeights.push(neuronWeights);
+		}
+		this.network.modify.axons.push(layerWeights);
 	}
 };
 
 // Creature.prototype feeds the neuron values through the axons, and all the way to the end of the network.
-Creature.prototype.feedForward = function(inputs) {
-	for (let i = 0; i < inputs.length; i++) {
-		this.network.neurons[0][i] = inputs[i]; // Takes the inputs and applies them
+Creature.prototype.feedForward = function (inputs) {
+	for (let i = 0; i < inputs.length + this.output.length + this.network.cellState.length; i++) {
+		if (i < inputs.length) this.network.forget.neurons[0][i] = inputs[i] * 2 - 1; // Takes the inputs and applies them
+		else if (i < inputs.length + this.output.length) this.network.forget.neurons[0][i] = this.output[i - inputs.length] || 0; // Takes the inputs and applies them
+		else this.network.forget.neurons[0][i] = this.network.cellState[i - inputs.length - this.output.length];
+	}
+	
+	for (let i = 0; i < inputs.length + this.output.length; i++) {
+		if (i < inputs.length) this.network.decide.neurons[0][i] = inputs[i] * 2 - 1; // Takes the inputs and applies them
+		else if (i < inputs.length + this.output.length) this.network.decide.neurons[0][i] = this.output[i - inputs.length] || 0; // Takes the inputs and applies them
+		else this.network.decide.neurons[0][i] = this.network.cellState[i - inputs.length - this.output.length];
+	}
+	
+	for (let i = 0; i < inputs.length + this.output.length + this.network.cellState.length; i++) {
+		if (i < inputs.length) this.network.modify.neurons[0][i] = inputs[i] * 2 - 1; // Takes the inputs and applies them
+		else if (i < inputs.length + this.output.length) this.network.modify.neurons[0][i] = this.output[i - inputs.length] || 0; // Takes the inputs and applies them
+		else this.network.modify.neurons[0][i] = this.network.cellState[i - inputs.length - this.output.length];
+	}
+	
+	for (let i = 0; i < inputs.length + this.output.length; i++) {
+		if (i < inputs.length) this.network.main.neurons[0][i] = inputs[i] * 2 - 1; // Takes the inputs and applies them
+		else if (i < inputs.length + this.output.length) this.network.main.neurons[0][i] = this.output[i - inputs.length] || 0; // Takes the inputs and applies them
+		else this.network.main.neurons[0][i] = this.network.cellState[i - inputs.length - this.output.length];
 	}
 
-	for (let i = 1; i < this.network.layers.length; i++) {
-		for (j = 0; j < this.network.layers[i]; j++) {
+	for (let i = 1; i < this.network.forget.layers.length; i++) {
+		for (j = 0; j < this.network.forget.layers[i]; j++) {
 			let value = offset;
-			for (k = 0; k < this.network.neurons[i - 1].length; k++) {
-				value += this.network.axons[i - 1][j][k] * this.network.neurons[i - 1][k]; // Adds the neurons value * the weight
+			for (k = 0; k < this.network.forget.neurons[i - 1].length; k++) {
+				value += this.network.forget.axons[i - 1][j][k] * this.network.forget.neurons[i - 1][k]; // Adds the neurons value * the weight
 			}
 
-			this.network.neurons[i][j] = Math.tanh(value); // Sets the neuron across from the axon to the new value (1 - -1)
+			this.network.forget.neurons[i][j] = 1 / (1 + Math.exp(-value)); // Sets the neuron across from the axon to the new value (0 - 1)
 		}
 	}
-	return this.network.neurons[this.network.neurons.length - 1]; // returns the output, or the last line
+	
+	let forgetOutput = this.network.forget.neurons[this.network.forget.neurons.length - 1];
+	
+	for (let i = 0; i < forgetOutput.length; i++) {
+	  this.network.cellState[i] *= forgetOutput[i];
+	}
+	
+	for (let i = 1; i < this.network.decide.layers.length; i++) {
+		for (j = 0; j < this.network.decide.layers[i]; j++) {
+			let value = offset;
+			for (k = 0; k < this.network.decide.neurons[i - 1].length; k++) {
+				value += this.network.decide.axons[i - 1][j][k] * this.network.decide.neurons[i - 1][k]; // Adds the neurons value * the weight
+			}
+
+			this.network.decide.neurons[i][j] = Math.tanh(value); // Sets the neuron across from the axon to the new value (0 - 1)
+		}
+	}
+	
+	let decideOutput = this.network.decide.neurons[this.network.decide.neurons.length - 1];
+	
+	for (let i = 1; i < this.network.modify.layers.length; i++) {
+		for (j = 0; j < this.network.modify.layers[i]; j++) {
+			let value = offset;
+			for (k = 0; k < this.network.modify.neurons[i - 1].length; k++) {
+				value += this.network.modify.axons[i - 1][j][k] * this.network.modify.neurons[i - 1][k]; // Adds the neurons value * the weight
+			}
+
+			this.network.modify.neurons[i][j] = 1 / (1 + Math.exp(-value)); // Sets the neuron across from the axon to the new value (0 - 1)
+		}
+	}
+	
+	let modifyOutput = this.network.modify.neurons[this.network.modify.neurons.length - 1];
+	
+	for (let i = 0; i < decideOutput.length; i++) {
+	  this.network.cellState[i] += modifyOutput[i] * decideOutput[i];
+	}
+	
+	for (let i = 1; i < this.network.main.layers.length; i++) {
+		for (j = 0; j < this.network.main.layers[i]; j++) {
+			let value = offset;
+			for (k = 0; k < this.network.main.neurons[i - 1].length; k++) {
+				value += this.network.main.axons[i - 1][j][k] * this.network.main.neurons[i - 1][k]; // Adds the neurons value * the weight
+			}
+
+			this.network.main.neurons[i][j] = 1 / (1 + Math.exp(-value)); // Sets the neuron across from the axon to the new value (0 - 1)
+		}
+	}
+	
+	let output = this.network.main.neurons[this.network.main.neurons.length - 1];
+	
+	for (let i = 0; i < output.length; i++) {
+	  output[i] *= Math.tanh(this.network.cellState[i]);
+	}
+	
+	return output; // returns the output, or the last line
 };
 
 // Modifies weights of the axons
-Creature.prototype.mutate = function() {
-	let tempcolor = this.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
+Creature.prototype.mutate = function () {
 	let rand = seededNoise() * 100;
 
-	if (rand < 10) {
-		tempcolor[0] = parseInt(tempcolor[0]) + Math.floor(seededNoise() * maxColorChange * 2 - maxColorChange);
-
-		if (tempcolor[0] < 0) tempcolor[0] = 0;
-		if (tempcolor[0] > 356) tempcolor[0] = 356;
-	} else if (rand < 20) {
-		tempcolor[1] = parseInt(tempcolor[1]) + Math.floor(seededNoise() * maxColorChange * 2 - maxColorChange);
-
-		if (tempcolor[1] < 0) tempcolor[1] = 0;
-		if (tempcolor[1] > 100) tempcolor[1] = 100;
-
-		tempcolor[1] += "%";
-	} else if (rand < 30) {
-		tempcolor[2] = parseInt(tempcolor[2]) + Math.floor(seededNoise() * maxColorChange * 2 - maxColorChange);
-		if (tempcolor[2] < 0) tempcolor[2] = 0;
-		if (tempcolor[2] > 100) tempcolor[2] = 100;
-
-		tempcolor[2] += "%";
+	if (rand > 15 && rand < 30) {
+		this.children += 1;
+	} else if (rand > 30 && rand < 45) {
+		this.children -= 1;
 	}
 
-	this.color = "hsl(" + tempcolor.join() + ")";
+	if (rand > 45 && rand < 60) {
+		this.size /= 1.03;
+	} else if (rand > 60 && rand < 75) {
+		this.size *= 1.03;
+	}
 
-	for (let i = 0; i < this.network.axons.length; i++) {
-		for (let j = 0; j < this.network.axons[i].length; j++) {
-			for (let k = 0; k < this.network.axons[i][j].length; k++) {
-				for (let l = 0; l < mutability; l++) {
-					let weight = this.network.axons[i][j][k];
-					let randomNumber = seededNoise() * 100;
-					const numMutations = 5;
+	if (rand > 77 && rand < 78) {
+		this.size /= 1.1;
+	} else if (rand > 79 && rand < 80) {
+		this.size *= 1.1;
+	}
 
-					if (randomNumber < totalProbability * 1 / numMutations) {
-						weight *= seededNoise();
-					} else if (randomNumber < totalProbability * 2 / numMutations) {
-						weight /= seededNoise() + 1e-10;
-					} else if (randomNumber < totalProbability * 3 / numMutations) {
-						weight *= -1;
-					} else if (randomNumber < totalProbability * 4 / numMutations) {
-						weight -= seededNoise() * 0.25;
-					} else if (randomNumber < totalProbability * 5 / numMutations) {
-						weight += seededNoise() * 0.25;
-					}
+	if (rand > 45 && rand < 60) {
+		this.childEnergy /= 1.03;
+	} else if (rand > 60 && rand < 75) {
+		this.childEnergy *= 1.03;
+	}
 
-					this.network.axons[i][j][k] = weight;
+	if (this.size < minCreatureSize) this.size = minCreatureSize;
+	if (this.size > maxCreatureSize) this.size = maxCreatureSize;
+
+	if (this.children < 1) this.children = 1;
+
+	if (this.childEnergy < 0.1) this.childEnergy = 0.1;
+	if (this.childEnergy > 1) this.childEnergy = 1;
+
+	for (let i = 0; i < this.network.main.axons.length; i++) {
+		for (let j = 0; j < this.network.main.axons[i].length; j++) {
+			for (let k = 0; k < this.network.main.axons[i][j].length; k++) {
+				let weight = this.network.main.axons[i][j][k];
+				let randomNumber = seededNoise() * 100;
+				const numMutations = 5;
+
+				if (randomNumber < mutability * 1 / numMutations) {
+					weight *= seededNoise() * (largeStepAmount - 1) + 1;
+				} else if (randomNumber < mutability * 2 / numMutations) {
+					weight /= seededNoise() * (largeStepAmount - 1) + 1;
+				} else if (randomNumber < mutability * 3 / numMutations) {
+					weight -= seededNoise() * stepAmount + minStepAmount;
+				} else if (randomNumber < mutability * 4 / numMutations) {
+					weight += seededNoise() * stepAmount + minStepAmount;
+				} else if (randomNumber < mutability * 5 / numMutations) {
+					weight = 0;
 				}
+
+				this.network.main.axons[i][j][k] = weight;
+			}
+		}
+	}
+	
+	for (let i = 0; i < this.network.forget.axons.length; i++) {
+		for (let j = 0; j < this.network.forget.axons[i].length; j++) {
+			for (let k = 0; k < this.network.forget.axons[i][j].length; k++) {
+				let weight = this.network.forget.axons[i][j][k];
+				let randomNumber = seededNoise() * 100;
+				const numMutations = 5;
+
+				if (randomNumber < mutability * 1 / numMutations) {
+					weight *= seededNoise() * (largeStepAmount - 1) + 1;
+				} else if (randomNumber < mutability * 2 / numMutations) {
+					weight /= seededNoise() * (largeStepAmount - 1) + 1;
+				} else if (randomNumber < mutability * 3 / numMutations) {
+					weight -= seededNoise() * stepAmount + minStepAmount;
+				} else if (randomNumber < mutability * 4 / numMutations) {
+					weight += seededNoise() * stepAmount + minStepAmount;
+				} else if (randomNumber < mutability * 5 / numMutations) {
+					weight = 0;
+				}
+
+				this.network.forget.axons[i][j][k] = weight;
+			}
+		}
+	}
+	
+	for (let i = 0; i < this.network.decide.axons.length; i++) {
+		for (let j = 0; j < this.network.decide.axons[i].length; j++) {
+			for (let k = 0; k < this.network.decide.axons[i][j].length; k++) {
+				let weight = this.network.decide.axons[i][j][k];
+				let randomNumber = seededNoise() * 100;
+				const numMutations = 5;
+
+				if (randomNumber < mutability * 1 / numMutations) {
+					weight *= seededNoise() * (largeStepAmount - 1) + 1;
+				} else if (randomNumber < mutability * 2 / numMutations) {
+					weight /= seededNoise() * (largeStepAmount - 1) + 1;
+				} else if (randomNumber < mutability * 3 / numMutations) {
+					weight -= seededNoise() * stepAmount + minStepAmount;
+				} else if (randomNumber < mutability * 4 / numMutations) {
+					weight += seededNoise() * stepAmount + minStepAmount;
+				} else if (randomNumber < mutability * 5 / numMutations) {
+					weight = 0;
+				}
+
+				this.network.decide.axons[i][j][k] = weight;
+			}
+		}
+	}
+	
+	for (let i = 0; i < this.network.modify.axons.length; i++) {
+		for (let j = 0; j < this.network.modify.axons[i].length; j++) {
+			for (let k = 0; k < this.network.modify.axons[i][j].length; k++) {
+				let weight = this.network.modify.axons[i][j][k];
+				let randomNumber = seededNoise() * 100;
+				const numMutations = 5;
+
+				if (randomNumber < mutability * 1 / numMutations) {
+					weight *= seededNoise() * (largeStepAmount - 1) + 1;
+				} else if (randomNumber < mutability * 2 / numMutations) {
+					weight /= seededNoise() * (largeStepAmount - 1) + 1;
+				} else if (randomNumber < mutability * 3 / numMutations) {
+					weight -= seededNoise() * stepAmount + minStepAmount;
+				} else if (randomNumber < mutability * 4 / numMutations) {
+					weight += seededNoise() * stepAmount + minStepAmount;
+				} else if (randomNumber < mutability * 5 / numMutations) {
+					weight = 0;
+				}
+
+				this.network.modify.axons[i][j][k] = weight;
 			}
 		}
 	}
 };
 
-Creature.prototype.copyNeuralNetwork = function(copyNetwork) {
-	this.copyAxons(copyNetwork.network.axons);
+Creature.prototype.copyNeuralNetwork = function (copy) {
+	for (let i = 0, l = this.network.main.axons.length; i < l; i++) {
+		for (let j = 0, m = this.network.main.axons[i].length; j < m; j++) {
+			for (let k = 0, n = this.network.main.axons[i][j].length; k < n; k++) {
+				this.network.main.axons[i][j][k] = copy.network.main.axons[i][j][k];
+			}
+		}
+	}
+	
+	for (let i = 0, l = this.network.forget.axons.length; i < l; i++) {
+		for (let j = 0, m = this.network.forget.axons[i].length; j < m; j++) {
+			for (let k = 0, n = this.network.forget.axons[i][j].length; k < n; k++) {
+				this.network.forget.axons[i][j][k] = copy.network.forget.axons[i][j][k];
+			}
+		}
+	}
+	
+	for (let i = 0, l = this.network.decide.axons.length; i < l; i++) {
+		for (let j = 0, m = this.network.decide.axons[i].length; j < m; j++) {
+			for (let k = 0, n = this.network.decide.axons[i][j].length; k < n; k++) {
+				this.network.decide.axons[i][j][k] = copy.network.decide.axons[i][j][k];
+			}
+		}
+	}
+	
+	for (let i = 0, l = this.network.modify.axons.length; i < l; i++) {
+		for (let j = 0, m = this.network.modify.axons[i].length; j < m; j++) {
+			for (let k = 0, n = this.network.modify.axons[i][j].length; k < n; k++) {
+				this.network.modify.axons[i][j][k] = copy.network.modify.axons[i][j][k];
+			}
+		}
+	}
 };
 
-Creature.prototype.copyAxons = function(copyAxon) {
-	for (let i = 0, l = this.network.axons.length; i < l; i++) {
-		for (let j = 0, m = this.network.axons[i].length; j < m; j++) {
-			for (let k = 0, n = this.network.axons[i][j].length; k < n; k++) {
-				this.network.axons[i][j][k] = copyAxon[i][j][k];
+Creature.prototype.breedNeuralNetwork = function (copy, copy2) {
+	for (let i = 0, l = this.network.main.axons.length; i < l; i++) {
+		for (let j = 0, m = this.network.main.axons[i].length; j < m; j++) {
+			for (let k = 0, n = this.network.main.axons[i][j].length; k < n; k++) {
+				this.network.main.axons[i][j][k] = (copy.network.main.axons[i][j][k] + copy2.network.main.axons[i][j][k]) / 2;
+			}
+		}
+	}
+	
+	for (let i = 0, l = this.network.forget.axons.length; i < l; i++) {
+		for (let j = 0, m = this.network.forget.axons[i].length; j < m; j++) {
+			for (let k = 0, n = this.network.forget.axons[i][j].length; k < n; k++) {
+				this.network.forget.axons[i][j][k] = (copy.network.forget.axons[i][j][k] + copy2.network.forget.axons[i][j][k]) / 2;
+			}
+		}
+	}
+	
+	for (let i = 0, l = this.network.decide.axons.length; i < l; i++) {
+		for (let j = 0, m = this.network.decide.axons[i].length; j < m; j++) {
+			for (let k = 0, n = this.network.decide.axons[i][j].length; k < n; k++) {
+				this.network.decide.axons[i][j][k] = (copy.network.decide.axons[i][j][k] + copy2.network.decide.axons[i][j][k]) / 2;
+			}
+		}
+	}
+	
+	for (let i = 0, l = this.network.modify.axons.length; i < l; i++) {
+		for (let j = 0, m = this.network.modify.axons[i].length; j < m; j++) {
+			for (let k = 0, n = this.network.modify.axons[i][j].length; k < n; k++) {
+				this.network.modify.axons[i][j][k] = (copy.network.modify.axons[i][j][k] + copy2.network.modify.axons[i][j][k]) / 2;
 			}
 		}
 	}

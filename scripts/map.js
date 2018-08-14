@@ -39,7 +39,7 @@ function generateOutline() {
 }
 
 function Tile() {
-    this.type = Math.floor(seededNoise() * 3) % 2;
-    this.food = maxTileFood / 1.2;
+    this.type = Math.min(Math.floor(seededNoise() * 1 / waterBias), 1);
+    this.food = maxTileFood * 0.5;
     if (this.type === 0) this.food = 0;
 }

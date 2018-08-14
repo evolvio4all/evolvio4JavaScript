@@ -4,13 +4,14 @@ function keyEvents() {
 		timeUp = 0;
 		timetoggle = false;
 	} else if (timetoggle) {
-		timescale = 250 * timeUp;
+		timescale = 3 * timeUp;
 	} else if (keyDown(controls.fastForward)) {
-		timescale = 50;
+		timescale = 3;
 	} else if (keyDown(controls.stop)) {
 		timescale = 0;
 	} else if (keyDown(controls.speedUp)) {
 		timetoggle = true;
+		timeUp++;
 	} else {
 	    timescale = 1;
 	}
@@ -25,8 +26,8 @@ let mouse = {
 
 function getMousePos(e) {
 	return [
-		(e.clientX - viewport.getBoundingClientRect().left) * (viewport.width / zoomLevel / viewport.clientWidth),
-		(e.clientY - viewport.getBoundingClientRect().top) * (viewport.height / zoomLevel / viewport.clientHeight)
+		(e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.clientWidth),
+		(e.clientY - canvas.getBoundingClientRect().top) * (canvas.height / canvas.clientHeight)
 	];
 }
 
@@ -66,24 +67,22 @@ window.onmousemove = function(e) {
 };
 
 window.onmousewheel = function(e) {
-	zoomLevel += e.wheelDelta / zoomSpeed / (2400 / zoomLevel);
+  e.preventDefault();
+  zoomAmount = e.wheelDelta / zoomSpeed / 2400;
+	zoomLevel += zoomAmount;
 
 	if (zoomLevel < minZoomLevel) {
 		zoomLevel = minZoomLevel;
-	}
-
+	} else
 	if (zoomLevel > maxZoomLevel) {
 		zoomLevel = maxZoomLevel;
+	} else {
+	  mouse.current.x = getMousePos(e)[0];
+	  mouse.current.y = getMousePos(e)[1];
+	  
+	  cropx = (cropx + mouse.current.x * (1 + zoomAmount)) - mouse.current.x * (zoomLevel - (zoomLevel - 1));
+	  cropy = (cropy + mouse.current.y * (1 + zoomAmount)) - mouse.current.y * (zoomLevel - (zoomLevel - 1));
 	}
-
-	mouse.current.x = getMousePos(e)[0];
-	mouse.current.y = getMousePos(e)[1];
-
-	cropx += lcx - mouse.current.x;
-	cropy += lcy - mouse.current.y;
-
-	lcx = mouse.current.x;
-	lcy = mouse.current.y;
 };
 
 window.onkeydown = function(e) {
