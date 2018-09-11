@@ -1,4 +1,4 @@
-function Creature(x, y, s, c) {
+function Creature(x, y, s, c, spec, sgen, gen) {
 	this.x = x || seededNoise() * tileSize * mapSize;
 	this.y = y || seededNoise() * tileSize * mapSize;
 
@@ -7,7 +7,7 @@ function Creature(x, y, s, c) {
 
 	this.age = 0;
 	this.reproduceTime = 0;
-	this.childEnergy = seededNoise() * 0.9 + 0.1;
+	this.childEnergy = seededNoise() * 0.6 + 0.2;
 	this.children = Math.floor(seededNoise() * 10) + 1;
 
 	this.color = c || newColor();
@@ -18,15 +18,18 @@ function Creature(x, y, s, c) {
 
 	this.output = [0, 0, 0, 0, 0];
 
-	this.generation = 0;
-	this.speciesGeneration = 0;
+	this.generation = gen || 0;
+	this.speciesGeneration = sgen || 0;
 
 	this.network = {};
 	this.createNeuralNetwork();
 
 	this.geneticID = "";
 
+	//console.log("\n\n\nDefining Species");
+	this.species = spec;
 	this.species = this.setSpecies();
+	//console.log("Done.");
 
 	this.select = function () {
 		if (mouse.down.x > this.x * zoomLevel - cropx - this.size * zoomLevel - selectSizeAddition * zoomLevel && mouse.down.x < this.x * zoomLevel - cropx + this.size * zoomLevel + selectSizeAddition * zoomLevel && mouse.down.y < this.y * zoomLevel - cropy + this.size * zoomLevel + selectSizeAddition * zoomLevel && mouse.down.y > this.y * zoomLevel - cropy - this.size * zoomLevel - selectSizeAddition * zoomLevel) {
@@ -51,7 +54,7 @@ Creature.prototype.randomize = function () {
 
 	this.age = 0;
 	this.reproduceTime = 0;
-	this.childEnergy = seededNoise() * 0.9 + 0.1;
+	this.childEnergy = seededNoise() * 0.6 + 0.2;
 	this.children = Math.floor(seededNoise() * 10) + 1;
 
 	this.color = newColor();
@@ -70,7 +73,10 @@ Creature.prototype.randomize = function () {
 
 	this.geneticID = "";
 
+	//console.log("\n\n\nDefining Species");
+	this.species = undefined;
 	this.species = this.setSpecies();
+	//console.log("Done.");
 };
 
 Creature.prototype.getPosition = function () {
@@ -81,96 +87,112 @@ Creature.prototype.getPosition = function () {
 };
 
 Creature.prototype.setSpecies = function () {
-	let geneticID = "ID";
-	let species = "";
+	let geneticID = [];
+	let species = this.species;
 	let prefix = "";
+	let spGen = this.speciesGeneration;
 
-	if (this.species === undefined || this.species === "") {
+	let testInput = [];
+	for (let i = 0; i < inputs; i++) {
+		testInput.push(0.8);
+	}
+
+	this.feedForward(testInput);
+  
+  for (let neuronValue of this.network.forget.neurons[forgetLayers.length - 1]) {
+		geneticID.push(neuronValue);
+	}
+	
+	for (let neuronValue of this.network.decide.neurons[decideLayers.length - 1]) {
+		geneticID.push((neuronValue + 1) / 2);
+	}
+	
+	for (let neuronValue of this.network.modify.neurons[modifyLayers.length - 1]) {
+		geneticID.push(neuronValue);
+	}
+  
+	for (let neuronValue of this.network.main.neurons[layers.length - 1]) {
+		geneticID.push(neuronValue);
+	}
+
+	let minGeneDiff = Infinity;
+	for (let specie in specieslist) {
+		let avgGeneticID = [];
+		for (let i = 0; i < specieslist[specie].contains[0].geneticID.length; i++) {
+			avgGeneticID.push(0);
+		}
+
+		for (let creature of specieslist[specie].contains) {
+			for (let i = 0; i < creature.geneticID.length; i++) {
+				avgGeneticID[i] += creature.geneticID[i];
+			}
+		}
+
+		for (let gene of avgGeneticID) {
+			gene /= specieslist[specie].contains.length;
+		}
+
+		var geneDiff = arrayDifference(geneticID, avgGeneticID);
+
+		if (geneDiff < minGeneDiff) {
+			minGeneDiff = geneDiff;
+			if (minGeneDiff < speciesDiversity) {
+				species = specie;
+				this.speciesGeneration = specieslist[species].contains[0].speciesGeneration;
+
+				console.log("  Added to species: '" + species + "'");
+			}
+		}
+	}
+
+	if (species == undefined) {
 		prefix = Math.floor(seededNoise() * prefixes.length);
 		species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
+
+		while (specieslist[species] !== undefined) {
+			//console.log("  Re-Rolling");
+			prefix = Math.floor(seededNoise() * prefixes.length);
+			species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
+		}
+
+		//console.log("  Created with species: '" + species + "'");
+		specieslist[species] = {};
+		specieslist[species].contains = [];
 	} else {
-		prefix = prefixes.indexOf(this.species.split(" ")[0]);
-		if (prefix < 0) {
-			console.log(this);
-			pause = true;
+		prefix = prefixes.indexOf(species.split(" ")[0]);
+		species = prefixes[prefix] + " " + suffixes[Math.min(this.speciesGeneration, suffixes.length - 1)];
+		for (let i = 1; i <= Math.floor(this.speciesGeneration / (suffixes.length - 1)); i++) {
+			species += " " + suffixes[Math.min(this.speciesGeneration - (suffixes.length - 1) * i, (suffixes.length - 2))];
 		}
-	}
+		console.log("  Born with species: '" + species + "'");
 
-	for (let layer of this.network.main.axons) {
-		for (let connection of layer) {
-			for (let axon of connection) {
-				let pon = Math.round(Math.clamp(axon * 2, -1, 1) + 1);
-				geneticID += pon;
-			}
-		}
-	}
-
-	for (let layer of this.network.forget.axons) {
-		for (let connection of layer) {
-			for (let axon of connection) {
-				let pon = Math.round(Math.clamp(axon * 2, -1, 1) + 1);
-				geneticID += pon;
-			}
-		}
-	}
-
-	for (let layer of this.network.decide.axons) {
-		for (let connection of layer) {
-			for (let axon of connection) {
-				let pon = Math.round(Math.clamp(axon * 2, -1, 1) + 1);
-				geneticID += pon;
-			}
-		}
-	}
-
-	for (let layer of this.network.modify.axons) {
-		for (let connection of layer) {
-			for (let axon of connection) {
-				let pon = Math.round(Math.clamp(axon * 2, -1, 1) + 1);
-				geneticID += pon;
-			}
-		}
-	}
-
-	if (specieslist[species] !== undefined) {
-		let geneDiff = strDifference(geneticID, specieslist[species].geneticID);
-		if (geneDiff >= speciesDiversity) {
+		if (minGeneDiff >= speciesDiversity) {
 			this.speciesGeneration++;
 			if (this.speciesGeneration < suffixes.length) species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 			else {
 				species = prefixes[prefix] + " " + suffixes[suffixes.length - 1];
-				for (let i = 1; i <= Math.floor(this.speciesGeneration / 10); i++) {
-					species += " " + suffixes[Math.min(this.speciesGeneration - 10 * i, 9)];
+				for (let i = 1; i <= Math.floor(this.speciesGeneration / (suffixes.length - 1)); i++) {
+					species += " " + suffixes[Math.min(this.speciesGeneration - (suffixes.length - 1) * i, (suffixes.length - 2))];
 				}
 			}
+			console.log("    became '" + species + "'");
 
-			if (specieslist[species] !== undefined) specieslist[species].contains.push(this);
-			else {
-				specieslist[species] = this;
+			if (specieslist[species] == undefined) {
+				specieslist[species] = {};
 				specieslist[species].contains = [];
 			}
 
 			let tempcolor = this.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
 
 			let rand = Math.floor(seededNoise() * 2);
-
-			tempcolor[0] = Math.floor((Number(tempcolor[0]) + (speciesColorChange * geneDiff / speciesDiversity * seededNoise() * 0.5 + 0.5) % 360)).toString();
+			tempcolor[0] = Math.floor((Number(tempcolor[0]) + Math.floor(Number(speciesColorChange * minGeneDiff / speciesDiversity * seededNoise() * 0.5 + 0.5)) % 360)).toString();
 			this.color = "hsl(" + tempcolor.join(",") + ")";
 		}
-	} else {
-		specieslist[species] = this;
-		specieslist[species].contains = [];
 	}
 
 	specieslist[species].contains.push(this);
 
 	this.geneticID = geneticID;
-
-	for (let prop in specieslist) {
-		if (specieslist[prop].contains.length === 0) {
-			delete specieslist[prop];
-		}
-	}
 
 	return species;
 };

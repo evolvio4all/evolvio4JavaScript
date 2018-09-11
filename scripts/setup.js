@@ -10,13 +10,15 @@ const ctz = viewport.getContext("2d", {
 });
 
 // VARIABLES //
-const outputs = 7;
-const inputs = 10;
+const memories = 2;
+const outputs = 5 + memories;
+const inputs = 7;
 
-const layers = [inputs + outputs, (inputs + outputs * 2) / 2, outputs];
-const forgetLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, outputs];
-const decideLayers = [inputs + outputs, (inputs + outputs * 2) / 2, outputs];
-const modifyLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, outputs];
+const layers = [inputs + outputs, (inputs + outputs * 2) / 2, outputs, outputs];
+const forgetLayers = [inputs + outputs * 2, (inputs + outputs * 2) / 2, outputs, outputs];
+const decideLayers = [inputs + outputs, (inputs + outputs * 2) / 2, outputs, outputs];
+const modifyLayers = [inputs + outputs * 2, (inputs + outputs * 2) / 2, outputs, outputs];
+const connectionDensity = 0.3; // must be >= 0.26
 
 let tick = 0;
 let tc = 0;
@@ -35,15 +37,15 @@ let timetoggle = false;
 
 let selectedCreature = null;
 
-let cropx = -40;
-let cropy = -40;
+let cropx = -10;
+let cropy = -10;
 
 let season = 0;
 let seasonUp = true;
 
 let specieslist = {};
-let prefixes = ["Feles", "Canis", "Elephantus", "Porcus", "Vacca", "Apis", "Lupus", "Cervus", "Cerva", "Equus", "Leo", "Avis", "Serpentis", "Vulpes", "Polypus", "Apris", "Formica", "Ovis", "Sciurus", "Neotoma", "Dipodomys"];
-let suffixes = ["Unus", "Duo", "Tribus", "Quattuor", "Quinque", "Sex", "Septem", "Novem", "Decem", "Maximus"];
+let prefixes = ["Feles", "Canis", "Elephantus", "Porcus", "Vacca", "Apis", "Lupus", "Cervus", "Cerva", "Equus", "Leo", "Avis", "Serpentis", "Vulpes", "Polypus", "Apris", "Formica", "Ovis", "Sciurus", "Neotoma", "Dipodomys", "Chelicerata", "Crustacea", "Insecta", "Arachnida", "Craniforma", "Chilopoda", "Amphibia", "Acoela", "Clitellata", "Echiura", "Sipuncula", "Myzostomida", "Xiphosura", "Maxillopoda", "Malacostraca", "Mandibulata", "Malacostraca", "Anopheles", "Aedes", "Culex", "Zygentoma", "Archaeognatha", "Diplura", "Volantis", "Passer", "Patella", "Coccymys", "Syngamia", "Chrysomya", "Nepenthes", "Microtus", "Veronica", "Agrestis", "Amblyrhynchus", "Cristatus", "Ursus", "Hyperoodon", "Scalopus", "Sceloporus", "Zenaida", "Cygnus", "Sauromalus", "Fulica", "Achillea", "Semotilus", "Eubalaena", "Taxus", "Conus", "Erignathus", "Micrelaps", "Mallos", "Brachycephalus", "Brachyphylla", "Holochilus", "Brunneria", "Ceratogymna", "Meloe", "Rieppeleon", "Lophiotoma", "Ceratosoma"];
+let suffixes = ["Unus", "Duo", "Tribus", "Quattuor", "Quinque", "Sex", "Septem", "Novem", "Decem", "Undecim", "Duodecim", "Tredecim", "Quattuordecim", "Quindecim", "Sedecim", "Septendecim", "Duodeviginti", "Undeviginti", "Viginti", "Maximus"];
 
 
 // FUNCTIONS //
@@ -69,6 +71,14 @@ function strDifference(str1, str2) {
   let value = 0;
   for (let i = 2; i < str1.length; i++) {
     value += Math.abs(str1[i] - str2[i]);
+  }
+  return value;
+}
+
+function arrayDifference(arr1, arr2) {
+  let value = 0;
+  for (let i = 0; i < arr1.length; i++) {
+    value += Math.abs(arr1[i] - arr2[i]);
   }
   return value;
 }

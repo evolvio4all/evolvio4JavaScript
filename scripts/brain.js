@@ -62,7 +62,8 @@ Creature.prototype.initAxons = function () {
 		for (let j = 0; j < this.network.main.neurons[i].length; j++) {
 			let neuronWeights = [];
 			for (let k = 0; k < neuronsInPreviousLayer; k++) {
-				neuronWeights.push(seededNoise() * 2 - 1);
+			  let weight = Math.round((seededNoise() * 4 - 2) / (1 / connectionDensity)) * (seededNoise() * 3);
+				neuronWeights.push(weight);
 			}
 			layerWeights.push(neuronWeights);
 		}
@@ -76,7 +77,8 @@ Creature.prototype.initAxons = function () {
 		for (let j = 0; j < this.network.forget.neurons[i].length; j++) {
 			let neuronWeights = [];
 			for (let k = 0; k < neuronsInPreviousLayer; k++) {
-				neuronWeights.push(seededNoise() * 2 - 1);
+				let weight = Math.round((seededNoise() * 4 - 2) / (1 / connectionDensity)) * (seededNoise() * 3);
+				neuronWeights.push(weight);
 			}
 			layerWeights.push(neuronWeights);
 		}
@@ -90,7 +92,8 @@ Creature.prototype.initAxons = function () {
 		for (let j = 0; j < this.network.decide.neurons[i].length; j++) {
 			let neuronWeights = [];
 			for (let k = 0; k < neuronsInPreviousLayer; k++) {
-				neuronWeights.push(seededNoise() * 2 - 1);
+				let weight = Math.round((seededNoise() * 4 - 2) / (1 / connectionDensity)) * (seededNoise() * 3);
+				neuronWeights.push(weight);
 			}
 			layerWeights.push(neuronWeights);
 		}
@@ -101,10 +104,11 @@ Creature.prototype.initAxons = function () {
 	for (let i = 1; i < this.network.modify.layers.length; i++) {
 		let layerWeights = [];
 		let neuronsInPreviousLayer = this.network.modify.layers[i - 1];
-		for (let j = 0; j < this.network.modify.neurons[i].length; j++) {
+		for (let j = 0; j < this.network.modify.layers[i]; j++) {
 			let neuronWeights = [];
 			for (let k = 0; k < neuronsInPreviousLayer; k++) {
-				neuronWeights.push(seededNoise() * 2 - 1);
+				let weight = Math.round((seededNoise() * 4 - 2) / (1 / connectionDensity)) * (seededNoise() * 3);
+				neuronWeights.push(weight);
 			}
 			layerWeights.push(neuronWeights);
 		}
@@ -113,31 +117,33 @@ Creature.prototype.initAxons = function () {
 };
 
 // Creature.prototype feeds the neuron values through the axons, and all the way to the end of the network.
-Creature.prototype.feedForward = function (inputs) {
-	for (let i = 0; i < inputs.length + this.output.length + this.network.cellState.length; i++) {
-		if (i < inputs.length) this.network.forget.neurons[0][i] = inputs[i] * 2 - 1; // Takes the inputs and applies them
-		else if (i < inputs.length + this.output.length) this.network.forget.neurons[0][i] = this.output[i - inputs.length] || 0; // Takes the inputs and applies them
-		else this.network.forget.neurons[0][i] = this.network.cellState[i - inputs.length - this.output.length];
+Creature.prototype.feedForward = function (ins) {
+	for (let i = 0; i < forgetLayers[0]; i++) {
+		if (i < inputs) this.network.forget.neurons[0][i] = ins[i]; // Takes the inputs and applies them
+		else if (i < inputs + outputs) this.network.forget.neurons[0][i] = this.output[i - inputs] || 0; // Takes the inputs and applies them
+		else this.network.forget.neurons[0][i] = this.network.cellState[i - inputs - outputs];
 	}
 	
-	for (let i = 0; i < inputs.length + this.output.length; i++) {
-		if (i < inputs.length) this.network.decide.neurons[0][i] = inputs[i] * 2 - 1; // Takes the inputs and applies them
-		else if (i < inputs.length + this.output.length) this.network.decide.neurons[0][i] = this.output[i - inputs.length] || 0; // Takes the inputs and applies them
-		else this.network.decide.neurons[0][i] = this.network.cellState[i - inputs.length - this.output.length];
+	for (let i = 0; i < decideLayers[0]; i++) {
+		if (i < inputs) this.network.decide.neurons[0][i] = ins[i]; // Takes the inputs and applies them
+		else if (i < inputs + outputs) this.network.decide.neurons[0][i] = this.output[i - inputs] || 0; // Takes the inputs and applies them
+		else this.network.decide.neurons[0][i] = this.network.cellState[i - inputs - outputs];
 	}
 	
-	for (let i = 0; i < inputs.length + this.output.length + this.network.cellState.length; i++) {
-		if (i < inputs.length) this.network.modify.neurons[0][i] = inputs[i] * 2 - 1; // Takes the inputs and applies them
-		else if (i < inputs.length + this.output.length) this.network.modify.neurons[0][i] = this.output[i - inputs.length] || 0; // Takes the inputs and applies them
-		else this.network.modify.neurons[0][i] = this.network.cellState[i - inputs.length - this.output.length];
+	for (let i = 0; i < modifyLayers[0]; i++) {
+		if (i < inputs) this.network.modify.neurons[0][i] = ins[i]; // Takes the inputs and applies them
+		else if (i < inputs + outputs) this.network.modify.neurons[0][i] = this.output[i - inputs] || 0; // Takes the inputs and applies them
+		else this.network.modify.neurons[0][i] = this.network.cellState[i - inputs - outputs];
 	}
 	
-	for (let i = 0; i < inputs.length + this.output.length; i++) {
-		if (i < inputs.length) this.network.main.neurons[0][i] = inputs[i] * 2 - 1; // Takes the inputs and applies them
-		else if (i < inputs.length + this.output.length) this.network.main.neurons[0][i] = this.output[i - inputs.length] || 0; // Takes the inputs and applies them
-		else this.network.main.neurons[0][i] = this.network.cellState[i - inputs.length - this.output.length];
+	for (let i = 0; i < layers[0]; i++) {
+		if (i < inputs) this.network.main.neurons[0][i] = ins[i]; // Takes the inputs and applies them
+		else if (i < inputs + outputs) this.network.main.neurons[0][i] = this.output[i - inputs] || 0; // Takes the inputs and applies them
+		else this.network.main.neurons[0][i] = this.network.cellState[i - inputs - outputs];
 	}
-
+  
+  
+  
 	for (let i = 1; i < this.network.forget.layers.length; i++) {
 		for (j = 0; j < this.network.forget.layers[i]; j++) {
 			let value = offset;
@@ -154,6 +160,7 @@ Creature.prototype.feedForward = function (inputs) {
 	for (let i = 0; i < forgetOutput.length; i++) {
 	  this.network.cellState[i] *= forgetOutput[i];
 	}
+	
 	
 	for (let i = 1; i < this.network.decide.layers.length; i++) {
 		for (j = 0; j < this.network.decide.layers[i]; j++) {
@@ -200,6 +207,7 @@ Creature.prototype.feedForward = function (inputs) {
 	
 	for (let i = 0; i < output.length; i++) {
 	  output[i] *= Math.tanh(this.network.cellState[i]);
+	  output[i] = Math.max(Math.min(output[i], 1), -1)
 	}
 	
 	return output; // returns the output, or the last line

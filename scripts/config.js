@@ -6,10 +6,10 @@ const offset = 0.0; // Amount to offset the value of a neuron
 
 let oldest = 0;
 const nnui = {
-    xoffset: 1920 - 300,
-    yoffset: 30,
-    xspacing: 50,
-    yspacing: 5,
+    xoffset: 1920 - 100,
+    yoffset: 70,
+    xspacing: 10,
+    yspacing: 100,
     size: 20,
     stroke: true,
     maxLineSize: 10,
@@ -17,61 +17,61 @@ const nnui = {
 };
 
 const zoomSpeed = 3;
-const eatSlowDown = 50;
+const eatSlowDown = 29;
 
 const maxZoomLevel = 4;
-const minZoomLevel = 0.04;
-let zoomLevel = 0.04;
+const minZoomLevel = 0.0424;
+let zoomLevel = 0.0424;
 
 const selectSizeAddition = 40;
 
 const maxCreatureSpeed = 30;
 
-const seed = Math.floor(Math.random() * 1000 + 1);
+const seed = Math.floor(Math.random() * 999 + 1);
 
 const mapSize = 100;
-const minCreatures = 80;
+const minCreatures = 50;
 
 const tileSize = 250;
 
-const eatEffeciency = 0.26;
+const eatEffeciency = 0.9;
 
 const energy = {
-    eat: 0.02,
-    metabolism: 0.2,
-    move: 0.02,
-    birth: 1,
-    attack: 0.02
+    eat: 0.1,
+    metabolism: 0.5,
+    move: 0.1,
+    attack: 0.1,
+    birth: 1
 };
 
-const attackEffeciency = 0.26;
+const attackEffeciency = 0.95;
 const attackPower = 3;
 
-const birthEffeciency = 0.8;
+const birthEffeciency = 0.85;
 
-const foodRegrowRate = 0.03;
+const foodRegrowRate = 0.02;
 
-let maxTileFood = 250;
+let maxTileFood = 100;
 
-const ageSpeed = 0.7;
+const ageSpeed = 0.2;
 const reproduceAge = 500;
 const minReproduceTime = 500;
 
-const mutability = 5;
+const mutability = 4;
 const totalProbability = (Math.log(1 - mutability / 100) / Math.log(0.99)) / mutability;
 
 const growSeasonLength = 500;
-const dieSeasonLength = 1000;
+const dieSeasonLength = 500;
 
 const seasonChange = 0.02;
 
-const waterBias = 0.3;
+const waterBias = 0.4;
 
-const stepAmount = 5;
-const largeStepAmount = 5;
+const stepAmount = 1;
+const largeStepAmount = 3;
 const minStepAmount = Number.EPSILON;
-const speciesDiversity = 500;
-const speciesColorChange = 15;
+const speciesDiversity = 5;
+const speciesColorChange = 20;
 
 const minEatPower = 0.0;
 const minReproducePower = 0.0;
