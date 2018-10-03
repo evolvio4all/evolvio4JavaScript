@@ -79,15 +79,15 @@ window.onmousewheel = function(e) {
 	} else {
 	  mouse.current.x = getMousePos(e)[0];
 	  mouse.current.y = getMousePos(e)[1];
-	  
-	  cropx = (cropx + mouse.current.x * (1 + zoomAmount)) - mouse.current.x * (zoomLevel - (zoomLevel - 1));
-	  cropy = (cropy + mouse.current.y * (1 + zoomAmount)) - mouse.current.y * (zoomLevel - (zoomLevel - 1));
+
+	  cropx = (cropx + mouse.current.x * (1 + zoomAmount)) - mouse.current.x;
+	  cropy = (cropy + mouse.current.y * (1 + zoomAmount)) - mouse.current.y;
 	}
 };
 
 window.onkeydown = function(e) {
 	activeKeys.push(e.keyCode);
-	
+
 	if (keyDown(controls.speedUp)) {
 	    timeUp += 1;
 	}
