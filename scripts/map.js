@@ -1,6 +1,6 @@
 let map = [];
 let outline = [];
-let mapNoise = seededNoise();  // We only assign noise once, to keep perlin consistent
+noise.seed(seededNoise());  // We seed our noise generator
 
 function generateMap() {
     for (let i = 0; i < mapSize; i++) {
@@ -40,9 +40,10 @@ function generateOutline() {
 }
 
 function Tile(x, y) {
-    x += mapNoise * 1000;
-    y += mapNoise * 1000;
-    this.type = Math.min(Math.floor(noise.simplex2(x / 20, y / 20) / waterBias), 1);
+    var tile = noise.simplex2(x / continentSize, y / continentSize) - waterBias;
+    // We increase odds of tile being water if it is further away from center (affected by distanceSmoothing)
+    tile -= Math.sqrt(Math.pow(x - mapSize/2, 2) + Math.pow(y - mapSize/2, 2)) / (mapSize / 2) * distanceSmoothing;
+    this.type = tile < 0 ? 0 : 1;
     this.food = maxTileFood * 0.5;
     if (this.type === 0) this.food = 0;
 }

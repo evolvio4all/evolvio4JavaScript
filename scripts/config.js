@@ -65,7 +65,9 @@ const dieSeasonLength = 500;
 
 const seasonChange = 0.02;
 
-const waterBias = 0.4;
+const waterBias = -0.1;
+const distanceSmoothing = 0.5; // less land further away from center
+const continentSize = 40;
 
 const stepAmount = 1;
 const largeStepAmount = 3;
