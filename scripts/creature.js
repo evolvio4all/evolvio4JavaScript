@@ -1,8 +1,8 @@
 function Creature(x, y, s, c, spec, sgen, gen) {
   let tile = Math.floor(seededNoise() * spawnTiles.length);
   
-	this.x = x || spawnTiles[tile].x * tileSize;
-	this.y = y || spawnTiles[tile].y * tileSize;
+	this.x = x || spawnTiles[tile].x * tileSize || 0;
+	this.y = y || spawnTiles[tile].y * tileSize || 0;
   
 	this.size = s || seededNoise() * (maxCreatureSize - minCreatureSize) + minCreatureSize;
 	this.energy = 100;
@@ -48,8 +48,8 @@ Creature.prototype.tick = function () {
 Creature.prototype.randomize = function () {
   let tile = Math.floor(seededNoise() * spawnTiles.length);
   
-	this.x = spawnTiles[tile].x * tileSize;
-	this.y = spawnTiles[tile].y * tileSize;
+	this.x = spawnTiles[tile].x * tileSize || 0;
+	this.y = spawnTiles[tile].y * tileSize || 0;
 
 	this.size = seededNoise() * (maxCreatureSize - minCreatureSize) + minCreatureSize;
 	this.energy = 100;

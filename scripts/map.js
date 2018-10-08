@@ -42,7 +42,7 @@ function generateOutline() {
 }
 
 function Tile(x, y) {
-    var tile = noise.simplex2(x / continentSize, y / continentSize) - waterBias;
+    var tile = noise.simplex2(x / continentSize, y / continentSize) - (waterBias * 2 - 1);
     // We increase odds of tile being water if it is further away from center (affected by distanceSmoothing)
     tile -= Math.sqrt(Math.pow(x - mapSize/2, 2) + Math.pow(y - mapSize/2, 2)) / (mapSize / 2) * distanceSmoothing;
     this.type = tile < 0 ? 0 : 1;

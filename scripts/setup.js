@@ -18,7 +18,8 @@ const layers = [inputs + outputs, (inputs + outputs * 2) / 2, outputs, outputs];
 const forgetLayers = [inputs + outputs * 2, (inputs + outputs * 2) / 2, outputs, outputs];
 const decideLayers = [inputs + outputs, (inputs + outputs * 2) / 2, outputs, outputs];
 const modifyLayers = [inputs + outputs * 2, (inputs + outputs * 2) / 2, outputs, outputs];
-const connectionDensity = 0.3; // must be >= 0.26
+
+const connectionDensity = 0.35; // must be >= 0.26
 
 let tick = 0;
 let tc = 0;

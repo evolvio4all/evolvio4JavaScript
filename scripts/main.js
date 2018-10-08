@@ -110,7 +110,7 @@ function update() {
 
 		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
 		//let eatPower = creature.output[2];
-		let age = (creature.age / (1000 / ageSpeed));
+		let age = (creature.age / (1000 / agingSpeed));
 		let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5);
 		//let xMove = creature.output[0];
 		//let yMove = creature.output[1];
@@ -124,7 +124,7 @@ function update() {
 			creature.eat(pos);
 		} else creature.maxSpeed = maxCreatureSpeed;
     
-    if (map[pos[0]][pos[1]].type === 0) creature.maxSpeed = maxCreatureSpeed * waterSpeed;
+    if (map[pos[0]][pos[1]].type === 0) creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
     
 		if (creature.output[3] >= minReproducePower) creature.reproduce();
 		if (creature.output[4] >= minAttackPower) creature.attack();

@@ -4,7 +4,7 @@ Creature.prototype.eat = function (p) {
 
 	this.energy -= energy.eat;
 
-	this.maxSpeed = Math.max(maxCreatureSpeed - eatSlowDown, 0);
+	this.maxSpeed = maxCreatureSpeed * eatingSpeed;
 
 	if (tile.food - this.output[2] <= 0) {
 		tile.food = 0;
@@ -16,7 +16,7 @@ Creature.prototype.eat = function (p) {
 };
 
 Creature.prototype.metabolize = function () {
-	this.energy -= energy.metabolism * (this.age / (1000 / ageSpeed));
+	this.energy -= energy.metabolism * (this.age / (1000 / agingSpeed));
 };
 
 Creature.prototype.move = function () {

@@ -254,17 +254,13 @@ Creature.prototype.mutate = function () {
 			for (let k = 0; k < this.network.main.axons[i][j].length; k++) {
 				let weight = this.network.main.axons[i][j][k];
 				let randomNumber = seededNoise() * 100;
-				const numMutations = 5;
+				const numMutations = 3;
 
 				if (randomNumber < mutability * 1 / numMutations) {
-					weight *= seededNoise() * (largeStepAmount - 1) + 1;
-				} else if (randomNumber < mutability * 2 / numMutations) {
-					weight /= seededNoise() * (largeStepAmount - 1) + 1;
-				} else if (randomNumber < mutability * 3 / numMutations) {
 					weight -= seededNoise() * stepAmount + minStepAmount;
-				} else if (randomNumber < mutability * 4 / numMutations) {
+				} else if (randomNumber < mutability * 2 / numMutations) {
 					weight += seededNoise() * stepAmount + minStepAmount;
-				} else if (randomNumber < mutability * 5 / numMutations) {
+				} else if (randomNumber < mutability * 3 / numMutations) {
 					weight = 0;
 				}
 
@@ -278,17 +274,13 @@ Creature.prototype.mutate = function () {
 			for (let k = 0; k < this.network.forget.axons[i][j].length; k++) {
 				let weight = this.network.forget.axons[i][j][k];
 				let randomNumber = seededNoise() * 100;
-				const numMutations = 5;
+				const numMutations = 3;
 
 				if (randomNumber < mutability * 1 / numMutations) {
-					weight *= seededNoise() * (largeStepAmount - 1) + 1;
-				} else if (randomNumber < mutability * 2 / numMutations) {
-					weight /= seededNoise() * (largeStepAmount - 1) + 1;
-				} else if (randomNumber < mutability * 3 / numMutations) {
 					weight -= seededNoise() * stepAmount + minStepAmount;
-				} else if (randomNumber < mutability * 4 / numMutations) {
+				} else if (randomNumber < mutability * 2 / numMutations) {
 					weight += seededNoise() * stepAmount + minStepAmount;
-				} else if (randomNumber < mutability * 5 / numMutations) {
+				} else if (randomNumber < mutability * 3 / numMutations) {
 					weight = 0;
 				}
 
@@ -302,17 +294,13 @@ Creature.prototype.mutate = function () {
 			for (let k = 0; k < this.network.decide.axons[i][j].length; k++) {
 				let weight = this.network.decide.axons[i][j][k];
 				let randomNumber = seededNoise() * 100;
-				const numMutations = 5;
-
-				if (randomNumber < mutability * 1 / numMutations) {
-					weight *= seededNoise() * (largeStepAmount - 1) + 1;
-				} else if (randomNumber < mutability * 2 / numMutations) {
-					weight /= seededNoise() * (largeStepAmount - 1) + 1;
-				} else if (randomNumber < mutability * 3 / numMutations) {
+				const numMutations = 3;
+				
+        if (randomNumber < mutability * 1 / numMutations) {
 					weight -= seededNoise() * stepAmount + minStepAmount;
-				} else if (randomNumber < mutability * 4 / numMutations) {
+				} else if (randomNumber < mutability * 2 / numMutations) {
 					weight += seededNoise() * stepAmount + minStepAmount;
-				} else if (randomNumber < mutability * 5 / numMutations) {
+				} else if (randomNumber < mutability * 3 / numMutations) {
 					weight = 0;
 				}
 
@@ -326,17 +314,13 @@ Creature.prototype.mutate = function () {
 			for (let k = 0; k < this.network.modify.axons[i][j].length; k++) {
 				let weight = this.network.modify.axons[i][j][k];
 				let randomNumber = seededNoise() * 100;
-				const numMutations = 5;
+				const numMutations = 3;
 
 				if (randomNumber < mutability * 1 / numMutations) {
-					weight *= seededNoise() * (largeStepAmount - 1) + 1;
-				} else if (randomNumber < mutability * 2 / numMutations) {
-					weight /= seededNoise() * (largeStepAmount - 1) + 1;
-				} else if (randomNumber < mutability * 3 / numMutations) {
 					weight -= seededNoise() * stepAmount + minStepAmount;
-				} else if (randomNumber < mutability * 4 / numMutations) {
+				} else if (randomNumber < mutability * 2 / numMutations) {
 					weight += seededNoise() * stepAmount + minStepAmount;
-				} else if (randomNumber < mutability * 5 / numMutations) {
+				} else if (randomNumber < mutability * 3 / numMutations) {
 					weight = 0;
 				}
 
