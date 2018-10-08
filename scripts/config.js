@@ -16,7 +16,7 @@ const nnui = {
     minLineSize: 5
 };
 
-const zoomSpeed = 3;
+const zoomSpeed = 0.01;
 const eatSlowDown = 29;
 
 const maxZoomLevel = 4;

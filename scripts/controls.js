@@ -82,13 +82,13 @@ window.onmousewheel = function (e) {
 
 		let bzoom = {};
 		zoomLevel -= zoomAmount * zoomSpeed;
-		bzoom.x = cropx / zoomLevel + mouse.current.x / zoomLevel;
-		bzoom.y = cropy / zoomLevel + mouse.current.y / zoomLevel;
+		bzoom.x = (cropx + mouse.current.x) / zoomLevel;
+		bzoom.y = (cropy + mouse.current.y) / zoomLevel;
 
 		let azoom = {};
 		zoomLevel += zoomAmount * zoomSpeed;
-		azoom.x = cropx / zoomLevel + mouse.current.x / zoomLevel;
-		azoom.y = cropy / zoomLevel + mouse.current.y / zoomLevel;
+		azoom.x = (cropx + mouse.current.x) / zoomLevel;
+		azoom.y = (cropy + mouse.current.y) / zoomLevel;
 
 		cropx += (bzoom.x - azoom.x) * zoomLevel;
 		cropy += (bzoom.y - azoom.y) * zoomLevel;
