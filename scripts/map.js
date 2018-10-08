@@ -1,12 +1,14 @@
 let map = [];
 let outline = [];
+let spawnTiles = [];
+
 noise.seed(seededNoise());  // We seed our noise generator
 
 function generateMap() {
-    for (let i = 0; i < mapSize; i++) {
+    for (let x = 0; x < mapSize; x++) {
         map.push([]);
-        for (let j = 0; j < mapSize; j++) {
-            map[i].push(new Tile(i, j));
+        for (let y = 0; y < mapSize; y++) {
+            map[x].push(new Tile(x, y));
         }
     }
 
@@ -45,5 +47,13 @@ function Tile(x, y) {
     tile -= Math.sqrt(Math.pow(x - mapSize/2, 2) + Math.pow(y - mapSize/2, 2)) / (mapSize / 2) * distanceSmoothing;
     this.type = tile < 0 ? 0 : 1;
     this.food = maxTileFood * 0.5;
-    if (this.type === 0) this.food = 0;
+    
+    this.x = x;
+    this.y = y;
+    
+    if (this.type) {
+      spawnTiles.push(this);
+    } else {
+      this.food = 0;
+    }
 }

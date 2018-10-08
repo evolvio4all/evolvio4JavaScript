@@ -123,7 +123,9 @@ function update() {
 		if (creature.output[2] >= minEatPower) {
 			creature.eat(pos);
 		} else creature.maxSpeed = maxCreatureSpeed;
-
+    
+    if (map[pos[0]][pos[1]].type === 0) creature.maxSpeed = maxCreatureSpeed * waterSpeed;
+    
 		if (creature.output[3] >= minReproducePower) creature.reproduce();
 		if (creature.output[4] >= minAttackPower) creature.attack();
 

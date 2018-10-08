@@ -17,7 +17,7 @@ const nnui = {
 };
 
 const zoomSpeed = 0.01;
-const eatSlowDown = 29;
+const eatSlowDown = 29.9;
 
 const maxZoomLevel = 4;
 const minZoomLevel = 0.0424;
@@ -26,6 +26,7 @@ let zoomLevel = 0.0424;
 const selectSizeAddition = 40;
 
 const maxCreatureSpeed = 30;
+const waterSpeed = 0.2;
 
 const seed = Math.floor(Math.random() * 999 + 1);
 
@@ -38,7 +39,7 @@ const eatEffeciency = 0.9;
 
 const energy = {
     eat: 0.1,
-    metabolism: 0.5,
+    metabolism: 0.2,
     move: 0.1,
     attack: 0.1,
     birth: 1
