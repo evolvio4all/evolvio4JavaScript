@@ -14,10 +14,10 @@ const memories = 2;
 const outputs = 5 + memories;
 const inputs = 7;
 
-const layers = [inputs + outputs, (inputs + outputs * 2) / 2, outputs, outputs];
-const forgetLayers = [inputs + outputs * 2, (inputs + outputs * 2) / 2, outputs, outputs];
-const decideLayers = [inputs + outputs, (inputs + outputs * 2) / 2, outputs, outputs];
-const modifyLayers = [inputs + outputs * 2, (inputs + outputs * 2) / 2, outputs, outputs];
+const layers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
+const forgetLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
+const decideLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
+const modifyLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
 
 const connectionDensity = 0.35; // must be >= 0.26
 

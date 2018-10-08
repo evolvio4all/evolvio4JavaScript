@@ -18,8 +18,7 @@ function main() {
 	}
 
 	let ndate = new Date();
-
-	if (ndate - odate <= 150) render();
+	if (ndate - odate < 100) render();
 }
 
 function wallLock(creature) {
@@ -100,20 +99,17 @@ function update() {
 		}
 
 		if (typeof creature.lastContact !== "undefined") {
-			//lastContactPos = creature.lastContact.getPosition();
+			lastContactPos = creature.lastContact.getPosition();
 			lastContactSize = ((creature.lastContact.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
 			lastContactX = creature.lastContact.x / (tileSize * mapSize);
 			lastContactY = creature.lastContact.y / (tileSize * mapSize);
-			//lastContactColor = creature.lastContact.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
+			lastContactColor = creature.lastContact.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
 			lastContactEnergy = creature.lastContact.energy / (creatureEnergy * creature.size / maxCreatureSize);
 		}
 
 		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
-		//let eatPower = creature.output[2];
 		let age = (creature.age / (1000 / agingSpeed));
 		let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5);
-		//let xMove = creature.output[0];
-		//let yMove = creature.output[1];
 		let memory = [];
 
 		creature.input = [1, x, y, size, energy, tileFood, age];
