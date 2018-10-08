@@ -18,9 +18,13 @@ const dieSeasonLength = 500; // Die season length
 
 const seasonChange = 0.02; // Food grow speed change (added in grow season and subtracted in die season)
 
+
 // CREATURES //
 const minCreatures = 50; // Minimum number of creatures
 const creatureEnergy = 80; // Max creature energy
+
+const speciesDiversity = 10; // Diversity of each species
+const speciesColorChange = 20; // Color change between species
 
 const maxCreatureSize = 100; // Maximum Creature Size
 const minCreatureSize = 30; // Minimum Creature Size
