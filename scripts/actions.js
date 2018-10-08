@@ -49,39 +49,31 @@ Creature.prototype.reproduce = function (t) {
 
 Creature.prototype.die = function () {
 	if (population <= minCreatures) {
-		//console.log(this.species + " died.");
-		
+
 		try {
 			specieslist[this.species].contains.splice(specieslist[this.species].contains.indexOf(this), 1);
 		} catch (e) {
 			console.error(this.species);
 		}
 
-		//console.log("  " + specieslist[this.species].contains.length + " left");
-		
 		if (specieslist[this.species].contains.length === 0) {
-		  //console.log("removed species " + this.species);
 			delete specieslist[this.species];
 		}
-		
+
 		this.randomize();
 	} else {
-	  //console.log(this.species + " died.");
-	  
+
 		let pos = creatures.indexOf(this);
 
 		creatures.splice(pos, 1);
-		
+
 		try {
 			specieslist[this.species].contains.splice(specieslist[this.species].contains.indexOf(this), 1);
 		} catch (e) {
 			console.error(this.species);
 		}
 
-		//console.log("  " + specieslist[this.species].contains.length + " left");
-		
 		if (specieslist[this.species].contains.length === 0) {
-		  //console.log("removed species " + this.species);
 			delete specieslist[this.species];
 		}
 	}

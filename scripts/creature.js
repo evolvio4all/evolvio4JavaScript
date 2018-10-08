@@ -26,10 +26,8 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 
 	this.geneticID = "";
 
-	//console.log("\n\n\nDefining Species");
 	this.species = spec;
 	this.species = this.setSpecies();
-	//console.log("Done.");
 
 	this.select = function () {
 		if (mouse.down.x > this.x * zoomLevel - cropx - this.size * zoomLevel - selectSizeAddition * zoomLevel && mouse.down.x < this.x * zoomLevel - cropx + this.size * zoomLevel + selectSizeAddition * zoomLevel && mouse.down.y < this.y * zoomLevel - cropy + this.size * zoomLevel + selectSizeAddition * zoomLevel && mouse.down.y > this.y * zoomLevel - cropy - this.size * zoomLevel - selectSizeAddition * zoomLevel) {
@@ -73,10 +71,8 @@ Creature.prototype.randomize = function () {
 
 	this.geneticID = "";
 
-	//console.log("\n\n\nDefining Species");
 	this.species = undefined;
 	this.species = this.setSpecies();
-	//console.log("Done.");
 };
 
 Creature.prototype.getPosition = function () {
@@ -98,19 +94,19 @@ Creature.prototype.setSpecies = function () {
 	}
 
 	this.feedForward(testInput);
-  
-  for (let neuronValue of this.network.forget.neurons[forgetLayers.length - 1]) {
+
+	for (let neuronValue of this.network.forget.neurons[forgetLayers.length - 1]) {
 		geneticID.push(neuronValue);
 	}
-	
+
 	for (let neuronValue of this.network.decide.neurons[decideLayers.length - 1]) {
 		geneticID.push((neuronValue + 1) / 2);
 	}
-	
+
 	for (let neuronValue of this.network.modify.neurons[modifyLayers.length - 1]) {
 		geneticID.push(neuronValue);
 	}
-  
+
 	for (let neuronValue of this.network.main.neurons[layers.length - 1]) {
 		geneticID.push(neuronValue);
 	}
@@ -140,7 +136,6 @@ Creature.prototype.setSpecies = function () {
 				species = specie;
 				this.speciesGeneration = specieslist[species].contains[0].speciesGeneration;
 
-				console.log("  Added to species: '" + species + "'");
 			}
 		}
 	}
@@ -150,12 +145,10 @@ Creature.prototype.setSpecies = function () {
 		species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 
 		while (specieslist[species] !== undefined) {
-			//console.log("  Re-Rolling");
 			prefix = Math.floor(seededNoise() * prefixes.length);
 			species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 		}
 
-		//console.log("  Created with species: '" + species + "'");
 		specieslist[species] = {};
 		specieslist[species].contains = [];
 	} else {
@@ -164,7 +157,6 @@ Creature.prototype.setSpecies = function () {
 		for (let i = 1; i <= Math.floor(this.speciesGeneration / (suffixes.length - 1)); i++) {
 			species += " " + suffixes[Math.min(this.speciesGeneration - (suffixes.length - 1) * i, (suffixes.length - 2))];
 		}
-		console.log("  Born with species: '" + species + "'");
 
 		if (minGeneDiff >= speciesDiversity) {
 			this.speciesGeneration++;
@@ -175,7 +167,6 @@ Creature.prototype.setSpecies = function () {
 					species += " " + suffixes[Math.min(this.speciesGeneration - (suffixes.length - 1) * i, (suffixes.length - 2))];
 				}
 			}
-			console.log("    became '" + species + "'");
 
 			if (specieslist[species] == undefined) {
 				specieslist[species] = {};
