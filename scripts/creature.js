@@ -46,8 +46,10 @@ Creature.prototype.tick = function () {
 };
 
 Creature.prototype.randomize = function () {
-	this.x = spawnTiles[Math.floor(seededNoise() * spawnTiles.length)].x * tileSize;
-	this.y = spawnTiles[Math.floor(seededNoise() * spawnTiles.length)].y * tileSize;
+  let tile = Math.floor(seededNoise() * spawnTiles.length);
+  
+	this.x = spawnTiles[tile].x * tileSize;
+	this.y = spawnTiles[tile].y * tileSize;
 
 	this.size = seededNoise() * (maxCreatureSize - minCreatureSize) + minCreatureSize;
 	this.energy = 100;
