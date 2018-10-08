@@ -92,10 +92,6 @@ window.onmousewheel = function (e) {
 
 		cropx += (bzoom.x - azoom.x) * zoomLevel;
 		cropy += (bzoom.y - azoom.y) * zoomLevel;
-
-		console.log(bzoom.x - azoom.x);
-
-		console.log(mouse.current.x / zoomLevel + cropx / zoomLevel);
 	}
 };
 
