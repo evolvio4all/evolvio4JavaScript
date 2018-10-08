@@ -13,7 +13,7 @@ function keyEvents() {
 		timetoggle = true;
 		timeUp++;
 	} else {
-	    timescale = 1;
+		timescale = 1;
 	}
 }
 
@@ -31,7 +31,7 @@ function getMousePos(e) {
 	];
 }
 
-window.onmousedown = function(e) {
+window.onmousedown = function (e) {
 	mouse.down.x = getMousePos(e)[0];
 	mouse.down.y = getMousePos(e)[1];
 
@@ -46,14 +46,14 @@ window.onmousedown = function(e) {
 	}
 };
 
-window.onmouseup = function(e) {
+window.onmouseup = function (e) {
 	mouse.up.x = getMousePos(e)[0];
 	mouse.up.y = getMousePos(e)[1];
 
 	mouse.isdown = false;
 };
 
-window.onmousemove = function(e) {
+window.onmousemove = function (e) {
 	mouse.current.x = getMousePos(e)[0];
 	mouse.current.y = getMousePos(e)[1];
 
@@ -66,10 +66,10 @@ window.onmousemove = function(e) {
 	lcy = mouse.current.y;
 };
 
-window.onmousewheel = function(e) {
-  e.preventDefault();
-  zoomAmount = e.wheelDelta / zoomSpeed / 2400;
-	zoomLevel += zoomAmount;
+window.onmousewheel = function (e) {
+	e.preventDefault();
+	zoomAmount = Math.max(Math.min(e.wheelDelta, 1), -1);
+	zoomLevel += zoomAmount * zoomSpeed;
 
 	if (zoomLevel < minZoomLevel) {
 		zoomLevel = minZoomLevel;
@@ -77,23 +77,37 @@ window.onmousewheel = function(e) {
 	if (zoomLevel > maxZoomLevel) {
 		zoomLevel = maxZoomLevel;
 	} else {
-	  mouse.current.x = getMousePos(e)[0];
-	  mouse.current.y = getMousePos(e)[1];
+		mouse.current.x = getMousePos(e)[0];
+		mouse.current.y = getMousePos(e)[1];
 
-	  cropx = (cropx + mouse.current.x * (1 + zoomAmount)) - mouse.current.x;
-	  cropy = (cropy + mouse.current.y * (1 + zoomAmount)) - mouse.current.y;
+		let bzoom = {};
+		zoomLevel -= zoomAmount * zoomSpeed;
+		bzoom.x = cropx / zoomLevel + mouse.current.x / zoomLevel;
+		bzoom.y = cropy / zoomLevel + mouse.current.y / zoomLevel;
+
+		let azoom = {};
+		zoomLevel += zoomAmount * zoomSpeed;
+		azoom.x = cropx / zoomLevel + mouse.current.x / zoomLevel;
+		azoom.y = cropy / zoomLevel + mouse.current.y / zoomLevel;
+
+		cropx += (bzoom.x - azoom.x) * zoomLevel;
+		cropy += (bzoom.y - azoom.y) * zoomLevel;
+
+		console.log(bzoom.x - azoom.x);
+
+		console.log(mouse.current.x / zoomLevel + cropx / zoomLevel);
 	}
 };
 
-window.onkeydown = function(e) {
+window.onkeydown = function (e) {
 	activeKeys.push(e.keyCode);
 
 	if (keyDown(controls.speedUp)) {
-	    timeUp += 1;
+		timeUp += 1;
 	}
 };
 
-window.onkeyup = function(e) {
+window.onkeyup = function (e) {
 	var z = activeKeys.indexOf(e.keyCode);
 	for (i = activeKeys.length; i > 0; i--) {
 		if (z == -1) break;
