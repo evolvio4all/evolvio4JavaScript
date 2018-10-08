@@ -1,11 +1,12 @@
 let map = [];
 let outline = [];
+noise.seed(seededNoise());  // We seed our noise generator
 
 function generateMap() {
     for (let i = 0; i < mapSize; i++) {
         map.push([]);
         for (let j = 0; j < mapSize; j++) {
-            map[i].push(new Tile());
+            map[i].push(new Tile(i, j));
         }
     }
 
@@ -38,8 +39,11 @@ function generateOutline() {
     }
 }
 
-function Tile() {
-    this.type = Math.min(Math.floor(seededNoise() * 1 / waterBias), 1);
+function Tile(x, y) {
+    var tile = noise.simplex2(x / continentSize, y / continentSize) - waterBias;
+    // We increase odds of tile being water if it is further away from center (affected by distanceSmoothing)
+    tile -= Math.sqrt(Math.pow(x - mapSize/2, 2) + Math.pow(y - mapSize/2, 2)) / (mapSize / 2) * distanceSmoothing;
+    this.type = tile < 0 ? 0 : 1;
     this.food = maxTileFood * 0.5;
     if (this.type === 0) this.food = 0;
 }
