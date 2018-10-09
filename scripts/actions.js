@@ -30,16 +30,16 @@ Creature.prototype.reproduce = function (t) {
 	if (this.age > reproduceAge && this.reproduceTime > minReproduceTime) {
 		for (let i = 0; i < this.children; i++) {
 			if (this.energy < energy.birth * this.childEnergy) break;
-			let child = new Creature(this.x, this.y, this.size, this.color, this.species, this.speciesGeneration, this.generation + 1);
+			let child = new Creature(this.x + Math.round(seededNoise() * 3 - 1.5) * 100, this.y + Math.round(seededNoise() * 2 - 1) * 100, this.size, this.color, this.species, this.speciesGeneration, this.generation + 1);
 			child.copyNeuralNetwork(this);
 			child.energy = creatureEnergy * this.childEnergy * birthEffeciency;
-			child.children = this.children / 2;
+			child.children = this.children;
 
 			child.mutate();
 
 			creatures.push(child);
 
-			this.energy -= energy.birth * (this.childEnergy * creatureEnergy);
+			this.energy -= energy.birth * this.childEnergy * creatureEnergy;
 			this.reproduceTime = 0;
 		}
 	}

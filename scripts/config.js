@@ -53,8 +53,8 @@ const minEatPower = 0.0; // Minimum eating strength (anything lower will be 0)
 const minReproducePower = 0.0; // Minimum output to reproduce (anything lower will be 0)
 const minAttackPower = 0.0; // Minimum attack strength (anything lower will be 0)
 
-const reproduceAge = 500; // Minimum age when a creature can reproduce
-const minReproduceTime = 500; // Minimum time between litters
+const reproduceAge = 1500; // Minimum age when a creature can reproduce
+const minReproduceTime = 1000; // Minimum time between litters
 
 // Neural Network //
 const offset = 0.0; // Amount to offset the value of a neuron

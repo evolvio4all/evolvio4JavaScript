@@ -139,12 +139,11 @@ Creature.prototype.setSpecies = function () {
 			if (minGeneDiff < speciesDiversity) {
 				species = specie;
 				this.speciesGeneration = specieslist[species].contains[0].speciesGeneration;
-
 			}
 		}
 	}
 
-	if (species == undefined) {
+	if (species === undefined) {
 		prefix = Math.floor(seededNoise() * prefixes.length);
 		species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 
@@ -172,7 +171,7 @@ Creature.prototype.setSpecies = function () {
 				}
 			}
 
-			if (specieslist[species] == undefined) {
+			if (specieslist[species] === undefined) {
 				specieslist[species] = {};
 				specieslist[species].contains = [];
 			}
@@ -188,6 +187,8 @@ Creature.prototype.setSpecies = function () {
 	specieslist[species].contains.push(this);
 
 	this.geneticID = geneticID;
+	
+	if (species === undefined) console.log(spGen);
 
 	return species;
 };
