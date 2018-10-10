@@ -1,8 +1,8 @@
 function Creature(x, y, s, c, spec, sgen, gen) {
   let tile = Math.floor(seededNoise() * spawnTiles.length);
   
-	this.x = x || spawnTiles[tile].x * tileSize || 0;
-	this.y = y || spawnTiles[tile].y * tileSize || 0;
+	this.x = x || spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
+	this.y = y || spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
   
 	this.size = s || seededNoise() * (maxCreatureSize - minCreatureSize) + minCreatureSize;
 	this.energy = 100;
@@ -48,8 +48,8 @@ Creature.prototype.tick = function () {
 Creature.prototype.randomize = function () {
   let tile = Math.floor(seededNoise() * spawnTiles.length);
   
-	this.x = spawnTiles[tile].x * tileSize || 0;
-	this.y = spawnTiles[tile].y * tileSize || 0;
+	this.x = spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
+	this.y = spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
 
 	this.size = seededNoise() * (maxCreatureSize - minCreatureSize) + minCreatureSize;
 	this.energy = 100;
@@ -188,8 +188,11 @@ Creature.prototype.setSpecies = function () {
 
 	this.geneticID = geneticID;
 	
-	if (species === undefined) console.log(spGen);
-
+	if (species === undefined) {
+	  console.log(spGen);
+	  console.log(this);
+	}
+  
 	return species;
 };
 

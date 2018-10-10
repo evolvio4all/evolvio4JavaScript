@@ -30,7 +30,7 @@ Creature.prototype.reproduce = function (t) {
 	if (this.age > reproduceAge && this.reproduceTime > minReproduceTime) {
 		for (let i = 0; i < this.children; i++) {
 			if (this.energy < energy.birth * this.childEnergy) break;
-			let child = new Creature(this.x + Math.round(seededNoise() * 3 - 1.5) * 100, this.y + Math.round(seededNoise() * 2 - 1) * 100, this.size, this.color, this.species, this.speciesGeneration, this.generation + 1);
+			let child = new Creature(this.x + Math.round(seededNoise() * 3 - 1.5) * tileSize, this.y + Math.round(seededNoise() * 2 - 1) * tileSize, this.size, this.color, this.species, this.speciesGeneration, this.generation + 1);
 			child.copyNeuralNetwork(this);
 			child.energy = creatureEnergy * this.childEnergy * birthEffeciency;
 			child.children = this.children;
@@ -52,29 +52,28 @@ Creature.prototype.die = function () {
 
 		try {
 			specieslist[this.species].contains.splice(specieslist[this.species].contains.indexOf(this), 1);
+			
+			if (specieslist[this.species].contains.length === 0) {
+			  delete specieslist[this.species];
+		  }
 		} catch (e) {
 			console.error(this.species);
 		}
 
-		if (specieslist[this.species].contains.length === 0) {
-			delete specieslist[this.species];
-		}
-
 		this.randomize();
 	} else {
-
 		let pos = creatures.indexOf(this);
 
 		creatures.splice(pos, 1);
 
 		try {
 			specieslist[this.species].contains.splice(specieslist[this.species].contains.indexOf(this), 1);
+			
+			if (specieslist[this.species].contains.length === 0) {
+			  delete specieslist[this.species];
+		  }
 		} catch (e) {
 			console.error(this.species);
-		}
-
-		if (specieslist[this.species].contains.length === 0) {
-			delete specieslist[this.species];
 		}
 	}
 
@@ -92,7 +91,7 @@ Creature.prototype.attack = function () {
 				creature.energy -= att * attackPower;
 				this.energy -= energy.attack * (this.size / maxCreatureSize);
 
-				this.energy += att * attackPower * attackEffeciency;
+				this.energy += att * attackEffeciency;
 			}
 		}
 	}

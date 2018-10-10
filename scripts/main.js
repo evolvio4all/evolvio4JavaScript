@@ -49,7 +49,7 @@ function update() {
 		season++;
 	} else season--;
 
-	if (season > growSeasonLength + dieSeasonLength || season < 0) seasonUp = !seasonUp;
+	if (season >= growSeasonLength + dieSeasonLength || season < 0) seasonUp = !seasonUp;
 
 	for (let i in map) {
 		for (let j in map[i]) {
@@ -141,13 +141,12 @@ function render() {
 	ctx.clearRect(0, 0, display.width, display.height);
 	ctz.clearRect(0, 0, viewport.width, viewport.height);
 
-	ctx.fillStyle = "#1799B5";
-	ctx.fillRect(0, 0, display.width, display.height);
-
 	for (let i in map) {
 		for (let j in map[i]) {
 			if (map[i][j].type === 0) continue;
-			ctx.fillStyle = "hsl(" + Math.max(100 - (season - growSeasonLength) / growSeasonLength * 50, 50) + "," + Math.floor(map[i][j].food / maxTileFood * 100) + "%, 22%)";
+			
+			let hue = Math.max(100 - (season - growSeasonLength) / growSeasonLength * 50, 50) + "," + Math.floor(map[i][j].food / maxTileFood * 100);
+			ctx.fillStyle = "hsl(" + hue + "%, 22%)";
 			ctx.fillRect(i * tileSize * zoomLevel - cropx, j * tileSize * zoomLevel - cropy, tileSize * zoomLevel + 1, tileSize * zoomLevel + 1);
 		}
 	}

@@ -1,6 +1,6 @@
 const display = document.getElementById("canvas");
 const ctx = display.getContext("2d", {
-	alpha: false
+	alpha: true
 });
 
 
@@ -19,7 +19,7 @@ const forgetLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs 
 const decideLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
 const modifyLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
 
-const connectionDensity = 0.35; // must be >= 0.26
+const connectionDensity = 0.3; // must be >= 0.26
 
 let tick = 0;
 let tc = 0;
@@ -37,9 +37,6 @@ let population = 0;
 let timetoggle = false;
 
 let selectedCreature = null;
-
-let cropx = -10;
-let cropy = -10;
 
 let season = 0;
 let seasonUp = true;
