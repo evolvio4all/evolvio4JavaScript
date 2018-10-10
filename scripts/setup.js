@@ -12,7 +12,7 @@ const ctz = viewport.getContext("2d", {
 // VARIABLES //
 const memories = 2;
 const outputs = 5 + memories;
-const inputs = 7;
+const inputs = 6;
 
 const layers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
 const forgetLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
