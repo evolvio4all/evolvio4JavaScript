@@ -14,12 +14,12 @@ const memories = 2;
 const outputs = 5 + memories;
 const inputs = 6;
 
-const layers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
-const forgetLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
-const decideLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
-const modifyLayers = [inputs + outputs * 2, (inputs + outputs * 3) / 2, (inputs + outputs * 3) / 2, outputs];
+const layers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
+const forgetLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
+const decideLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
+const modifyLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
 
-const connectionDensity = 0.32; // must be >= 0.26
+const connectionDensity = 0.5; // must be >= 0.26
 
 let tick = 0;
 let tc = 0;
@@ -29,12 +29,11 @@ let pause = false;
 let timescale = 1;
 let fastforward = false;
 
-let creatures = [];
-
-let grv = 1;
+let debugToggle = false;
 
 let population = 0;
 
+let creatures = [];
 let selectedCreature = null;
 
 let season = 0;
@@ -51,15 +50,13 @@ let suffixes = ["Unus", "Duo", "Tribus", "Quattuor", "Quinque", "Sex", "Septem",
 function newColor() {
 	let h = Math.floor(seededNoise() * 360);
 	let s = Math.floor(seededNoise() * 60 + 20);
-	let l = Math.floor(seededNoise() * 60 + 20);
-
+  let l = 50;
+  
+  
 	return "hsl(" + h + ", " + s + "%, " + l + "%)";
 }
 
-function newSeed() {
-	return Math.floor(Math.random() * 1000000);
-}
-
+let grv = 1;
 function seededNoise() {
 	grv++;
 	return Math.abs(seed * Math.tan(grv / Math.sin(grv * seed))) % 1;
@@ -89,3 +86,12 @@ CanvasRenderingContext2D.prototype.fillCircle = function(x, y, r, s) {
 	this.fill();
 	if (s) this.stroke();
 };
+
+function rtanh(x) {
+	if (x < -3)
+		return -1;
+	else if (x > 3)
+		return 1;
+	else
+		return x * (27 + x * x) / (27 + 9 * x * x);
+}

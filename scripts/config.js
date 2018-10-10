@@ -1,5 +1,7 @@
 // GLOBAL //
 const seed = Math.floor(Math.random() * 999 + 1);
+let debugMode = false;
+
 
 // MAP //
 const mapSize = 100;
@@ -39,16 +41,16 @@ const rotationSpeed = 0.1; // Speed % how fast creatures rotate
 let oldest = 0; // oldest creature's age
 
 const energy = { // Energy cost per tick
-    eat: 0.1, // Energy cost to eat
-    metabolism: 0.2, // Energy cost to live
-    move: 0.1, // Energy cost to move
+    eat: 0.02, // Energy cost to eat
+    metabolism: 0.05, // Energy cost to live
+    move: 0.05, // Energy cost to move
     attack: 0.1, // Energy cost to attack
     birth: 1 // Energy cost to birth
 };
 
 const eatEffeciency = 0.9; // Eat effeciency %
 const birthEffeciency = 0.85; // Birth effeciency %
-const attackEffeciency = 0.95; // Attack effeciency %
+const attackEffeciency = 2.00; // Attack effeciency %
 const attackPower = 3.00; // Attack power %
 
 const minEatPower = 0.0; // Minimum eating strength (anything lower will be 0)
@@ -62,8 +64,8 @@ const minReproduceTime = 800; // Minimum time between litters
 const offset = 0.0; // Amount to offset the value of a neuron
 const mutability = 5; // Chance of mutating a single axon
 
-const stepAmount = 1; // Max step amount
 const minStepAmount = Number.EPSILON; // Min step amount (Number.EPSILON is the smallest positive number)
+const stepAmount = 1; // Max step amount
 
 // ZOOM //
 const zoomSpeed = 0.01;
@@ -80,7 +82,8 @@ const controls = {
     fastForward: "right",
     speedUp: "up",
     stop: "left",
-    play: "down"
+    play: "down",
+    debug: "d"
 };
 
 const nnui = { // Neural network UI config
