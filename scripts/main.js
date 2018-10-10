@@ -1,7 +1,7 @@
 function main() {
 	let odate = new Date();
 	if (creatures.length > 2000) return;
-	if (timescale >= 1) {	// Can timescale ever go below 1?
+	if (timescale >= 1) { // Can timescale ever go below 1?
 		for (let ts = 0; ts < timescale; ts++) {
 			update();
 		}
@@ -51,18 +51,21 @@ function update() {
 		if (seasonUp) year++;
 	}
 
-	for (let i in map) {		// This has a big impact on performance. Wouldn't it be possible to do something alike to carykh?
-		for (let j in map[i]) {		// Instead of updating every tile each frame, simply update its food level whenever
-			if (map[i][j].type == 1) {		// A creature tries to eat from it. Might be kinda difficult math-wise, so I don't know if it is realistic.
-				if (season < growSeasonLength) {
-					map[i][j].food += seasonChange;
-				} else {
-					map[i][j].food -= seasonChange;
+	if (season % 20 == 0) {
+		for (let i in map) {
+			for (let j in map[i]) {
+				if (map[i][j].type == 1) {
+					if (season < growSeasonLength) {
+						map[i][j].food += seasonChange * 20;
+					} else {
+						map[i][j].food -= seasonChange * 20;
+					}
+
+					map[i][j].food += foodRegrowRate * 20;
+
+					if (map[i][j].food > maxTileFood) map[i][j].food = maxTileFood;
+					else if (map[i][j].food < 0) map[i][j].food = 0;
 				}
-
-				map[i][j].food += foodRegrowRate;
-
-				if (map[i][j].food > maxTileFood) map[i][j].food = maxTileFood;
 			}
 		}
 	}
@@ -73,17 +76,18 @@ function update() {
 		wallLock(creature);
 		clampSize(creature);
 
-		let x = (creature.x / (tileSize * mapSize));
-		let y = (creature.y / (tileSize * mapSize));
 		let size = ((creature.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
 		let energy = creature.energy / (creatureEnergy * creature.size / maxCreatureSize);
-
 		let pos = creature.getPosition();
 
+    
+    // UNUSED SENSES //
+		/* let x = (creature.x / (tileSize * mapSize));
+		let y = (creature.y / (tileSize * mapSize));
 		let color = creature.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
 		let lastContactX = 0;
 		let lastContactY = 0;
-		let lastContactPos = [0, 0];	// This entire block of variables gets assigned values but they are never used?
+		let lastContactPos = [0, 0];
 		let lastContactSize = 1;
 		let lastContactColor = [0, 0, 0];
 		let lastContactEnergy = 0;
@@ -105,14 +109,15 @@ function update() {
 			lastContactColor = creature.lastContact.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
 			lastContactEnergy = creature.lastContact.energy / (creatureEnergy * creature.size / maxCreatureSize);
 		}
+		
+		let memory = [];
+		let age = (creature.age / (1000 / agingSpeed));
+		let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5); */
 
 		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
-		let age = (creature.age / (1000 / agingSpeed));
-		let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5);	// These 3 variables are assigned but never used?
-		let memory = [];
-    
-    let rotation = creature.rotation / (2 * Math.PI);
-    
+
+		let rotation = creature.rotation / (2 * Math.PI);
+
 		creature.input = [1, rotation, size, energy, tileFood, season / (growSeasonLength + dieSeasonLength)];
 
 		creature.output = creature.feedForward(creature.input);
@@ -120,9 +125,9 @@ function update() {
 		if (creature.output[2] >= minEatPower) {
 			creature.eat(pos);
 		} else creature.maxSpeed = maxCreatureSpeed;
-    
-    if (map[pos[0]][pos[1]].type === 0) creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
-    
+
+		if (map[pos[0]][pos[1]].type === 0) creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
+
 		if (creature.output[3] >= minReproducePower) creature.reproduce();
 		if (creature.output[4] >= minAttackPower) creature.attack();
 
@@ -146,7 +151,7 @@ function render() {
 		for (let j in map[i]) {
 			if (map[i][j].type === 0) continue;
 			let hue = Math.max(100 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 2 * 50, 50) + "," + Math.floor(map[i][j].food / maxTileFood * 100);
-			
+
 			ctx.fillStyle = "hsl(" + hue + "%, 22%)";
 			ctx.fillRect(i * tileSize * zoomLevel - cropx, j * tileSize * zoomLevel - cropy, tileSize * zoomLevel + 1, tileSize * zoomLevel + 1);
 		}
@@ -211,44 +216,44 @@ function render() {
 			ctz.fillCircle(i * 50 + 1920 - 350, 1080 - 35, nnui.size, nnui.stroke);
 		}
 
-    ctz.strokeStyle = "#000000";
+		ctz.strokeStyle = "#000000";
 		ctz.fillStyle = "#ffffff";
-		
+
 		ctz.textAlign = "left";
-    ctz.strokeText(selectedCreature.species, 20, 1080 - 20);
+		ctz.strokeText(selectedCreature.species, 20, 1080 - 20);
 		ctz.fillText(selectedCreature.species, 20, 1080 - 20);
 		ctz.textAlign = "center";
-		
-    ctz.strokeText("Cell State", 1920 - 200, 1080 - 70);
-		
+
+		ctz.strokeText("Cell State", 1920 - 200, 1080 - 70);
+
 		ctz.strokeText("X Move", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
-    ctz.strokeText("Y Move", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
-    ctz.strokeText("Eat", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
-    ctz.strokeText("Attack", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
-    ctz.strokeText("Mitosis", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
-    
-    for (let i = 0; i < memories; i++) {
-      ctz.strokeText("Mem. " + i, nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
-    }
-    
-    ctz.fillText("Cell State", 1920 - 200, 1080 - 70);
-		
+		ctz.strokeText("Y Move", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
+		ctz.strokeText("Eat", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
+		ctz.strokeText("Attack", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
+		ctz.strokeText("Mitosis", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
+
+		for (let i = 0; i < memories; i++) {
+			ctz.strokeText("Mem. " + i, nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
+		}
+
+		ctz.fillText("Cell State", 1920 - 200, 1080 - 70);
+
 		ctz.fillText("X Move", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
-    ctz.fillText("Y Move", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
-    ctz.fillText("Eat", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
-    ctz.fillText("Attack", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
-    ctz.fillText("Mitosis", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
-    
-    for (let i = 0; i < memories; i++) {
-      ctz.fillText("Mem. " + i, nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
-    }
-    
-    ctz.font = "bold 21px Calibri";
-    
+		ctz.fillText("Y Move", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
+		ctz.fillText("Eat", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
+		ctz.fillText("Attack", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
+		ctz.fillText("Mitosis", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
+
+		for (let i = 0; i < memories; i++) {
+			ctz.fillText("Mem. " + i, nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
+		}
+
+		ctz.font = "bold 21px Calibri";
+
 		for (let j = 0; j < forgetLayers[0]; j++) {
 			ctz.fillText(selectedCreature.network.forget.neurons[0][j].toFixed(1), nnui.xoffset - 250, j * (nnui.size * 2 + 5) + nnui.yoffset + 6);
 		}
-    
+
 		for (let j = 0; j < forgetLayers[forgetLayers.length - 1]; j++) {
 			ctz.fillText(selectedCreature.network.forget.neurons[forgetLayers.length - 1][j].toFixed(1), nnui.xoffset - 150, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
 		}
