@@ -1,19 +1,14 @@
-function keyEvents() {
-	if (keyDown(controls.play)) {
+function checkKey(key) {
+	// checks an incoming key
+	if (key == keys[controls.play]) {
 		timescale = 1;
-		timeUp = 0;
-		timetoggle = false;
-	} else if (timetoggle) {
-		timescale = 3 * timeUp;
-	} else if (keyDown(controls.fastForward)) {
-		timescale = 3;
-	} else if (keyDown(controls.stop)) {
+	} else if (key == keys[controls.fastForward] && !fastforward) {
+		timescale *= 3;
+		fastforward = true;
+	} else if (key == keys[controls.stop]) {
 		timescale = 0;
-	} else if (keyDown(controls.speedUp)) {
-		timetoggle = true;
-		timeUp++;
-	} else {
-		timescale = 1;
+	} else if (key == keys[controls.speedUp]) {
+		timescale += 2;
 	}
 }
 
@@ -96,23 +91,12 @@ window.onmousewheel = function (e) {
 };
 
 window.onkeydown = function (e) {
-	activeKeys.push(e.keyCode);
-
-	if (keyDown(controls.speedUp)) {
-		timeUp += 1;
-	}
+	checkKey(e.keyCode);
 };
 
 window.onkeyup = function (e) {
-	var z = activeKeys.indexOf(e.keyCode);
-	for (i = activeKeys.length; i > 0; i--) {
-		if (z == -1) break;
-		activeKeys.splice(z, 1);
-		z = activeKeys.indexOf(e.keyCode);
-	}
-};
-
-function keyDown(key) {
-	if (activeKeys.indexOf(keys[key]) > -1) return true;
-	return false;
+	if (e.keyCode == keys[controls.fastForward] && fastforward) {
+		fastforward = false;
+		timescale /= 3;
+	};
 }
