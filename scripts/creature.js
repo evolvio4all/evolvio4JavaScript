@@ -187,11 +187,6 @@ Creature.prototype.setSpecies = function () {
 	specieslist[species].contains.push(this);
 
 	this.geneticID = geneticID;
-	
-	if (species === undefined) {
-	  console.log(spGen);
-	  console.log(this);
-	}
   
 	return species;
 };
