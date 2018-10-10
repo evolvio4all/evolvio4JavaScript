@@ -7,16 +7,16 @@ const tileSize = 250;
 const selectSizeAddition = 40;
 
 let maxTileFood = 100; // Maximum food in a tile
-const foodRegrowRate = 0.02; // How fast food regrows
+const foodRegrowRate = 0.05; // How fast food regrows
 
 const waterBias = 0.4; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
 const continentSize = 50; // How large the islands are (maintains water ratio)
 
 const growSeasonLength = 800; // Grow season length
-const dieSeasonLength = 1000; // Die season length
+const dieSeasonLength = 800; // Die season length
 
-const seasonChange = 0.02; // Food grow speed change (added in grow season and subtracted in die season)
+const seasonChange = 0.04; // Food grow speed change (added in grow season and subtracted in die season)
 
 
 // CREATURES //

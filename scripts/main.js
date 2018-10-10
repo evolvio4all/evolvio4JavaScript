@@ -144,8 +144,8 @@ function render() {
 	for (let i in map) {
 		for (let j in map[i]) {
 			if (map[i][j].type === 0) continue;
+			let hue = Math.max(100 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 2 * 50, 50) + "," + Math.floor(map[i][j].food / maxTileFood * 100);
 			
-			let hue = Math.max(100 - (season - growSeasonLength) / growSeasonLength * 50, 50) + "," + Math.floor(map[i][j].food / maxTileFood * 100);
 			ctx.fillStyle = "hsl(" + hue + "%, 22%)";
 			ctx.fillRect(i * tileSize * zoomLevel - cropx, j * tileSize * zoomLevel - cropy, tileSize * zoomLevel + 1, tileSize * zoomLevel + 1);
 		}
