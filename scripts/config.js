@@ -18,7 +18,7 @@ const continentSize = 50; // How large the islands are (maintains water ratio)
 const growSeasonLength = 800; // Grow season length
 const dieSeasonLength = 800; // Die season length
 
-const seasonChange = 0.04; // Food grow speed change (added in grow season and subtracted in die season)
+const seasonChange = 0.025; // Food grow speed change (added in grow season and subtracted in die season)
 
 
 // CREATURES //
@@ -65,7 +65,7 @@ const offset = 0.0; // Amount to offset the value of a neuron
 const mutability = 5; // Chance of mutating a single axon
 
 const minStepAmount = Number.EPSILON; // Min step amount (Number.EPSILON is the smallest positive number)
-const stepAmount = 1; // Max step amount
+const stepAmount = 3; // Max step amount
 
 // ZOOM //
 const zoomSpeed = 0.01;

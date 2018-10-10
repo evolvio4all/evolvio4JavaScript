@@ -63,7 +63,7 @@ function update() {
 
 					map[i][j].food += foodRegrowRate * 20;
 
-					if (map[i][j].food > maxTileFood) map[i][j].food = maxTileFood;
+					if (map[i][j].food > map[i][j].maxFood) map[i][j].food = map[i][j].maxFood;
 					else if (map[i][j].food < 0) map[i][j].food = 0;
 				}
 			}
