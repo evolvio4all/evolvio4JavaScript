@@ -34,11 +34,13 @@ const swimmingSpeed = 0.05; // Speed % in water
 const agingSpeed = 0.2; // Aging speed percentage %
 const eatingSpeed = 0.1; // Speed % while eating
 
+const rotationSpeed = 0.1; // Speed % how fast creatures rotate
+
 let oldest = 0; // oldest creature's age
 
 const energy = { // Energy cost per tick
     eat: 0.1, // Energy cost to eat
-    metabolism: 0.6, // Energy cost to live
+    metabolism: 0.2, // Energy cost to live
     move: 0.1, // Energy cost to move
     attack: 0.1, // Energy cost to attack
     birth: 1 // Energy cost to birth
@@ -53,8 +55,8 @@ const minEatPower = 0.0; // Minimum eating strength (anything lower will be 0)
 const minReproducePower = 0.0; // Minimum output to reproduce (anything lower will be 0)
 const minAttackPower = 0.0; // Minimum attack strength (anything lower will be 0)
 
-const reproduceAge = 1000; // Minimum age when a creature can reproduce
-const minReproduceTime = 500; // Minimum time between litters
+const reproduceAge = 1200; // Minimum age when a creature can reproduce
+const minReproduceTime = 800; // Minimum time between litters
 
 // Neural Network //
 const offset = 0.0; // Amount to offset the value of a neuron
