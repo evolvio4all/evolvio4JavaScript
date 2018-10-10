@@ -2,7 +2,6 @@ function main() {
 	let odate = new Date();
 	if (creatures.length > 2000) pause = true;
 	if (!pause) {
-		keyEvents();
 		if (timescale >= 1) {
 			for (let ts = 0; ts < timescale; ts++) {
 				update();
@@ -49,7 +48,10 @@ function update() {
 		season++;
 	} else season--;
 
-	if (season >= growSeasonLength + dieSeasonLength || season < 0) seasonUp = !seasonUp;
+	if (season >= growSeasonLength + dieSeasonLength || season < 0) {
+		seasonUp = !seasonUp;
+		if (seasonUp) year++;
+	}
 
 	for (let i in map) {
 		for (let j in map[i]) {
@@ -84,7 +86,7 @@ function update() {
 
 		let lastContactX = 0;
 		let lastContactY = 0;
-		let lastContactPos = [0, 0];
+		let lastContactPos = [0, 0];	// This entire block of variables gets assigned values but they are never used?
 		let lastContactSize = 1;
 		let lastContactColor = [0, 0, 0];
 		let lastContactEnergy = 0;
@@ -109,7 +111,7 @@ function update() {
 
 		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
 		let age = (creature.age / (1000 / agingSpeed));
-		let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5);
+		let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5);	// These 3 variables are assigned but never used?
 		let memory = [];
 
 		creature.input = [1, x, y, size, energy, tileFood, season / (growSeasonLength + dieSeasonLength)];
@@ -169,8 +171,18 @@ function render() {
 		ctx.fillCircle(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy, creature.size * zoomLevel, true);
 	}
 
+	ctz.textAlign = "left";
+	ctz.fillStyle = "#222222";
+	ctz.font = "28px Calibri";
+	ctz.strokeStyle = "hsl(0, 0%, 100%)";
 	ctz.lineWidth = 3;
+
+	ctz.strokeText("Year " + year, 5, 50);
+	ctz.strokeText("Population: " + population, 5, 100);
+	ctz.strokeText("Timescale: " + timescale + "x", 5, 150);
+
 	if (selectedCreature !== null) {
+
 		ctz.fillStyle = "#222222";
 		ctz.font = "32px Calibri";
 		ctz.strokeStyle = "hsl(0, 0%, 100%)";

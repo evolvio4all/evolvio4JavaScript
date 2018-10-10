@@ -1,19 +1,13 @@
-function keyEvents() {
-	if (keyDown(controls.play)) {
+function checkKey(key) {
+	// checks an incoming key
+	if (key == keys[controls.play]) {
 		timescale = 1;
-		timeUp = 0;
-		timetoggle = false;
-	} else if (timetoggle) {
-		timescale = 3 * timeUp;
-	} else if (keyDown(controls.fastForward)) {
+	} else if (key == keys[controls.fastForward]) {
 		timescale = 3;
-	} else if (keyDown(controls.stop)) {
+	} else if (key == keys[controls.stop]) {
 		timescale = 0;
-	} else if (keyDown(controls.speedUp)) {
-		timetoggle = true;
-		timeUp++;
-	} else {
-		timescale = 1;
+	} else if (key == keys[controls.speedUp]) {
+		timescale += 2;
 	}
 }
 
@@ -96,11 +90,7 @@ window.onmousewheel = function (e) {
 };
 
 window.onkeydown = function (e) {
-	activeKeys.push(e.keyCode);
-
-	if (keyDown(controls.speedUp)) {
-		timeUp += 1;
-	}
+	checkKey(e.keyCode);
 };
 
 window.onkeyup = function (e) {
