@@ -32,7 +32,7 @@ const minCreatureSize = 30; // Minimum Creature Size
 const maxCreatureSpeed = 30; // Maximum Creature Speed
 const swimmingSpeed = 0.05; // Speed % in water
 const agingSpeed = 0.2; // Aging speed percentage %
-const eatingSpeed = 0; // Speed % while eating
+const eatingSpeed = 0.1; // Speed % while eating
 
 let oldest = 0; // oldest creature's age
 

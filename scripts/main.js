@@ -112,7 +112,7 @@ function update() {
 		let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5);
 		let memory = [];
 
-		creature.input = [1, x, y, size, energy, tileFood, age];
+		creature.input = [1, x, y, size, energy, tileFood, season / (growSeasonLength + dieSeasonLength)];
 
 		creature.output = creature.feedForward(creature.input);
 
