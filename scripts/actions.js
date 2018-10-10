@@ -20,10 +20,15 @@ Creature.prototype.metabolize = function () {
 };
 
 Creature.prototype.move = function () {
-	this.energy -= energy.move * (this.size / maxCreatureSize) * (Math.abs(this.output[0]) + Math.abs(this.output[1]));
-
-	this.x += this.output[0] * this.maxSpeed;
-	this.y += this.output[1] * this.maxSpeed;
+	this.energy -= energy.move * (Math.abs(this.output[1]) + Math.abs(this.output[0])) * (this.size / maxCreatureSize);
+  
+  this.rotation += (this.output[0] - this.output[1]) / 180;
+  
+	//this.x += this.output[0] * this.maxSpeed;
+	//this.y += this.output[1] * this.maxSpeed;
+	
+	this.x += Math.cos(this.rotation) * this.maxSpeed * (this.output[0] + this.output[1]) / 2;
+	this.y += Math.sin(this.rotation) * this.maxSpeed * (this.output[0] + this.output[1]) / 2;
 };
 
 Creature.prototype.reproduce = function (t) {

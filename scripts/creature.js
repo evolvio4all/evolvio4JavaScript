@@ -30,6 +30,8 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 
 	this.species = spec;
 	this.species = this.setSpecies();
+	
+	this.rotation = 0;
 
 	this.select = function () {
 		if (mouse.down.x > this.x * zoomLevel - cropx - this.size * zoomLevel - selectSizeAddition * zoomLevel && mouse.down.x < this.x * zoomLevel - cropx + this.size * zoomLevel + selectSizeAddition * zoomLevel && mouse.down.y < this.y * zoomLevel - cropy + this.size * zoomLevel + selectSizeAddition * zoomLevel && mouse.down.y > this.y * zoomLevel - cropy - this.size * zoomLevel - selectSizeAddition * zoomLevel) {

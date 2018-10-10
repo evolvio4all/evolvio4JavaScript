@@ -38,7 +38,7 @@ let oldest = 0; // oldest creature's age
 
 const energy = { // Energy cost per tick
     eat: 0.1, // Energy cost to eat
-    metabolism: 0.2, // Energy cost to live
+    metabolism: 0.6, // Energy cost to live
     move: 0.1, // Energy cost to move
     attack: 0.1, // Energy cost to attack
     birth: 1 // Energy cost to birth
