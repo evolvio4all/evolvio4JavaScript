@@ -34,14 +34,14 @@ const minCreatureSize = 30; // Minimum Creature Size
 const maxCreatureSpeed = 30; // Maximum Creature Speed
 const swimmingSpeed = 0.05; // Speed % in water
 const agingSpeed = 0.2; // Aging speed percentage %
-const eatingSpeed = 0.1; // Speed % while eating
+const eatingSpeed = 0.0; // Speed % while eating
 
 const rotationSpeed = 0.1; // Speed % how fast creatures rotate
 
 let oldest = 0; // oldest creature's age
 
 const energy = { // Energy cost per tick
-    eat: 0.02, // Energy cost to eat
+    eat: 0.04, // Energy cost to eat
     metabolism: 0.05, // Energy cost to live
     move: 0.05, // Energy cost to move
     attack: 0.1, // Energy cost to attack
