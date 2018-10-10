@@ -52,9 +52,9 @@ function update() {
 	}
 
 	if (season % 20 == 0) {
-		for (let i in map) { // This has a big impact on performance. Wouldn't it be possible to do something alike to carykh?
-			for (let j in map[i]) { // Instead of updating every tile each frame, simply update its food level whenever
-				if (map[i][j].type == 1) { // A creature tries to eat from it. Might be kinda difficult math-wise, so I don't know if it is realistic.
+		for (let i in map) {
+			for (let j in map[i]) {
+				if (map[i][j].type == 1) {
 					if (season < growSeasonLength) {
 						map[i][j].food += seasonChange * 20;
 					} else {
@@ -76,17 +76,18 @@ function update() {
 		wallLock(creature);
 		clampSize(creature);
 
-		let x = (creature.x / (tileSize * mapSize));
-		let y = (creature.y / (tileSize * mapSize));
 		let size = ((creature.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
 		let energy = creature.energy / (creatureEnergy * creature.size / maxCreatureSize);
-
 		let pos = creature.getPosition();
 
+    
+    // UNUSED SENSES //
+		/* let x = (creature.x / (tileSize * mapSize));
+		let y = (creature.y / (tileSize * mapSize));
 		let color = creature.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
 		let lastContactX = 0;
 		let lastContactY = 0;
-		let lastContactPos = [0, 0]; // This entire block of variables gets assigned values but they are never used?
+		let lastContactPos = [0, 0];
 		let lastContactSize = 1;
 		let lastContactColor = [0, 0, 0];
 		let lastContactEnergy = 0;
@@ -108,11 +109,12 @@ function update() {
 			lastContactColor = creature.lastContact.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
 			lastContactEnergy = creature.lastContact.energy / (creatureEnergy * creature.size / maxCreatureSize);
 		}
+		
+		let memory = [];
+		let age = (creature.age / (1000 / agingSpeed));
+		let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5); */
 
 		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
-		let age = (creature.age / (1000 / agingSpeed));
-		let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5); // These 3 variables are assigned but never used?
-		let memory = [];
 
 		let rotation = creature.rotation / (2 * Math.PI);
 
