@@ -44,7 +44,7 @@ Creature.prototype.initAxons = function () {
 			for (let neuron = 0; neuron < this.network[brain].neurons[layer].length; neuron++) {
 				let neuronWeights = [];
 				for (let axon = 0; axon < neuronsInNextLayer; axon++) {
-					let weight = Math.round((seededNoise() * 4 - 2) / (1 / connectionDensity)) * (seededNoise() * 3);
+					let weight = Math.round((seededNoise() * stepSize - stepSize / 2) / (1 / connectionDensity)) * (seededNoise() * 3);
 					neuronWeights.push(weight);
 				}
 				layerWeights.push(neuronWeights);
@@ -61,7 +61,7 @@ Creature.prototype.feedForward = function (input) {
 
 		let layer = 0;
 		for (let neuron = 0; neuron < input.length; neuron++) {
-			this.network[brain].neurons[0][neuron] = input[neuron] != Infinity ? input[neuron] : 0;
+			this.network[brain].neurons[0][neuron] = input[neuron];
 		}
 
 		for (let op = 0; op < outputs; op++) {
