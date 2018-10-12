@@ -15,7 +15,13 @@ function main() {
 	}
 
 	let ndate = new Date();
-	if (ndate - odate < 100) render();
+	if (ndate - odate < 100) {
+	  render();
+	}
+	
+	if (ndate - odate > 1000) {
+	  timescale /= 2;
+	}
 }
 
 function wallLock(creature) {
@@ -278,11 +284,11 @@ function render() {
 
 		ctz.fillText("Cell State", 1920 - 200, 1080 - 70);
 
-		ctz.fillText("X Move", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
-		ctz.fillText("Y Move", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
+		ctz.fillText("Left", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+		ctz.fillText("Right", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
 		ctz.fillText("Eat", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
 		ctz.fillText("Attack", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
-		ctz.fillText("Mitosis", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
+		ctz.fillText("Reproduce", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
 
 		for (let i = 0; i < memories; i++) {
 			ctz.fillText("Mem. " + i, nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);

@@ -148,11 +148,11 @@ Creature.prototype.setSpecies = function () {
 	}
 
 	if (species == undefined) {
-		prefix = Math.floor(seededNoise() * prefixes.length);
+		prefix = Math.floor(seededNoise() * prefixes.length - Number.EPSILON);
 		species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 
-		while (specieslist[species] !== undefined && species !== undefined) {
-			prefix = Math.floor(seededNoise() * prefixes.length);
+		while (specieslist[species] !== undefined && prefix !== undefined) {
+			prefix = Math.floor(seededNoise() * prefixes.length - Number.EPSILON);
 			species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 		}
 
@@ -170,7 +170,7 @@ Creature.prototype.setSpecies = function () {
 						species += " " + suffixes[Math.min(this.speciesGeneration - suffixes.length * i, (suffixes.length - 1))];
 					}
 				} else {
-					species += " " + suffixes[this.speciesGeneration % suffixes.length] + (this.speciesGeneration - suffixes.length);
+					species += " " + this.speciesGeneration;
 				}
 			}
 
@@ -190,7 +190,7 @@ Creature.prototype.setSpecies = function () {
 					species += " " + suffixes[Math.min(this.speciesGeneration - suffixes.length * i, (suffixes.length - 1))];
 				}
 			} else {
-				species += " " + suffixes[this.speciesGeneration % suffixes.length] + (this.speciesGeneration - suffixes.length);
+				species += " " + this.speciesGeneration;
 			}
 		}
 	}
