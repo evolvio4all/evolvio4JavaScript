@@ -16,9 +16,9 @@ const distanceSmoothing = 0.5; // less land further away from center
 const continentSize = 50; // How large the islands are (maintains water ratio)
 
 const growSeasonLength = 800; // Grow season length
-const dieSeasonLength = 800; // Die season length
+const dieSeasonLength = 1000; // Die season length
 
-const seasonChange = 0.01; // Food grow speed change (added in grow season and subtracted in die season)
+const seasonChange = 0.02; // Food grow speed change (added in grow season and subtracted in die season)
 const mapUpdateDelay = 100;
 
 // CREATURES //
@@ -69,7 +69,7 @@ const stepAmount = 3; // Max step amount
 
 // ZOOM //
 const zoomSpeed = 0.01;
-const minZoomLevel = 0.0424;
+const minZoomLevel = 0.0424 / 2;
 const maxZoomLevel = 4;
 let zoomLevel = 0.0424;
 

@@ -93,7 +93,9 @@ Creature.prototype.setSpecies = function () {
 	let species = this.species;
 	let prefix = "";
 	let spGen = this.speciesGeneration;
-
+  
+  this.spIn = species;
+  
 	let testInput = [];
 	for (let i = 0; i < inputs; i++) {
 		testInput.push(0.8);
@@ -101,22 +103,22 @@ Creature.prototype.setSpecies = function () {
 
 	for (let i = 0; i < 3; i++) {
 		this.feedForward(testInput);
-	}
 
-	for (let neuronValue of this.network.forget.neurons[forgetLayers.length - 1]) {
-		geneticID.push(neuronValue);
-	}
+		for (let neuronValue of this.network.forget.neurons[forgetLayers.length - 1]) {
+			geneticID.push(neuronValue);
+		}
 
-	for (let neuronValue of this.network.decide.neurons[decideLayers.length - 1]) {
-		geneticID.push((neuronValue + 1) / 2);
-	}
+		for (let neuronValue of this.network.decide.neurons[decideLayers.length - 1]) {
+			geneticID.push((neuronValue + 1) / 2);
+		}
 
-	for (let neuronValue of this.network.modify.neurons[modifyLayers.length - 1]) {
-		geneticID.push(neuronValue);
-	}
+		for (let neuronValue of this.network.modify.neurons[modifyLayers.length - 1]) {
+			geneticID.push(neuronValue);
+		}
 
-	for (let neuronValue of this.network.main.neurons[layers.length - 1]) {
-		geneticID.push(neuronValue);
+		for (let neuronValue of this.network.main.neurons[layers.length - 1]) {
+			geneticID.push(neuronValue);
+		}
 	}
 
 	let minGeneDiff = Infinity;
@@ -141,29 +143,29 @@ Creature.prototype.setSpecies = function () {
 		if (geneDiff < minGeneDiff) {
 			minGeneDiff = geneDiff;
 			if (minGeneDiff < speciesDiversity) {
-				species = specie;
+				species = specie.split(" ")[0];
 				this.speciesGeneration = specieslist[species].contains[0].speciesGeneration;
 			}
 		}
 	}
-
-	if (species == undefined) {
-		prefix = Math.floor(seededNoise() * prefixes.length - Number.EPSILON);
+	
+  if (species !== undefined) species = species.split(" ")[0];
+  
+	if (species === undefined || species == "undefined") {
+		prefix = Math.floor(seededNoise() * prefixes.length);
 		species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 
-		while (specieslist[species] !== undefined && prefix !== undefined) {
-			prefix = Math.floor(seededNoise() * prefixes.length - Number.EPSILON);
+		while (specieslist[species] !== undefined) {
+			prefix = Math.floor(seededNoise() * prefixes.length);
 			species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 		}
 
 		specieslist[species] = {};
 		specieslist[species].contains = [];
 	} else {
-		species = species.split(" ")[0];
-		
 		if (minGeneDiff >= speciesDiversity) {
 			this.speciesGeneration++;
-			if (this.speciesGeneration < suffixes.length) species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
+			if (this.speciesGeneration < suffixes.length) species += " " + suffixes[this.speciesGeneration];
 			else {
 				if (this.speciesGeneration < 40) {
 					for (let i = 0; i < Math.floor(this.speciesGeneration / suffixes.length) + 1; i++) {
@@ -194,7 +196,7 @@ Creature.prototype.setSpecies = function () {
 			}
 		}
 	}
-
+	
 	specieslist[species].contains.push(this);
 
 	this.geneticID = geneticID;

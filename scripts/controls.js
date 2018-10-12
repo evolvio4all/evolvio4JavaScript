@@ -26,9 +26,9 @@ function checkKey(key) {
 }
 
 let mouse = {
-	up: {},
-	down: {},
-	current: {},
+	up: {x: 0, y: 0},
+	down: {x: 0, y: 0},
+	current: {x: 0, y: 0},
 	isdown: false
 };
 

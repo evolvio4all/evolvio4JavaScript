@@ -20,7 +20,11 @@ function main() {
 	}
 	
 	if (ndate - odate > 1000) {
-	  timescale /= 2;
+	  timescale *= 0.9;
+	}
+	
+	if (timescale <= 1 && ndate - odate > 20) {
+	  timescale *= 0.9;
 	}
 }
 
