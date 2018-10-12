@@ -243,27 +243,27 @@ function render() {
 		ctz.lineWidth = 3;
 
 		for (let j = 0; j < forgetLayers[0]; j++) {
-			ctz.fillCircle(nnui.xoffset - 250, j * (nnui.size * 2 + 5) + nnui.yoffset, nnui.size, nnui.stroke);
+			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 14, j * (nnui.size * 2 + 5) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
 		for (let j = 0; j < forgetLayers[forgetLayers.length - 1]; j++) {
-			ctz.fillCircle(nnui.xoffset - 150, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
 		for (let j = 0; j < decideLayers[decideLayers.length - 1]; j++) {
-			ctz.fillCircle(nnui.xoffset - 100, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 8, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
 		for (let j = 0; j < modifyLayers[modifyLayers.length - 1]; j++) {
-			ctz.fillCircle(nnui.xoffset - 50, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 6, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
 		for (let j = 0; j < layers[layers.length - 1]; j++) {
-			ctz.fillCircle(nnui.xoffset, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 3, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
 		for (let i = 0; i < selectedCreature.network.cellState.length; i++) {
-			ctz.fillCircle(i * 50 + 1920 - 350, 1080 - 35, nnui.size, nnui.stroke);
+			ctz.fillCircle(1920 - 60, i * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
 		ctz.strokeStyle = "#000000";
@@ -274,54 +274,54 @@ function render() {
 		ctz.fillText(selectedCreature.species, 20, 1080 - 20);
 		ctz.textAlign = "center";
 
-		ctz.strokeText("Cell State", 1920 - 200, 1080 - 70);
+		ctz.strokeText("Cell State", 1920 - 60, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
 
-		ctz.strokeText("Left", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
-		ctz.strokeText("Right", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
-		ctz.strokeText("Eat", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
-		ctz.strokeText("Attack", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
-		ctz.strokeText("Reproduce", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
+		ctz.strokeText("Left", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+		ctz.strokeText("Right", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
+		ctz.strokeText("Eat", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
+		ctz.strokeText("Attack", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
+		ctz.strokeText("Reproduce", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
 
 		for (let i = 0; i < memories; i++) {
-			ctz.strokeText("Mem. " + i, nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
+			ctz.strokeText("Mem. " + i, nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
 		}
 
-		ctz.fillText("Cell State", 1920 - 200, 1080 - 70);
+		ctz.fillText("Cell State", 1920 - 60, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
 
-		ctz.fillText("Left", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
-		ctz.fillText("Right", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
-		ctz.fillText("Eat", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
-		ctz.fillText("Attack", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
-		ctz.fillText("Reproduce", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
+		ctz.fillText("Left", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+		ctz.fillText("Right", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
+		ctz.fillText("Eat", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
+		ctz.fillText("Attack", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
+		ctz.fillText("Reproduce", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
 
 		for (let i = 0; i < memories; i++) {
-			ctz.fillText("Mem. " + i, nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
+			ctz.fillText("Mem. " + i, nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
 		}
 
 		ctz.font = "bold 21px Calibri";
 
 		for (let j = 0; j < forgetLayers[0]; j++) {
-			ctz.fillText(selectedCreature.network.forget.neurons[0][j].toFixed(1), nnui.xoffset - 250, j * (nnui.size * 2 + 5) + nnui.yoffset + 6);
+			ctz.fillText(selectedCreature.network.forget.neurons[0][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 14, j * (nnui.size * 2 + 5) + nnui.yoffset + 6);
 		}
 
 		for (let j = 0; j < forgetLayers[forgetLayers.length - 1]; j++) {
-			ctz.fillText(selectedCreature.network.forget.neurons[forgetLayers.length - 1][j].toFixed(1), nnui.xoffset - 150, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+			ctz.fillText(selectedCreature.network.forget.neurons[forgetLayers.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
 		}
 
 		for (let j = 0; j < decideLayers[decideLayers.length - 1]; j++) {
-			ctz.fillText(selectedCreature.network.decide.neurons[decideLayers.length - 1][j].toFixed(1), nnui.xoffset - 100, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+			ctz.fillText(selectedCreature.network.decide.neurons[decideLayers.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 8, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
 		}
 
 		for (let j = 0; j < modifyLayers[modifyLayers.length - 1]; j++) {
-			ctz.fillText(selectedCreature.network.modify.neurons[modifyLayers.length - 1][j].toFixed(1), nnui.xoffset - 50, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+			ctz.fillText(selectedCreature.network.modify.neurons[modifyLayers.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 6, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
 		}
 
 		for (let j = 0; j < layers[layers.length - 1]; j++) {
-			ctz.fillText(selectedCreature.network.main.neurons[layers.length - 1][j].toFixed(1), nnui.xoffset, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+			ctz.fillText(selectedCreature.network.main.neurons[layers.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 3, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
 		}
 
 		for (let i = 0; i < selectedCreature.network.cellState.length; i++) {
-			ctz.fillText(selectedCreature.network.cellState[i].toFixed(1), i * 50 + 1920 - 350, 1080 - 35 + 6);
+			ctz.fillText(selectedCreature.network.cellState[i].toFixed(1), 1920 - 60, i * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
 		}
 	}
 }
