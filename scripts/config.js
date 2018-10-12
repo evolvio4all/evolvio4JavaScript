@@ -1,7 +1,7 @@
 // GLOBAL //
 const seed = Math.floor(Math.random() * 999 + 1);
-let debugMode = false;
-
+let debugMode = true;
+let gifMode = false;
 
 // MAP //
 const mapSize = 100;
@@ -9,7 +9,7 @@ const tileSize = 250;
 const selectSizeAddition = 40;
 
 let maxTileFood = 100; // Maximum food in a tile
-const foodRegrowRate = 0.05; // How fast food regrows
+const foodRegrowRate = 0.025; // How fast food regrows
 
 const waterBias = 0.4; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
@@ -18,7 +18,7 @@ const continentSize = 50; // How large the islands are (maintains water ratio)
 const growSeasonLength = 800; // Grow season length
 const dieSeasonLength = 800; // Die season length
 
-const seasonChange = 0.025; // Food grow speed change (added in grow season and subtracted in die season)
+const seasonChange = 0.01; // Food grow speed change (added in grow season and subtracted in die season)
 
 
 // CREATURES //
@@ -32,7 +32,7 @@ const maxCreatureSize = 100; // Maximum Creature Size
 const minCreatureSize = 30; // Minimum Creature Size
 
 const maxCreatureSpeed = 30; // Maximum Creature Speed
-const swimmingSpeed = 0.05; // Speed % in water
+const swimmingSpeed = 0.3; // Speed % in water
 const agingSpeed = 0.2; // Aging speed percentage %
 const eatingSpeed = 0.0; // Speed % while eating
 
@@ -44,7 +44,7 @@ const energy = { // Energy cost per tick
     eat: 0.04, // Energy cost to eat
     metabolism: 0.05, // Energy cost to live
     move: 0.05, // Energy cost to move
-    attack: 0.1, // Energy cost to attack
+    attack: 0.04, // Energy cost to attack
     birth: 1 // Energy cost to birth
 };
 
@@ -62,7 +62,7 @@ const minReproduceTime = 800; // Minimum time between litters
 
 // Neural Network //
 const offset = 0.0; // Amount to offset the value of a neuron
-const mutability = 5; // Chance of mutating a single axon
+const mutability = 4; // Chance of mutating a single axon
 
 const minStepAmount = Number.EPSILON; // Min step amount (Number.EPSILON is the smallest positive number)
 const stepAmount = 3; // Max step amount
@@ -83,7 +83,8 @@ const controls = {
     speedUp: "up",
     stop: "left",
     play: "down",
-    debug: "d"
+    debug: "d",
+    gif: "g"
 };
 
 const nnui = { // Neural network UI config

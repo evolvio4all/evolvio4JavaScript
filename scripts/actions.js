@@ -22,12 +22,9 @@ Creature.prototype.metabolize = function () {
 Creature.prototype.move = function () {
 	this.energy -= energy.move * (Math.abs(this.output[1]) + Math.abs(this.output[0])) * (this.size / maxCreatureSize);
   
-  this.rotation += (this.output[0] - this.output[1]) * rotationSpeed;
+  this.rotation += (this.output[1] - this.output[0]) * rotationSpeed;
   
-  this.rotation = Math.abs(this.rotation) % (2 * Math.PI);
-  
-	//this.x += this.output[0] * this.maxSpeed;
-	//this.y += this.output[1] * this.maxSpeed;
+  this.rotation = this.rotation % (2 * Math.PI);
 	
 	this.x += Math.cos(this.rotation) * this.maxSpeed * (this.output[0] + this.output[1]) / 2;
 	this.y += Math.sin(this.rotation) * this.maxSpeed * (this.output[0] + this.output[1]) / 2;

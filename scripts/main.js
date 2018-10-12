@@ -80,8 +80,7 @@ function update() {
 		let energy = creature.energy / (creatureEnergy * creature.size / maxCreatureSize);
 		let pos = creature.getPosition();
 
-    
-    // UNUSED SENSES //
+		// UNUSED SENSES //
 		/* let x = (creature.x / (tileSize * mapSize));
 		let y = (creature.y / (tileSize * mapSize));
 		let color = creature.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
@@ -153,11 +152,12 @@ function render() {
 			let hue = Math.max(100 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 2 * 50, 50) + "," + Math.floor(map[i][j].food / maxTileFood * 100);
 
 			ctx.fillStyle = "hsl(" + hue + "%, 22%)";
-			ctx.fillRect(i * tileSize * zoomLevel - cropx, j * tileSize * zoomLevel - cropy, tileSize * zoomLevel + 1, tileSize * zoomLevel + 1);
+			ctx.fillRect(i * tileSize * zoomLevel - cropx - 1, j * tileSize * zoomLevel - cropy - 1, tileSize * zoomLevel + 2, tileSize * zoomLevel + 2);
 		}
 	}
 
-	ctx.lineWidth = 5 * zoomLevel;
+	ctx.strokeStyle = "#ffffff";
+	ctx.lineWidth = 10 * zoomLevel;
 	for (let i in outline) {
 		ctx.beginPath();
 		ctx.moveTo(outline[i][0] * zoomLevel - cropx, outline[i][1] * zoomLevel - cropy);
@@ -167,23 +167,63 @@ function render() {
 
 	for (let creature of creatures) {
 		ctx.strokeStyle = "#ffffff";
+
 		if (selectedCreature == creature) {
 			ctx.strokeStyle = "#ff0000";
 		}
 
 		ctx.fillStyle = creature.color;
 		ctx.fillCircle(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy, creature.size * zoomLevel, true);
+		ctx.stroke();
 	}
 
-	ctz.textAlign = "left";
+	if (debugMode) {
+		ctx.strokeStyle = "#ff0000";
+		ctx.lineWidth = 20 * zoomLevel;
+		for (let creature of creatures) {
+			ctx.beginPath();
+			ctx.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
+			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * 200 * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * 200 * zoomLevel);
+			ctx.stroke();
+
+			ctx.beginPath();
+			ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
+			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation - Math.PI / 2) * (100 * creature.network.output[0]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation - Math.PI / 2) * (100 * creature.network.output[0]) * zoomLevel);
+			ctx.stroke();
+
+			ctx.beginPath();
+			ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
+			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel);
+			ctx.stroke();
+		}
+	}
+
+	ctz.textAlign = "center";
 	ctz.fillStyle = "#222222";
-	ctz.font = "28px Calibri";
+	ctz.font = "48px Calibri";
 	ctz.strokeStyle = "hsl(0, 0%, 100%)";
 	ctz.lineWidth = 3;
 
-	ctz.strokeText("Year " + year, 5, 50);
-	ctz.strokeText("Population: " + population, 5, 100);
-	ctz.strokeText("Timescale: " + timescale + "x", 5, 150);
+	ctz.strokeText("Year " + year, 1920 / 2, 50);
+	ctz.fillText("Year " + year, 1920 / 2, 50);
+
+	ctz.textAlign = "left";
+	ctz.strokeText("Population: " + population, 40, 1040);
+	ctz.fillText("Population: " + population, 40, 1040);
+
+	ctz.textAlign = "right";
+	ctz.strokeText(timescale + "x", 1880, 1040);
+	ctz.fillText(timescale + "x", 1880, 1040);
+
+	ctz.textAlign = "center";
+	if (debugMode) {
+		ctz.font = zoomLevel * 128 + "px Calibri";
+
+		let tilex = Math.floor((mouse.current.x + cropx) / tileSize / zoomLevel);
+		let tiley = Math.floor((mouse.current.y + cropy) / tileSize / zoomLevel);
+		ctz.strokeText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 2 * zoomLevel);
+		ctz.fillText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 2 * zoomLevel);
+	}
 
 	if (selectedCreature !== null) {
 

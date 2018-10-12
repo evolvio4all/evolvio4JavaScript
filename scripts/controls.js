@@ -1,14 +1,27 @@
 function checkKey(key) {
 	// checks an incoming key
-	if (key == keys[controls.play]) {
+	lastKey = key;
+	
+	if (keyDown(controls.play)) {
 		timescale = 1;
-	} else if (key == keys[controls.fastForward] && !fastforward) {
+	} else if (keyDown(controls.fastForward) && !fastforward) {
 		timescale *= 3;
 		fastforward = true;
-	} else if (key == keys[controls.stop]) {
+	} else if (keyDown(controls.stop)) {
 		timescale = 0;
-	} else if (key == keys[controls.speedUp]) {
+	} else if (keyDown(controls.speedUp)) {
 		timescale += 2;
+	}
+	
+	if (keyDown(controls.debug)) {
+	  debugMode = !debugMode;
+	}
+	
+	if (keyDown(controls.gif)) {
+	  gifMode = !gifMode;
+	  
+	  if (gifMode) document.body.style.background = "black";
+	  else document.body.style.background = "url('./water.gif') center center repeat fixed";
 	}
 }
 
@@ -24,6 +37,11 @@ function getMousePos(e) {
 		(e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.clientWidth),
 		(e.clientY - canvas.getBoundingClientRect().top) * (canvas.height / canvas.clientHeight)
 	];
+}
+
+function keyDown(key) {
+  if (lastKey == keys[key]) return true;
+  return false;
 }
 
 window.onmousedown = function (e) {
@@ -98,5 +116,5 @@ window.onkeyup = function (e) {
 	if (e.keyCode == keys[controls.fastForward] && fastforward) {
 		fastforward = false;
 		timescale /= 3;
-	};
-}
+	}
+};

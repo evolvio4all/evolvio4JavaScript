@@ -1,9 +1,9 @@
 function Creature(x, y, s, c, spec, sgen, gen) {
-  let tile = Math.floor(seededNoise() * spawnTiles.length);
-  
+	let tile = Math.floor(seededNoise() * spawnTiles.length);
+
 	this.x = x || spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
 	this.y = y || spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
-  
+
 	this.size = s || seededNoise() * (maxCreatureSize - minCreatureSize) + minCreatureSize;
 	this.energy = 100;
 
@@ -30,7 +30,7 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 
 	this.species = spec;
 	this.species = this.setSpecies();
-	
+
 	this.rotation = 0;
 
 	this.select = function () {
@@ -48,8 +48,8 @@ Creature.prototype.tick = function () {
 };
 
 Creature.prototype.randomize = function () {
-  let tile = Math.floor(seededNoise() * spawnTiles.length);
-  
+	let tile = Math.floor(seededNoise() * spawnTiles.length);
+
 	this.x = spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
 	this.y = spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
 
@@ -99,7 +99,9 @@ Creature.prototype.setSpecies = function () {
 		testInput.push(0.8);
 	}
 
-	this.feedForward(testInput);
+	for (let i = 0; i < 3; i++) {
+		this.feedForward(testInput);
+	}
 
 	for (let neuronValue of this.network.forget.neurons[forgetLayers.length - 1]) {
 		geneticID.push(neuronValue);
@@ -145,11 +147,11 @@ Creature.prototype.setSpecies = function () {
 		}
 	}
 
-	if (species === undefined) {
+	if (species == undefined) {
 		prefix = Math.floor(seededNoise() * prefixes.length);
 		species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 
-		while (specieslist[species] !== undefined) {
+		while (specieslist[species] !== undefined && species !== undefined) {
 			prefix = Math.floor(seededNoise() * prefixes.length);
 			species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 		}
@@ -157,19 +159,18 @@ Creature.prototype.setSpecies = function () {
 		specieslist[species] = {};
 		specieslist[species].contains = [];
 	} else {
-		prefix = prefixes.indexOf(species.split(" ")[0]);
-		species = prefixes[prefix] + " " + suffixes[Math.min(this.speciesGeneration, suffixes.length - 1)];
-		for (let i = 1; i <= Math.floor(this.speciesGeneration / (suffixes.length - 1)); i++) {
-			species += " " + suffixes[Math.min(this.speciesGeneration - (suffixes.length - 1) * i, (suffixes.length - 2))];
-		}
-
+		species = species.split(" ")[0];
+		
 		if (minGeneDiff >= speciesDiversity) {
 			this.speciesGeneration++;
 			if (this.speciesGeneration < suffixes.length) species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
 			else {
-				species = prefixes[prefix] + " " + suffixes[suffixes.length - 1];
-				for (let i = 1; i <= Math.floor(this.speciesGeneration / (suffixes.length - 1)); i++) {
-					species += " " + suffixes[Math.min(this.speciesGeneration - (suffixes.length - 1) * i, (suffixes.length - 2))];
+				if (this.speciesGeneration < 40) {
+					for (let i = 0; i < Math.floor(this.speciesGeneration / suffixes.length) + 1; i++) {
+						species += " " + suffixes[Math.min(this.speciesGeneration - suffixes.length * i, (suffixes.length - 1))];
+					}
+				} else {
+					species += " " + suffixes[this.speciesGeneration % suffixes.length] + (this.speciesGeneration - suffixes.length);
 				}
 			}
 
@@ -183,13 +184,21 @@ Creature.prototype.setSpecies = function () {
 			let rand = Math.floor(seededNoise() * 2);
 			tempcolor[0] = Math.floor((Number(tempcolor[0]) + Math.floor(Number(speciesColorChange * minGeneDiff / speciesDiversity * seededNoise() * 0.5 + 0.5)) % 360)).toString();
 			this.color = "hsl(" + tempcolor.join(",") + ")";
+		} else {
+			if (this.speciesGeneration < 40) {
+				for (let i = 0; i < Math.floor(this.speciesGeneration / suffixes.length) + 1; i++) {
+					species += " " + suffixes[Math.min(this.speciesGeneration - suffixes.length * i, (suffixes.length - 1))];
+				}
+			} else {
+				species += " " + suffixes[this.speciesGeneration % suffixes.length] + (this.speciesGeneration - suffixes.length);
+			}
 		}
 	}
 
 	specieslist[species].contains.push(this);
 
 	this.geneticID = geneticID;
-  
+
 	return species;
 };
 
