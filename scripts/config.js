@@ -4,7 +4,7 @@ let debugMode = true;
 let gifMode = false;
 
 // MAP //
-const mapSize = 100;
+const mapSize = 200;
 const tileSize = 250;
 const selectSizeAddition = 40;
 
@@ -19,7 +19,7 @@ const growSeasonLength = 800; // Grow season length
 const dieSeasonLength = 800; // Die season length
 
 const seasonChange = 0.01; // Food grow speed change (added in grow season and subtracted in die season)
-
+const mapUpdateDelay = 100;
 
 // CREATURES //
 const minCreatures = 50; // Minimum number of creatures

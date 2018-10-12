@@ -51,17 +51,17 @@ function update() {
 		if (seasonUp) year++;
 	}
 
-	if (season % 20 == 0) {
+	if (season % mapUpdateDelay == 0) {
 		for (let i in map) {
 			for (let j in map[i]) {
 				if (map[i][j].type == 1) {
 					if (season < growSeasonLength) {
-						map[i][j].food += seasonChange * 20;
+						map[i][j].food += seasonChange * mapUpdateDelay;
 					} else {
-						map[i][j].food -= seasonChange * 20;
+						map[i][j].food -= seasonChange * mapUpdateDelay;
 					}
 
-					map[i][j].food += foodRegrowRate * 20;
+					map[i][j].food += foodRegrowRate * mapUpdateDelay;
 
 					if (map[i][j].food > map[i][j].maxFood) map[i][j].food = map[i][j].maxFood;
 					else if (map[i][j].food < 0) map[i][j].food = 0;
@@ -266,11 +266,11 @@ function render() {
 
 		ctz.strokeText("Cell State", 1920 - 200, 1080 - 70);
 
-		ctz.strokeText("X Move", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
-		ctz.strokeText("Y Move", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
+		ctz.strokeText("Left", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+		ctz.strokeText("Right", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
 		ctz.strokeText("Eat", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
 		ctz.strokeText("Attack", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
-		ctz.strokeText("Mitosis", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
+		ctz.strokeText("Reproduce", nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
 
 		for (let i = 0; i < memories; i++) {
 			ctz.strokeText("Mem. " + i, nnui.xoffset - 75, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
