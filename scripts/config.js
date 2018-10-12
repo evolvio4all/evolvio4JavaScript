@@ -4,7 +4,7 @@ let debugMode = true;
 let gifMode = false;
 
 // MAP //
-const mapSize = 200;
+const mapSize = 150;
 const tileSize = 250;
 const selectSizeAddition = 40;
 

@@ -227,8 +227,13 @@ function render() {
 
 		let tilex = Math.floor((mouse.current.x + cropx) / tileSize / zoomLevel);
 		let tiley = Math.floor((mouse.current.y + cropy) / tileSize / zoomLevel);
-		ctz.strokeText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 2 * zoomLevel);
-		ctz.fillText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 2 * zoomLevel);
+		ctz.strokeText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 1.5 * zoomLevel);
+		//ctz.fillText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 2 * zoomLevel);
+
+		ctx.strokeStyle = "#ffffff";
+		ctx.lineWidth = 1;
+		ctx.rect(tilex * tileSize * zoomLevel - cropx, tiley * tileSize * zoomLevel - cropy, tileSize * zoomLevel + 2, tileSize * zoomLevel + 2);
+		ctx.stroke();
 	}
 
 	if (selectedCreature !== null) {
