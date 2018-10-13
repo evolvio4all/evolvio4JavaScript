@@ -2,6 +2,7 @@
 const seed = Math.floor(Math.random() * 999 + 1);
 let debugMode = true;
 let gifMode = false;
+let autoMode = false; // automatically calculate timescale
 
 // MAP //
 const mapSize = 200;
@@ -45,7 +46,7 @@ const maxEyeDistance = 500; // Maximum distance an "eye" can be from a creature
 
 const energy = { // Energy cost per tick
     eat: 0.04, // Energy cost to eat
-    metabolism: 0.1, // Energy cost to live
+    metabolism: 0.04, // Energy cost to live
     move: 0.05, // Energy cost to move
     attack: 0.04, // Energy cost to attack
     birth: 1 // Energy cost to birth
@@ -87,7 +88,8 @@ const controls = {
     stop: "left",
     play: "down",
     debug: "d",
-    gif: "g"
+    gif: "g",
+    auto: "a"
 };
 
 const nnui = { // Neural network UI config

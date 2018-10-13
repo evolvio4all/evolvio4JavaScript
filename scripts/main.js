@@ -15,21 +15,16 @@ function main() {
 	}
 
 	let ndate = new Date();
-	if (ndate - odate < 100) {
-		render();
+
+	if (ndate - odate < 50) twice = false;
+
+	if (twice && !fastforward && autoMode) {
+		timescale *= 0.95;
+	} else {
+	  render();
 	}
 
-	if (ndate - odate > 1000) {
-		timescale *= 0.9;
-	}
-
-	if (ndate - odate < 60) twice = false;
-
-	if (timescale <= 1 && twice) {
-		timescale *= 0.9;
-	}
-
-	if (ndate - odate >= 60) twice = true;
+	if (ndate - odate >= 50) twice = true;
 }
 
 function wallLock(creature) {
@@ -246,8 +241,8 @@ function render() {
 	ctz.fillText("Population: " + population, 40, 1040);
 
 	ctz.textAlign = "right";
-	ctz.strokeText(timescale + "x", 1880, 1040);
-	ctz.fillText(timescale + "x", 1880, 1040);
+	ctz.strokeText(Math.floor(timescale) + "x", 1880, 1040);
+	ctz.fillText(Math.floor(timescale) + "x", 1880, 1040);
 
 	ctz.textAlign = "center";
 	if (debugMode) {

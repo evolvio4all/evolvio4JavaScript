@@ -3,7 +3,7 @@ const inputs = 6;
 const memories = 2;
 const outputs = 5 + memories;
 
-const connectionDensity = 0.4; // % of axons initially connected in the brain
+const connectionDensity = 0.2; // % of axons initially connected in the brain
 
 // Creature.prototype creates a neural network composed of layers and axons
 Creature.prototype.createNeuralNetwork = function () {
