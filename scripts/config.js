@@ -5,7 +5,7 @@ let gifMode = false;
 let autoMode = false; // automatically calculate timescale
 
 // MAP //
-const mapSize = 200;
+const mapSize = 150;
 const tileSize = 250;
 const selectSizeAddition = 40;
 
