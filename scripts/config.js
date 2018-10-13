@@ -2,6 +2,7 @@
 const seed = Math.floor(Math.random() * 999 + 1);
 let debugMode = true;
 let gifMode = false;
+let autoMode = false; // automatically calculate timescale
 
 // MAP //
 const mapSize = 150;
@@ -16,9 +17,9 @@ const distanceSmoothing = 0.5; // less land further away from center
 const continentSize = 50; // How large the islands are (maintains water ratio)
 
 const growSeasonLength = 800; // Grow season length
-const dieSeasonLength = 800; // Die season length
+const dieSeasonLength = 1000; // Die season length
 
-const seasonChange = 0.01; // Food grow speed change (added in grow season and subtracted in die season)
+const seasonChange = 0.02; // Food grow speed change (added in grow season and subtracted in die season)
 const mapUpdateDelay = 100;
 
 // CREATURES //
@@ -40,9 +41,12 @@ const rotationSpeed = 0.1; // Speed % how fast creatures rotate
 
 let oldest = 0; // oldest creature's age
 
+const maxEyes = 6; // maximum number of "eyes" a creature can have
+const maxEyeDistance = 500; // Maximum distance an "eye" can be from a creature
+
 const energy = { // Energy cost per tick
     eat: 0.04, // Energy cost to eat
-    metabolism: 0.05, // Energy cost to live
+    metabolism: 0.04, // Energy cost to live
     move: 0.05, // Energy cost to move
     attack: 0.04, // Energy cost to attack
     birth: 1 // Energy cost to birth
@@ -69,7 +73,7 @@ const stepAmount = 3; // Max step amount
 
 // ZOOM //
 const zoomSpeed = 0.01;
-const minZoomLevel = 0.0424;
+const minZoomLevel = 0.0424 / 2;
 const maxZoomLevel = 4;
 let zoomLevel = 0.0424;
 
@@ -84,7 +88,8 @@ const controls = {
     stop: "left",
     play: "down",
     debug: "d",
-    gif: "g"
+    gif: "g",
+    auto: "a"
 };
 
 const nnui = { // Neural network UI config
@@ -92,7 +97,7 @@ const nnui = { // Neural network UI config
     yoffset: 70,
     xspacing: 10,
     yspacing: 100,
-    size: 20,
+    size: 18,
     stroke: true,
     maxLineSize: 10,
     minLineSize: 5

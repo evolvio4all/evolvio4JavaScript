@@ -10,11 +10,15 @@ function checkKey(key) {
 	} else if (keyDown(controls.stop)) {
 		timescale = 0;
 	} else if (keyDown(controls.speedUp)) {
-		timescale += 2;
+		timescale += 20;
 	}
 	
 	if (keyDown(controls.debug)) {
 	  debugMode = !debugMode;
+	}
+	
+	if (keyDown(controls.auto)) {
+	  autoMode = !autoMode;
 	}
 	
 	if (keyDown(controls.gif)) {
@@ -26,9 +30,9 @@ function checkKey(key) {
 }
 
 let mouse = {
-	up: {},
-	down: {},
-	current: {},
+	up: {x: 0, y: 0},
+	down: {x: 0, y: 0},
+	current: {x: 0, y: 0},
 	isdown: false
 };
 
