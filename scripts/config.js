@@ -40,9 +40,12 @@ const rotationSpeed = 0.1; // Speed % how fast creatures rotate
 
 let oldest = 0; // oldest creature's age
 
+const maxEyes = 6; // maximum number of "eyes" a creature can have
+const maxEyeDistance = 500; // Maximum distance an "eye" can be from a creature
+
 const energy = { // Energy cost per tick
     eat: 0.04, // Energy cost to eat
-    metabolism: 0.05, // Energy cost to live
+    metabolism: 0.1, // Energy cost to live
     move: 0.05, // Energy cost to move
     attack: 0.04, // Energy cost to attack
     birth: 1 // Energy cost to birth
@@ -92,7 +95,7 @@ const nnui = { // Neural network UI config
     yoffset: 70,
     xspacing: 10,
     yspacing: 100,
-    size: 20,
+    size: 18,
     stroke: true,
     maxLineSize: 10,
     minLineSize: 5

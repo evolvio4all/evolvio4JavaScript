@@ -16,16 +16,20 @@ function main() {
 
 	let ndate = new Date();
 	if (ndate - odate < 100) {
-	  render();
+		render();
 	}
-	
+
 	if (ndate - odate > 1000) {
-	  timescale *= 0.9;
+		timescale *= 0.9;
 	}
-	
-	if (timescale <= 1 && ndate - odate > 20) {
-	  timescale *= 0.9;
+
+	if (ndate - odate < 60) twice = false;
+
+	if (timescale <= 1 && twice) {
+		timescale *= 0.9;
 	}
+
+	if (ndate - odate >= 60) twice = true;
 }
 
 function wallLock(creature) {
@@ -89,45 +93,59 @@ function update() {
 		let size = ((creature.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
 		let energy = creature.energy / (creatureEnergy * creature.size / maxCreatureSize);
 		let pos = creature.getPosition();
+		let eyes = [];
+		for (let eye of creature.eyes) {
+			eyes.push(eye.see());
+		}
 
 		// UNUSED SENSES //
 		/* let x = (creature.x / (tileSize * mapSize));
-		let y = (creature.y / (tileSize * mapSize));
-		let color = creature.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
-		let lastContactX = 0;
-		let lastContactY = 0;
-		let lastContactPos = [0, 0];
-		let lastContactSize = 1;
-		let lastContactColor = [0, 0, 0];
-		let lastContactEnergy = 0;
+			let y = (creature.y / (tileSize * mapSize));
+			let color = creature.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
+			let lastContactX = 0;
+			let lastContactY = 0;
+			let lastContactPos = [0, 0];
+			let lastContactSize = 1;
+			let lastContactColor = [0, 0, 0];
+			let lastContactEnergy = 0;
 
-		for (let creature2 of creatures) {
-			if (creature2 == creature) continue;
-			if (~~(creature.x / tileSize) == ~~(creature2.x / tileSize)) {
-				if (~~(creature.y / tileSize) == ~~(creature2.y / tileSize)) {
-					creature.lastContact = creature2;
+			for (let creature2 of creatures) {
+				if (creature2 == creature) continue;
+				if (~~(creature.x / tileSize) == ~~(creature2.x / tileSize)) {
+					if (~~(creature.y / tileSize) == ~~(creature2.y / tileSize)) {
+						creature.lastContact = creature2;
+					}
 				}
 			}
-		}
 
-		if (typeof creature.lastContact !== "undefined") {
-			lastContactPos = creature.lastContact.getPosition();
-			lastContactSize = ((creature.lastContact.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
-			lastContactX = creature.lastContact.x / (tileSize * mapSize);
-			lastContactY = creature.lastContact.y / (tileSize * mapSize);
-			lastContactColor = creature.lastContact.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
-			lastContactEnergy = creature.lastContact.energy / (creatureEnergy * creature.size / maxCreatureSize);
-		}
+			if (typeof creature.lastContact !== "undefined") {
+				lastContactPos = creature.lastContact.getPosition();
+				lastContactSize = ((creature.lastContact.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
+				lastContactX = creature.lastContact.x / (tileSize * mapSize);
+				lastContactY = creature.lastContact.y / (tileSize * mapSize);
+				lastContactColor = creature.lastContact.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
+				lastContactEnergy = creature.lastContact.energy / (creatureEnergy * creature.size / maxCreatureSize);
+			}
 		
-		let memory = [];
-		let age = (creature.age / (1000 / agingSpeed));
-		let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5); */
+			let memory = [];
+			let age = (creature.age / (1000 / agingSpeed));
+			let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5); */
 
 		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
 
 		let rotation = creature.rotation / (2 * Math.PI);
 
-		creature.input = [1, rotation, size, energy, tileFood, season / (growSeasonLength + dieSeasonLength)];
+		creature.input = [Math.E / 5, rotation, size, energy, tileFood, season / (growSeasonLength + dieSeasonLength)];
+
+		for (let eye of eyes) {
+			if (eye[1] == "tile") {
+				creature.input.push(eye[0].food / maxTileFood);
+			} else if (eye[1] == "creature") {
+				creature.input.push(eye[0].energy / creatureEnergy);
+			} else if (eye[1] == "oob") {
+				creature.input.push(eye[0]);
+			}
+		}
 
 		creature.output = creature.feedForward(creature.input);
 
@@ -205,6 +223,12 @@ function render() {
 			ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
 			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel);
 			ctx.stroke();
+
+			for (let eye of creature.eyes) {
+				ctx.beginPath();
+				ctx.fillRect(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, 40 * zoomLevel, 40 * zoomLevel);
+				ctx.stroke();
+			}
 		}
 	}
 
@@ -236,29 +260,28 @@ function render() {
 	}
 
 	if (selectedCreature !== null) {
-
 		ctz.fillStyle = "#222222";
 		ctz.font = "32px Calibri";
 		ctz.strokeStyle = "hsl(0, 0%, 100%)";
 		ctz.lineWidth = 3;
 
-		for (let j = 0; j < forgetLayers[0]; j++) {
+		for (let j = 0; j < selectedCreature.network.forget.neurons[0].length; j++) {
 			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 14, j * (nnui.size * 2 + 5) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
-		for (let j = 0; j < forgetLayers[forgetLayers.length - 1]; j++) {
+		for (let j = 0; j < selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1].length; j++) {
 			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
-		for (let j = 0; j < decideLayers[decideLayers.length - 1]; j++) {
+		for (let j = 0; j < selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1].length; j++) {
 			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 8, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
-		for (let j = 0; j < modifyLayers[modifyLayers.length - 1]; j++) {
+		for (let j = 0; j < selectedCreature.network.modify.neurons[selectedCreature.network.modify.neurons.length - 1].length; j++) {
 			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 6, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
-		for (let j = 0; j < layers[layers.length - 1]; j++) {
+		for (let j = 0; j < selectedCreature.network.main.neurons[selectedCreature.network.main.neurons.length - 1].length; j++) {
 			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 3, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
 		}
 
@@ -300,24 +323,24 @@ function render() {
 
 		ctz.font = "bold 21px Calibri";
 
-		for (let j = 0; j < forgetLayers[0]; j++) {
+		for (let j = 0; j < selectedCreature.network.forget.neurons[0].length; j++) {
 			ctz.fillText(selectedCreature.network.forget.neurons[0][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 14, j * (nnui.size * 2 + 5) + nnui.yoffset + 6);
 		}
 
-		for (let j = 0; j < forgetLayers[forgetLayers.length - 1]; j++) {
-			ctz.fillText(selectedCreature.network.forget.neurons[forgetLayers.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+		for (let j = 0; j < selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1].length; j++) {
+			ctz.fillText(selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
 		}
 
-		for (let j = 0; j < decideLayers[decideLayers.length - 1]; j++) {
-			ctz.fillText(selectedCreature.network.decide.neurons[decideLayers.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 8, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+		for (let j = 0; j < selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1].length; j++) {
+			ctz.fillText(selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 8, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
 		}
 
-		for (let j = 0; j < modifyLayers[modifyLayers.length - 1]; j++) {
-			ctz.fillText(selectedCreature.network.modify.neurons[modifyLayers.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 6, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+		for (let j = 0; j < selectedCreature.network.modify.neurons[selectedCreature.network.modify.neurons.length - 1].length; j++) {
+			ctz.fillText(selectedCreature.network.modify.neurons[selectedCreature.network.modify.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 6, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
 		}
 
-		for (let j = 0; j < layers[layers.length - 1]; j++) {
-			ctz.fillText(selectedCreature.network.main.neurons[layers.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 3, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+		for (let j = 0; j < selectedCreature.network.main.neurons[selectedCreature.network.main.neurons.length - 1].length; j++) {
+			ctz.fillText(selectedCreature.network.main.neurons[selectedCreature.network.main.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 3, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
 		}
 
 		for (let i = 0; i < selectedCreature.network.cellState.length; i++) {

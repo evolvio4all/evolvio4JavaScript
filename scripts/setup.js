@@ -9,18 +9,6 @@ const ctz = viewport.getContext("2d", {
 	alpha: true
 });
 
-// VARIABLES //
-const memories = 2;
-const outputs = 5 + memories;
-const inputs = 6;
-
-const layers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
-const forgetLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
-const decideLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
-const modifyLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
-
-const connectionDensity = 0.5; // must be >= 0.26
-
 let tick = 0;
 let tc = 0;
 

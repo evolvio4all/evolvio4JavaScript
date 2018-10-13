@@ -20,15 +20,15 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 
 	this.output = [0, 0, 0, 0, 0];
 
-	this.generation = gen || 0;
-	this.speciesGeneration = sgen || 0;
+	this.eyes = this.makeEyes();
 
 	this.network = {};
 	this.createNeuralNetwork();
 
 	this.geneticID = "";
-
+	this.generation = gen || 0;
 	this.species = spec;
+	this.speciesGeneration = sgen || 0;
 	this.species = this.setSpecies();
 
 	this.rotation = 0;
@@ -71,12 +71,14 @@ Creature.prototype.randomize = function () {
 
 	this.generation = 0;
 	this.speciesGeneration = 0;
+	
+  this.eyes = this.makeEyes();
 
 	this.network = {};
 	this.createNeuralNetwork();
 
 	this.geneticID = "";
-
+  
 	this.species = undefined;
 	this.species = this.setSpecies();
 };
@@ -93,9 +95,9 @@ Creature.prototype.setSpecies = function () {
 	let species = this.species;
 	let prefix = "";
 	let spGen = this.speciesGeneration;
-  
-  this.spIn = species;
-  
+	
+	this.spIn = species;
+
 	let testInput = [];
 	for (let i = 0; i < inputs; i++) {
 		testInput.push(0.8);
@@ -104,19 +106,19 @@ Creature.prototype.setSpecies = function () {
 	for (let i = 0; i < 3; i++) {
 		this.feedForward(testInput);
 
-		for (let neuronValue of this.network.forget.neurons[forgetLayers.length - 1]) {
+		for (let neuronValue of this.network.forget.neurons[this.network.forget.neurons.length - 1]) {
 			geneticID.push(neuronValue);
 		}
 
-		for (let neuronValue of this.network.decide.neurons[decideLayers.length - 1]) {
+		for (let neuronValue of this.network.decide.neurons[this.network.decide.neurons.length - 1]) {
 			geneticID.push((neuronValue + 1) / 2);
 		}
 
-		for (let neuronValue of this.network.modify.neurons[modifyLayers.length - 1]) {
+		for (let neuronValue of this.network.modify.neurons[this.network.modify.neurons.length - 1]) {
 			geneticID.push(neuronValue);
 		}
 
-		for (let neuronValue of this.network.main.neurons[layers.length - 1]) {
+		for (let neuronValue of this.network.main.neurons[this.network.main.neurons.length - 1]) {
 			geneticID.push(neuronValue);
 		}
 	}
@@ -144,13 +146,13 @@ Creature.prototype.setSpecies = function () {
 			minGeneDiff = geneDiff;
 			if (minGeneDiff < speciesDiversity) {
 				species = specie.split(" ")[0];
-				this.speciesGeneration = specieslist[species].contains[0].speciesGeneration;
+				this.speciesGeneration = specieslist[specie].contains[0].speciesGeneration;
 			}
 		}
 	}
-	
-  if (species !== undefined) species = species.split(" ")[0];
-  
+
+	if (species !== undefined) species = species.split(" ")[0];
+
 	if (species === undefined || species == "undefined") {
 		prefix = Math.floor(seededNoise() * prefixes.length);
 		species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
@@ -196,7 +198,7 @@ Creature.prototype.setSpecies = function () {
 			}
 		}
 	}
-	
+
 	specieslist[species].contains.push(this);
 
 	this.geneticID = geneticID;
@@ -207,3 +209,41 @@ Creature.prototype.setSpecies = function () {
 Math.clamp = function (num, min, max) {
 	return Math.min(Math.max(num, min), max);
 };
+
+Creature.prototype.eye = function (parent, distance, angle) {
+	this.angle = angle || seededNoise() * 2 * Math.PI;
+  this.parent = parent;
+	this.distance = distance || seededNoise() * (maxEyeDistance - this.parent.size) + this.parent.size;
+  
+	this.see = function() {
+		let out;
+
+		let pos = [~~((this.parent.x + Math.cos(this.parent.rotation + this.angle) * this.distance) / tileSize), ~~((this.parent.y + Math.sin(this.parent.rotation + this.angle) * this.distance) / tileSize)];
+    
+    if (pos[0] < 0 || pos[0] >= mapSize || pos[1] < 0 || pos[1] >= mapSize) return [0, "oob"];
+    
+		out = [map[pos[0]][pos[1]], "tile"];
+
+		for (let creature of creatures) {
+			if (creature == creature) continue;
+			if (~~(creature.x / tileSize) == pos[0]) {
+				if (~~(creature.y / tileSize) == pos[1]) {
+					out = [creature, "creature"];
+				}
+			}
+		}
+
+		return out;
+	}
+}
+
+Creature.prototype.makeEyes = function () {
+	let eyes = [];
+	let numEyes = Math.floor(seededNoise() * (maxEyes + 1));
+	
+	for (let i = 0; i < numEyes; i++) {
+		eyes.push(new this.eye(this));
+	}
+	
+	return eyes;
+}

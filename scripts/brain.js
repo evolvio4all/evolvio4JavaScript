@@ -1,5 +1,20 @@
+// BRAIN INFO //
+const inputs = 6;
+const memories = 2;
+const outputs = 5 + memories;
+
+const connectionDensity = 0.4; // % of axons initially connected in the brain
+
 // Creature.prototype creates a neural network composed of layers and axons
 Creature.prototype.createNeuralNetwork = function () {
+	// VARIABLES //
+	this.inputs = inputs + this.eyes.length;
+
+	let layers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
+	let forgetLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
+	let decideLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
+	let modifyLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
+  
 	this.network.main = {};
 	this.network.main.layers = layers;
 	this.network.forget = {};
@@ -44,7 +59,12 @@ Creature.prototype.initAxons = function () {
 			for (let neuron = 0; neuron < this.network[brain].neurons[layer].length; neuron++) {
 				let neuronWeights = [];
 				for (let axon = 0; axon < neuronsInNextLayer; axon++) {
-					let weight = Math.round((seededNoise() * stepAmount - stepAmount / 2) / (1 / connectionDensity)) * (seededNoise() * 3);
+				  let weight = 0;
+				  
+				  if (seededNoise() < connectionDensity) {
+					  weight = Math.round(seededNoise() * 6 - 3);
+				  }
+				  
 					neuronWeights.push(weight);
 				}
 				layerWeights.push(neuronWeights);
@@ -65,13 +85,13 @@ Creature.prototype.feedForward = function (input) {
 		}
 
 		for (let op = 0; op < outputs; op++) {
-			this.network[brain].neurons[0][inputs + op] = this.network.output[op] || 0;
+			this.network[brain].neurons[0][this.inputs + op] = this.network.output[op] || 0;
 		}
 
 		for (let cs = 0; cs < this.network.cellState.length; cs++) {
-			this.network[brain].neurons[0][inputs + outputs + cs] = this.network.cellState[cs] || 0;
+			this.network[brain].neurons[0][this.inputs + outputs + cs] = this.network.cellState[cs] || 0;
 		}
-    
+
 		for (let neuronsInLayer of this.network[brain].layers) {
 			neuronsInNextLayer = this.network[brain].layers[layer + 1];
 			if (neuronsInNextLayer === undefined) break;
