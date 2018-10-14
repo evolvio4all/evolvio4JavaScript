@@ -42,8 +42,8 @@ const eatingSpeed = 0.0; // Speed % while eating
 const rotationSpeed = 0.1; // Speed % how fast creatures rotate
 
 let oldest = 0; // oldest creature's age
-
-const maxEyes = 2; // maximum number of "eyes" a creature can have
+const maxInitEyes = 2;
+const maxEyes = 6; // maximum number of "eyes" a creature can have
 const maxEyeDistance = 500; // Maximum distance an "eye" can be from a creature
 
 const energy = { // Energy cost per tick

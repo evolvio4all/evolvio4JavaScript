@@ -170,7 +170,7 @@ Creature.prototype.mutate = function () {
 	
 	rand = seededNoise() * 100;
 	
-	if (rand < 5) {
+	if (rand < 5 && this.eyes.length < maxEyes) {
 	  this.eyes.push(new this.eye(this));
 	} else if (rand < 10) {
 	  this.eyes.splice(Math.floor(seededNoise() * this.eyes.length), 1);

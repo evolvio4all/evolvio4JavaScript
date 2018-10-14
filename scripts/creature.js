@@ -19,7 +19,8 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 	this.maxSpeed = maxCreatureSpeed;
 
 	this.output = [0, 0, 0, 0, 0];
-
+  
+  this.eyes = [];
 	this.eyes = this.makeEyes();
 
 	this.network = {};
@@ -71,7 +72,8 @@ Creature.prototype.randomize = function () {
 
 	this.generation = 0;
 	this.speciesGeneration = 0;
-
+  
+  this.eyes = [];
 	this.eyes = this.makeEyes();
 
 	this.network = {};
@@ -239,7 +241,7 @@ Creature.prototype.eye = function (parent, distance, angle) {
 
 Creature.prototype.makeEyes = function () {
 	let eyes = [];
-	let numEyes = Math.floor(seededNoise() * (maxEyes + 1));
+	let numEyes = Math.floor(seededNoise() * (maxInitEyes + 1));
 
 	for (let i = 0; i < numEyes; i++) {
 		eyes.push(new this.eye(this));
