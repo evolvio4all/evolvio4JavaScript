@@ -1,13 +1,13 @@
 // GLOBAL //
 const seed = Math.floor(Math.random() * 999 + 1);
-let debugMode = true;
-let gifMode = false;
+let debugMode = true; // Shows debug info (angle, left and right turn outputs, and tile food)
+let gifMode = false; // removes background
 let autoMode = false; // automatically calculate timescale
 
 // MAP //
-const mapSize = 150;
-const tileSize = 250;
-const selectSizeAddition = 40;
+const mapSize = 150; // Size of the map (height and width) in tiles
+const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
+const selectSizeAddition = 40; // How far around creatures can you click to select them
 
 let maxTileFood = 100; // Maximum food in a tile
 const foodRegrowRate = 0.025; // How fast food regrows
@@ -20,7 +20,7 @@ const growSeasonLength = 800; // Grow season length
 const dieSeasonLength = 1000; // Die season length
 
 const seasonChange = 0.02; // Food grow speed change (added in grow season and subtracted in die season)
-const mapUpdateDelay = 100;
+const mapUpdateDelay = 100; // How many ticks before the map tiles update
 
 // CREATURES //
 const minCreatures = 50; // Minimum number of creatures
@@ -74,10 +74,10 @@ const minStepAmount = Number.EPSILON; // Min step amount (Number.EPSILON is the 
 const stepAmount = 3; // Max step amount
 
 // ZOOM //
-const zoomSpeed = 0.01;
-const minZoomLevel = 0.0424 / 2;
-const maxZoomLevel = 4;
-let zoomLevel = 0.0424;
+const zoomSpeed = 0.01; // How fast the zoom happens
+const minZoomLevel = 0.0424 / 2; // Furthest zoom
+const maxZoomLevel = 4;  // Nearest zoom
+let zoomLevel = 0.0424; // Default zoom
 
 // CENTER MAP (AUTOMATIC) //
 let cropx = -(1920 - tileSize * mapSize * zoomLevel) / 2;
