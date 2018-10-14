@@ -130,28 +130,50 @@ Creature.prototype.feedForward = function (input) {
 Creature.prototype.mutate = function () {
 	let rand = seededNoise() * 100;
 
-	if (rand > 15 && rand < 30) {
+	if (rand < 10) {
 		this.children += 1;
-	} else if (rand > 30 && rand < 45) {
+	} else if (rand < 20) {
 		this.children -= 1;
 	}
-
-	if (rand > 45 && rand < 60) {
+  
+  rand = seededNoise() * 100;
+  
+	if (rand < 10) {
 		this.size /= 1.03;
-	} else if (rand > 60 && rand < 75) {
+	} else if (rand < 20) {
 		this.size *= 1.03;
 	}
 
-	if (rand > 77 && rand < 78) {
+  rand = seededNoise() * 100;
+
+	if (rand < 2) {
 		this.size /= 1.1;
-	} else if (rand > 79 && rand < 80) {
+	} else if (rand < 4) {
 		this.size *= 1.1;
 	}
-
-	if (rand > 45 && rand < 60) {
+  
+  rand = seededNoise() * 100;
+  
+	if (rand < 10) {
 		this.childEnergy /= 1.03;
-	} else if (rand > 60 && rand < 75) {
+	} else if (rand < 20) {
 		this.childEnergy *= 1.03;
+	}
+	
+	rand = seededNoise() * 100;
+	
+	if (rand < 5) {
+	  this.eyes[Math.floor(seededNoise() * this.eyes.length)].angle += seededNoise * 2 / 90 - 1 / 90;
+	} else if (rand < 10) {
+	  this.eyes[Math.floor(seededNoise() * this.eyes.length)].distance += seededNoise * 10 - 5;
+	}
+	
+	rand = seededNoise() * 100;
+	
+	if (rand < 5) {
+	  this.eyes.push(new this.eye(this));
+	} else if (rand < 10) {
+	  this.eyes.splice(Math.floor(seededNoise() * this.eyes.length), 1);
 	}
 
 	if (this.size < minCreatureSize) this.size = minCreatureSize;

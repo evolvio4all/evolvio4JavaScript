@@ -24,6 +24,8 @@ const mapUpdateDelay = 100;
 
 // CREATURES //
 const minCreatures = 50; // Minimum number of creatures
+const minFirstGen = 10; // Minimum number of first generation creatures
+
 const creatureEnergy = 80; // Max creature energy
 
 const speciesDiversity = 6; // Diversity of each species
@@ -41,7 +43,7 @@ const rotationSpeed = 0.1; // Speed % how fast creatures rotate
 
 let oldest = 0; // oldest creature's age
 
-const maxEyes = 6; // maximum number of "eyes" a creature can have
+const maxEyes = 2; // maximum number of "eyes" a creature can have
 const maxEyeDistance = 500; // Maximum distance an "eye" can be from a creature
 
 const energy = { // Energy cost per tick

@@ -55,7 +55,7 @@ Creature.prototype.reproduce = function (t) {
 };
 
 Creature.prototype.die = function () {
-	if (population <= minCreatures) {
+	if (population <= minCreatures || firstGen < minFirstGen) {
 
 		try {
 			specieslist[this.species].contains.splice(specieslist[this.species].contains.indexOf(this), 1);

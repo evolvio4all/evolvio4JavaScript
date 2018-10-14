@@ -10,7 +10,7 @@ function checkKey(key) {
 	} else if (keyDown(controls.stop)) {
 		timescale = 0;
 	} else if (keyDown(controls.speedUp)) {
-		timescale += 20;
+		timescale *= 2;
 	}
 	
 	if (keyDown(controls.debug)) {

@@ -78,10 +78,12 @@ function update() {
 			}
 		}
 	}
-
+  
+  firstGen = 0;
+  
 	for (let creature of creatures) {
 		if (creature.age > oldest) oldest = creature.age;
-
+    if (creature.generation === 0) firstGen++;
 		wallLock(creature);
 		clampSize(creature);
 
@@ -203,6 +205,8 @@ function render() {
 	if (debugMode) {
 		ctx.strokeStyle = "#ff0000";
 		ctx.lineWidth = 20 * zoomLevel;
+		ctx.fillStyle = "#22ffff"
+		
 		for (let creature of creatures) {
 			ctx.beginPath();
 			ctx.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
@@ -218,7 +222,7 @@ function render() {
 			ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
 			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel);
 			ctx.stroke();
-
+      
 			for (let eye of creature.eyes) {
 				ctx.beginPath();
 				ctx.fillRect(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, 40 * zoomLevel, 40 * zoomLevel);
