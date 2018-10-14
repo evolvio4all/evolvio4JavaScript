@@ -40,7 +40,9 @@ Creature.prototype.reproduce = function (t) {
 			child.copyNeuralNetwork(this);
 			child.energy = creatureEnergy * this.childEnergy * birthEffeciency;
 			child.children = this.children;
-      child.eyes = this.eyes;
+			for (let eye of this.eyes) {
+        child.eyes.push(eye);
+			}
       
 			child.mutate();
 

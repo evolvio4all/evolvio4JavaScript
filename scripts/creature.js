@@ -71,14 +71,14 @@ Creature.prototype.randomize = function () {
 
 	this.generation = 0;
 	this.speciesGeneration = 0;
-	
-  this.eyes = this.makeEyes();
+
+	this.eyes = this.makeEyes();
 
 	this.network = {};
 	this.createNeuralNetwork();
 
 	this.geneticID = "";
-  
+
 	this.species = undefined;
 	this.species = this.setSpecies();
 };
@@ -95,7 +95,7 @@ Creature.prototype.setSpecies = function () {
 	let species = this.species;
 	let prefix = "";
 	let spGen = this.speciesGeneration;
-	
+
 	this.spIn = species;
 
 	let testInput = [];
@@ -212,16 +212,16 @@ Math.clamp = function (num, min, max) {
 
 Creature.prototype.eye = function (parent, distance, angle) {
 	this.angle = angle || seededNoise() * 2 * Math.PI;
-  this.parent = parent;
+	this.parent = parent;
 	this.distance = distance || seededNoise() * (maxEyeDistance - this.parent.size) + this.parent.size;
-  
-	this.see = function() {
+
+	this.see = function () {
 		let out;
 
 		let pos = [~~((this.parent.x + Math.cos(this.parent.rotation + this.angle) * this.distance) / tileSize), ~~((this.parent.y + Math.sin(this.parent.rotation + this.angle) * this.distance) / tileSize)];
-    
-    if (pos[0] < 0 || pos[0] >= mapSize || pos[1] < 0 || pos[1] >= mapSize) return [0, "oob"];
-    
+
+		if (pos[0] < 0 || pos[0] >= mapSize || pos[1] < 0 || pos[1] >= mapSize) return [0, "oob"];
+
 		out = [map[pos[0]][pos[1]], "tile"];
 
 		for (let creature of creatures) {
@@ -240,10 +240,10 @@ Creature.prototype.eye = function (parent, distance, angle) {
 Creature.prototype.makeEyes = function () {
 	let eyes = [];
 	let numEyes = Math.floor(seededNoise() * (maxEyes + 1));
-	
+
 	for (let i = 0; i < numEyes; i++) {
 		eyes.push(new this.eye(this));
 	}
-	
+
 	return eyes;
 }
