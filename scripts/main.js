@@ -65,12 +65,10 @@ function update() {
 			for (let j in map[i]) {
 				if (map[i][j].type == 1) {
 					if (season < growSeasonLength) {
-						map[i][j].food += seasonChange * mapUpdateDelay;
+						map[i][j].food += growSeasonGrowRate * mapUpdateDelay;
 					} else {
-						map[i][j].food -= seasonChange * mapUpdateDelay;
+						map[i][j].food += dieSeasonGrowRate * mapUpdateDelay;
 					}
-
-					map[i][j].food += foodRegrowRate * mapUpdateDelay;
 
 					if (map[i][j].food > map[i][j].maxFood) map[i][j].food = map[i][j].maxFood;
 					else if (map[i][j].food < 0) map[i][j].food = 0;

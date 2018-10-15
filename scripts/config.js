@@ -10,7 +10,8 @@ const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 40; // How far around creatures can you click to select them
 
 let maxTileFood = 100; // Maximum food in a tile
-const foodRegrowRate = 0.025; // How fast food regrows
+const growSeasonGrowRate = 0.1; // How fast food regrows
+const dieSeasonGrowRate = 0.06; // How fast food regrows
 
 const waterBias = 0.4; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
@@ -19,7 +20,6 @@ const continentSize = 50; // How large the islands are (maintains water ratio)
 const growSeasonLength = 600; // Grow season length
 const dieSeasonLength = 600; // Die season length
 
-const seasonChange = 0.02; // Food grow speed change (added in grow season and subtracted in die season)
 const mapUpdateDelay = 30; // How many ticks before the map tiles update
 
 // CREATURES //
@@ -56,9 +56,9 @@ const minChildEnergy = 0.1; // Min % of creatures energy to be given to a single
 const maxChildEnergy = 0.8; // Max % of creatures energy to be given to a single child
 
 const energy = { // Energy cost per tick
-    eat: 0.02, // Energy cost to eat
+    eat: 0.1, // Energy cost to eat
     move: 0.02, // Energy cost to move
-    attack: 0.02, // Energy cost to attack
+    attack: 0.1, // Energy cost to attack
     birth: 1 // Energy cost to birth
 };
 
@@ -77,15 +77,15 @@ const minReproduceTime = 200; // Minimum number of ticks between spawns (minRepr
 // Neural Network //
 const offset = 0.0; // Amount to offset the value of a neuron
 const mutability = 4; // Chance of mutating a single axon
-const connectionDensity = 0.4; // % of axons initially connected in the brain
+const connectionDensity = 0.2; // % of axons initially connected in the brain
 
-const memories = 2; // # of memories a creature can store (outputs that do nothing, except store a value)
+const memories = 3; // # of memories a creature can store (outputs that do nothing, except store a value)
 
 const minStepAmount = 0.01; // Minimum amount an axon can be changed by in mutation (Number.EPSILON is the smallest positive number)
 const stepAmount = 2; // Maximum amount an axon can be changed by in mutation
 
-const minInitialAxonValue = -6; // Minimum power of an axon intially
-const maxInitialAxonValue = 6; // Maximum power of an axon intially
+const minInitialAxonValue = -4; // Minimum power of an axon intially
+const maxInitialAxonValue = 4; // Maximum power of an axon intially
 
 // ZOOM //
 const zoomSpeed = 0.01; // How fast the zoom happens
