@@ -26,6 +26,19 @@ let population = 0;
 let creatures = [];
 let selectedCreature = null;
 
+let energyGraph = {
+  eat: [],
+  move: [],
+  metabolism: [],
+  attack: [],
+  birth: [],
+  net: [],
+  gain: [],
+  loss: [],
+  total: []
+};
+
+
 let season = 0;
 let seasonUp = true;
 let year = 0;

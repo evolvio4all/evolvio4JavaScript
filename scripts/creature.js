@@ -3,10 +3,24 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 
 	this.x = x || spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
 	this.y = y || spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
+  
+  this.energyGraph = {
+    move: [],
+    eat: [],
+    attack: [],
+    spawn: [],
+    metabolism: [],
+    gain: [],
+    loss: [],
+    net: [],
+    gross: []
+  };
 
 	this.size = s || seededNoise() * (maxCreatureSize - minCreatureSize) + minCreatureSize;
-	this.energy = 100;
-
+	
+	this.energy = creatureEnergy;
+  this.lastEnergy = creatureEnergy;
+  
 	this.age = 0;
 	this.reproduceTime = 0;
 	this.childEnergy = seededNoise() * (maxChildEnergy - minChildEnergy) + minChildEnergy;
@@ -51,9 +65,21 @@ Creature.prototype.randomize = function () {
 
 	this.x = spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
 	this.y = spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
-
+  
+  this.energyGraph = {
+    move: [],
+    eat: [],
+    attack: [],
+    spawn: [],
+    metabolism: [],
+    gain: [],
+    loss: [],
+    net: [],
+    gross: []
+  };
+  
 	this.size = seededNoise() * (maxCreatureSize - minCreatureSize) + minCreatureSize;
-	this.energy = 100;
+	this.energy = creatureEnergy;
 
 	this.age = 0;
 	this.reproduceTime = 0;

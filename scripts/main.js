@@ -42,7 +42,7 @@ function wallLock(creature) {
 }
 
 function clampSize(creature) {
-	if (creature.energy > creatureEnergy * creature.size / maxCreatureSize) creature.energy = creatureEnergy * creature.size / maxCreatureSize;
+	if (creature.energy > creatureEnergy) creature.energy = creatureEnergy;
 	if (creature.energy <= 0) {
 		if (creature == selectedCreature) selectedCreature = null;
 		creature.die();
@@ -143,20 +143,23 @@ function update() {
 
 		creature.output = creature.feedForward(creature.input);
 
-		if (creature.output[2] >= minEatPower) {
-			creature.eat(pos);
-		} else creature.maxSpeed = maxCreatureSpeed;
+		creature.maxSpeed = maxCreatureSpeed;
 
+		creature.eat(pos);
+		
 		if (map[pos[0]][pos[1]].type === 0) creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
 
-		if (creature.output[3] >= minReproducePower) creature.reproduce();
-		if (creature.output[4] >= minAttackPower) creature.attack();
-
 		creature.move();
+		creature.attack();
+		creature.reproduce();
 		creature.metabolize();
-
 		creature.tick();
-
+		
+		creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
+		creature.energyGraph.gross.push(creature.energy);
+    
+    creature.lastEnergy = creature.energy;
+    
 		if (creature == selectedCreature && zoomLevel > 0.424) {
 			cropx -= (cropx - (creature.x * zoomLevel - canvas.width / 2)) / (50 / zoomLevel);
 			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / (50 / zoomLevel);
@@ -317,6 +320,75 @@ function render() {
 
 		for (let i = 0; i < selectedCreature.network.cellState.length; i++) {
 			ctz.fillCircle(1920 - 60, i * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+		}
+
+		if (debugMode) {
+		  ctz.strokeStyle = "#000000";
+		  
+		  ctz.beginPath();
+		  ctz.moveTo(0, 900);
+		  ctz.lineTo(1400, 900);
+		  ctz.stroke();
+		  
+			ctz.strokeStyle = "#ffffff";
+			let x = 0;
+			ctz.beginPath();
+			for (let point of selectedCreature.energyGraph.gross) {
+				if (x * 10 >= 1400) selectedCreature.energyGraph.gross.splice(0, 1);
+				ctz.lineTo(x * 10, 900 - point * 10);
+				x++;
+			}
+			ctz.stroke();
+
+			ctz.strokeStyle = "#aa88ff";
+			x = 0;
+			ctz.beginPath();
+			for (let point of selectedCreature.energyGraph.move) {
+				if (x * 10 >= 1400) selectedCreature.energyGraph.move.splice(0, 1);
+				ctz.lineTo(x * 10, 900 - point * 100);
+				x++;
+			}
+			ctz.stroke();
+
+			ctz.strokeStyle = "#00ff00";
+			x = 0;
+			ctz.beginPath();
+			for (let point of selectedCreature.energyGraph.eat) {
+				if (x * 10 >= 1400) selectedCreature.energyGraph.eat.splice(0, 1);
+				ctz.lineTo(x * 10, 900 - point * 100);
+				x++;
+			}
+			ctz.stroke();
+
+			ctz.strokeStyle = "#ffaa00";
+			x = 0;
+			ctz.beginPath();
+			for (let point of selectedCreature.energyGraph.metabolism) {
+				if (x * 10 >= 1400) selectedCreature.energyGraph.metabolism.splice(0, 1);
+				ctz.lineTo(x * 10, 900 - point * 100);
+				x++;
+			}
+			ctz.stroke();
+			
+			ctz.strokeStyle = "#ff2233";
+			x = 0;
+			ctz.beginPath();
+			for (let point of selectedCreature.energyGraph.attack) {
+				if (x * 10 >= 1400) selectedCreature.energyGraph.attack.splice(0, 1);
+				ctz.lineTo(x * 10, 900 - point * 100);
+				x++;
+			}
+			ctz.stroke();
+			
+			ctz.strokeStyle = "#aaffff";
+			x = 0;
+			ctz.beginPath();
+			for (let point of selectedCreature.energyGraph.net) {
+				if (x * 10 >= 1400) selectedCreature.energyGraph.net.splice(0, 1);
+				ctz.lineTo(x * 10, 900 - point * 100);
+				x++;
+			}
+			ctz.stroke();
 		}
 
 		ctz.strokeStyle = "#000000";
