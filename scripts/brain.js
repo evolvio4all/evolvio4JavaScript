@@ -181,7 +181,7 @@ Creature.prototype.mutate = function () {
 
 	if (rand < 5 && this.eyes.length < maxEyes) {
 		this.eyes.push(new this.eye(this));
-	} else if (rand < 10 && this.eyes.length > 0) {
+	} else if (rand < 10 && this.eyes.length > minEyes) {
 		this.eyes.splice(Math.floor(seededNoise() * this.eyes.length), 1);
 	}
 

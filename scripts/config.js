@@ -10,8 +10,8 @@ const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 40; // How far around creatures can you click to select them
 
 let maxTileFood = 10; // Maximum food in a tile
-const growSeasonGrowRate = 0.025; // How fast food regrows
-const dieSeasonGrowRate = 0.02; // How fast food regrows
+const growSeasonGrowRate = 0.04; // How fast food regrows
+const dieSeasonGrowRate = 0.03; // How fast food regrows
 
 const waterBias = 0.4; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
@@ -38,15 +38,17 @@ const maxCreatureSpeed = 50; // Maximum creature speed
 const swimmingSpeed = 0.3; // Movement speed % in water
 
 const lifeSpan = 900; // Max lifespan of a creature in ticks (lifeSpan / 30 = lifespan in seconds) determines metabolism
-const eatingSpeed = 1.0; // Movement speed % while eating
+const eatingSpeed = 0.6; // Movement speed % while eating
 
-const rotationSpeed = 0.2; // Speed % how fast creatures rotate
+const rotationSpeed = 0.5; // Speed % how fast creatures rotate
 
 let oldest = 0; // Oldest creature's age
-const maxInitEyes = 4; // Max "eyes" a first generation creature can have
+
+const minInitEyes = 0; // Minimum "eyes" a first generation creature can have
+const maxInitEyes = 6; // Maximum "eyes" a first generation creature can have
 
 const minEyes = 0; // Minimum number of "eyes" a creature can have
-const maxEyes = 12; // maximum number of "eyes" a creature can have
+const maxEyes = 6; // Maximum number of "eyes" a creature can have
 const maxEyeDistance = 1000; // Maximum distance an "eye" can be from a creature
 
 const minChildren = 1; // Minimum children a creature is allowed to produce
@@ -56,9 +58,9 @@ const minChildEnergy = 0.1; // Min % of creatures energy to be given to a single
 const maxChildEnergy = 0.8; // Max % of creatures energy to be given to a single child
 
 const energy = { // Energy cost per tick
-    eat: 0.2, // Energy cost to eat
-    move: 0.2, // Energy cost to move
-    attack: 0.2 // Energy cost to attack
+    eat: 0.1, // Energy cost to eat
+    move: 0.1, // Energy cost to move
+    attack: 0.1 // Energy cost to attack
 };
 
 const eatEffeciency = 1; // Eat effeciency %

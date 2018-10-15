@@ -234,10 +234,10 @@ function render() {
 	}
 
 	ctz.textAlign = "center";
-	ctz.fillStyle = "#222222";
+	ctz.fillStyle = "#ffffff";
+	ctz.strokeStyle = "#000000";
 	ctz.font = "48px Calibri";
-	ctz.strokeStyle = "hsl(0, 0%, 100%)";
-	ctz.lineWidth = 3;
+	ctz.lineWidth = 5;
 
 	ctz.strokeText("Year " + year, 1920 / 2, 50);
 	ctz.fillText("Year " + year, 1920 / 2, 50);

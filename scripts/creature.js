@@ -263,7 +263,7 @@ Creature.prototype.eye = function (parent, angle, distance) {
 
 Creature.prototype.makeEyes = function () {
 	let eyes = [];
-	let numEyes = Math.floor(seededNoise() * (maxInitEyes - minEyes + 1) + minEyes);
+	let numEyes = Math.floor(seededNoise() * (maxInitEyes - minInitEyes + 1) + minInitEyes);
 
 	for (let i = 0; i < numEyes; i++) {
 		eyes.push(new this.eye(this));
