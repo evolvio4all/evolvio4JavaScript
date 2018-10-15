@@ -21,7 +21,7 @@ function main() {
 	if (twice && !fastforward && autoMode) {
 		timescale *= 0.95;
 	} else {
-	  render();
+		render();
 	}
 
 	if (ndate - odate >= 50) twice = true;
@@ -78,22 +78,18 @@ function update() {
 			}
 		}
 	}
-  
-  firstGen = 0;
-  
+
+	firstGen = 0;
+
 	for (let creature of creatures) {
 		if (creature.age > oldest) oldest = creature.age;
-    if (creature.generation === 0) firstGen++;
+		if (creature.generation === 0) firstGen++;
 		wallLock(creature);
 		clampSize(creature);
 
 		let size = ((creature.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
 		let energy = creature.energy / (creatureEnergy * creature.size / maxCreatureSize);
 		let pos = creature.getPosition();
-		let eyes = [];
-		for (let eye of creature.eyes) {
-			eyes.push(eye.see());
-		}
 
 		// UNUSED SENSES //
 		/* let x = (creature.x / (tileSize * mapSize));
@@ -125,7 +121,7 @@ function update() {
 			}
 		
 			let memory = [];
-			let age = (creature.age / (1000 / agingSpeed));
+			let age = creature.age / lifeSpan;
 			let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5); */
 
 		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
@@ -134,13 +130,16 @@ function update() {
 
 		creature.input = [Math.E / 5, rotation, size, energy, tileFood, season / (growSeasonLength + dieSeasonLength)];
 
-		for (let eye of eyes) {
-			if (eye[1] == "tile") {
-				creature.input.push(eye[0].food / maxTileFood);
-			} else if (eye[1] == "creature") {
-				creature.input.push(eye[0].energy / creatureEnergy);
-			} else if (eye[1] == "oob") {
-				creature.input.push(eye[0]);
+		for (let eye of creature.eyes) {
+			if (eye.see()[1] == "tile") {
+				creature.input.push(eye.see()[0].food / maxTileFood);
+				creature.input.push(Math.max(100 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 2 * 50, 50) / 360);
+			} else if (eye.see()[1] == "creature") {
+				creature.input.push(eye.see()[0].energy / creatureEnergy);
+				creature.input.push((parseInt(eye.see()[0].color.split(",")[0].replace("hsl(", "")) % 360) / 360);
+			} else if (eye.see()[1] == "oob") {
+				creature.input.push(eye.see()[0]);
+				creature.input.push(eye.see()[0]);
 			}
 		}
 
@@ -191,6 +190,10 @@ function render() {
 	}
 
 	for (let creature of creatures) {
+		ctx.fillStyle = "rgba(255, 0, 0, " + creature.output[3] + ")";
+		let pos = creature.getPosition();
+		if (creature.output[3] > minAttackPower && debugMode) ctx.fillRect(pos[0] * zoomLevel * tileSize - cropx, pos[1] * zoomLevel * tileSize - cropy, tileSize * zoomLevel, tileSize * zoomLevel);
+
 		ctx.strokeStyle = "#ffffff";
 
 		if (selectedCreature == creature) {
@@ -203,30 +206,28 @@ function render() {
 	}
 
 	if (debugMode) {
-		ctx.strokeStyle = "#ff0000";
-		ctx.lineWidth = 20 * zoomLevel;
-		ctx.fillStyle = "#22ffff"
-		
+		ctz.strokeStyle = "#dddddd";
+		ctz.lineWidth = 20 * zoomLevel;
+		ctz.fillStyle = "#ff0000";
+
 		for (let creature of creatures) {
-			ctx.beginPath();
-			ctx.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
-			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * 200 * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * 200 * zoomLevel);
-			ctx.stroke();
+			ctz.beginPath();
+			ctz.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
+			ctz.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * 200 * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * 200 * zoomLevel);
+			ctz.stroke();
 
-			ctx.beginPath();
-			ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
-			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation - Math.PI / 2) * (100 * creature.network.output[0]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation - Math.PI / 2) * (100 * creature.network.output[0]) * zoomLevel);
-			ctx.stroke();
+			ctz.beginPath();
+			ctz.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
+			ctz.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation - Math.PI / 2) * (100 * creature.network.output[0]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation - Math.PI / 2) * (100 * creature.network.output[0]) * zoomLevel);
+			ctz.stroke();
 
-			ctx.beginPath();
-			ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
-			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel);
-			ctx.stroke();
-      
+			ctz.beginPath();
+			ctz.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
+			ctz.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel);
+			ctz.stroke();
+
 			for (let eye of creature.eyes) {
-				ctx.beginPath();
-				ctx.fillRect(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, 40 * zoomLevel, 40 * zoomLevel);
-				ctx.stroke();
+				ctz.fillRect(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, 40 * zoomLevel, 40 * zoomLevel);
 			}
 		}
 	}
@@ -249,24 +250,51 @@ function render() {
 	ctz.fillText(Math.floor(timescale) + "x", 1880, 1040);
 
 	ctz.textAlign = "center";
+
 	if (debugMode) {
 		ctz.font = zoomLevel * 128 + "px Calibri";
 
 		let tilex = Math.floor((mouse.current.x + cropx) / tileSize / zoomLevel);
 		let tiley = Math.floor((mouse.current.y + cropy) / tileSize / zoomLevel);
-		ctz.strokeText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 1.5 * zoomLevel);
-		ctz.fillText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 1.5 * zoomLevel);
+		if (tilex >= 0 && tilex < mapSize && tiley >= 0 && tiley < mapSize) {
+			ctz.strokeText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 1.5 * zoomLevel);
+			ctz.fillText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 1.5 * zoomLevel);
+		}
 
-		ctx.strokeStyle = "#ffffff";
-		ctx.lineWidth = 1;
-		ctx.rect(tilex * tileSize * zoomLevel - cropx, tiley * tileSize * zoomLevel - cropy, tileSize * zoomLevel + 2, tileSize * zoomLevel + 2);
-		ctx.stroke();
+		ctz.strokeStyle = "#ffffff";
+		ctz.lineWidth = 2;
+		ctz.rect(tilex * tileSize * zoomLevel - cropx, tiley * tileSize * zoomLevel - cropy, tileSize * zoomLevel + 2, tileSize * zoomLevel + 2);
+		ctz.stroke();
 	}
 
 	if (selectedCreature !== null) {
-		ctz.fillStyle = "#222222";
 		ctz.font = "32px Calibri";
+		ctz.lineWidth = 10 * zoomLevel;
+
+		ctz.strokeStyle = "#222266";
+		ctz.beginPath();
+		ctz.moveTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation) * selectedCreature.size * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation) * selectedCreature.size * zoomLevel);
+		ctz.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation - Math.PI / 2) * (100 * selectedCreature.network.output[0]) * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation - Math.PI / 2) * (100 * selectedCreature.network.output[0]) * zoomLevel);
+		ctz.stroke();
+
+		ctz.strokeStyle = "#994444"
+		ctz.beginPath();
+		ctz.moveTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation) * selectedCreature.size * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation) * selectedCreature.size * zoomLevel);
+		ctz.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation + Math.PI / 2) * (100 * selectedCreature.network.output[1]) * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation + Math.PI / 2) * (100 * selectedCreature.network.output[1]) * zoomLevel);
+		ctz.stroke();
+
+		ctz.strokeStyle = "#ff8888";
+		ctz.beginPath();
+		ctz.moveTo(selectedCreature.x * zoomLevel - cropx, selectedCreature.y * zoomLevel - cropy);
+		ctz.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation) * 200 * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation) * 200 * zoomLevel);
+		ctz.stroke();
+
+		ctz.fillStyle = "#222222";
 		ctz.strokeStyle = "hsl(0, 0%, 100%)";
+		for (let eye of selectedCreature.eyes) {
+			ctz.fillRect(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, 40 * zoomLevel, 40 * zoomLevel);
+		}
+
 		ctz.lineWidth = 3;
 
 		for (let j = 0; j < selectedCreature.network.forget.neurons[0].length; j++) {

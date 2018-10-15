@@ -9,8 +9,8 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 
 	this.age = 0;
 	this.reproduceTime = 0;
-	this.childEnergy = seededNoise() * 0.6 + 0.2;
-	this.children = Math.floor(seededNoise() * 10) + 1;
+	this.childEnergy = seededNoise() * (maxChildEnergy - minChildEnergy) + minChildEnergy;
+	this.children = Math.floor(seededNoise() * (maxChildren - minChildren)) + minChildren;
 
 	this.color = c || newColor();
 
@@ -19,11 +19,9 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 	this.maxSpeed = maxCreatureSpeed;
 
 	this.output = [0, 0, 0, 0, 0];
-  
-  this.eyes = [];
+
 	this.eyes = this.makeEyes();
 
-	this.network = {};
 	this.createNeuralNetwork();
 
 	this.geneticID = "";
@@ -72,11 +70,9 @@ Creature.prototype.randomize = function () {
 
 	this.generation = 0;
 	this.speciesGeneration = 0;
-  
-  this.eyes = [];
+
 	this.eyes = this.makeEyes();
 
-	this.network = {};
 	this.createNeuralNetwork();
 
 	this.geneticID = "";
@@ -212,9 +208,9 @@ Math.clamp = function (num, min, max) {
 	return Math.min(Math.max(num, min), max);
 };
 
-Creature.prototype.eye = function (parent, distance, angle) {
-	this.angle = angle || seededNoise() * 2 * Math.PI;
+Creature.prototype.eye = function (parent, angle, distance) {
 	this.parent = parent;
+	this.angle = angle || seededNoise() * 2 * Math.PI;
 	this.distance = distance || seededNoise() * (maxEyeDistance - this.parent.size) + this.parent.size;
 
 	this.see = function () {
@@ -227,9 +223,9 @@ Creature.prototype.eye = function (parent, distance, angle) {
 		out = [map[pos[0]][pos[1]], "tile"];
 
 		for (let creature of creatures) {
-			if (creature == creature) continue;
-			if (~~(creature.x / tileSize) == pos[0]) {
-				if (~~(creature.y / tileSize) == pos[1]) {
+			if (creature == this.parent) continue;
+			if (Math.floor(creature.x / tileSize) == pos[0]) {
+				if (Math.floor(creature.y / tileSize) == pos[1]) {
 					out = [creature, "creature"];
 				}
 			}
@@ -241,7 +237,7 @@ Creature.prototype.eye = function (parent, distance, angle) {
 
 Creature.prototype.makeEyes = function () {
 	let eyes = [];
-	let numEyes = Math.floor(seededNoise() * (maxInitEyes + 1));
+	let numEyes = Math.floor(seededNoise() * (maxInitEyes - minEyes + 1) + minEyes);
 
 	for (let i = 0; i < numEyes; i++) {
 		eyes.push(new this.eye(this));

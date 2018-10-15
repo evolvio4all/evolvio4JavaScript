@@ -16,7 +16,7 @@ Creature.prototype.eat = function (p) {
 };
 
 Creature.prototype.metabolize = function () {
-	this.energy -= energy.metabolism * (this.age / (1000 / agingSpeed));
+	this.energy -= (eatEffeciency - energy.eat) * (this.age / lifeSpan);
 };
 
 Creature.prototype.move = function () {
@@ -34,17 +34,22 @@ Creature.prototype.reproduce = function (t) {
 	if (this.age > reproduceAge && this.reproduceTime > minReproduceTime) {
 		for (let i = 0; i < this.children; i++) {
 			if (this.energy < energy.birth * this.childEnergy) break;
-			
 			let child = new Creature(this.x + Math.round(seededNoise() * 3 - 1.5) * tileSize, this.y + Math.round(seededNoise() * 2 - 1) * tileSize, this.size, this.color, this.species, this.speciesGeneration, this.generation + 1);
+			
+			child.eyes = [];
+			for (let eye of this.eyes) {
+        child.eyes.push(new child.eye(child, eye.angle, eye.distance));
+			}
+			
+      child.mutate();
+      
+	    child.createNeuralNetwork();
 			child.copyNeuralNetwork(this);
+			
 			child.energy = creatureEnergy * this.childEnergy * birthEffeciency;
 			child.children = this.children;
-			
-			for (let eye of this.eyes) {
-        child.eyes.push(eye);
-			}
       
-			child.mutate();
+			child.network.mutate();
 
 			creatures.push(child);
 
