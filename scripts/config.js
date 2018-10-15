@@ -26,7 +26,7 @@ const mapUpdateDelay = 30; // How many ticks before the map tiles update
 const minCreatures = 50; // Minimum number of creatures
 const minFirstGen = 10; // Minimum number of first generation creatures
 
-const creatureEnergy = 20; // Max creature energy
+const creatureEnergy = 50; // Max creature energy
 
 const speciesDiversity = 6; // Diversity of each species
 const speciesColorChange = 20; // Color change between species
@@ -38,7 +38,7 @@ const maxCreatureSpeed = 50; // Maximum creature speed
 const swimmingSpeed = 0.3; // Movement speed % in water
 
 const lifeSpan = 900; // Max lifespan of a creature in ticks (lifeSpan / 30 = lifespan in seconds) determines metabolism
-const eatingSpeed = 0.0; // Movement speed % while eating
+const eatingSpeed = 0.1; // Movement speed % while eating
 
 const rotationSpeed = 0.2; // Speed % how fast creatures rotate
 
@@ -56,9 +56,9 @@ const minChildEnergy = 0.1; // Min % of creatures energy to be given to a single
 const maxChildEnergy = 0.8; // Max % of creatures energy to be given to a single child
 
 const energy = { // Energy cost per tick
-    eat: 0.2, // Energy cost to eat
+    eat: 0.02, // Energy cost to eat
     move: 0.02, // Energy cost to move
-    attack: 0.1, // Energy cost to attack
+    attack: 0.02, // Energy cost to attack
     birth: 1 // Energy cost to birth
 };
 
