@@ -144,7 +144,7 @@ Creature.prototype.mutate = function () {
 		if (this.children < minChildren) this.children = minChildren;
 	} else if (rand < this.mutability.children) {
 		this.children -= 1;
-	  if (this.children > maxChildren) this.children = maxChildren;
+		if (this.children > maxChildren) this.children = maxChildren;
 	}
 
 	rand = seededNoise() * 100;
@@ -174,7 +174,7 @@ Creature.prototype.mutate = function () {
 		if (this.childEnergy < minChildEnergy) this.childEnergy = minChildEnergy;
 	} else if (rand < this.mutability.childEnergy) {
 		this.childEnergy *= 1.03;
-	  if (this.childEnergy > maxChildEnergy) this.childEnergy = maxChildEnergy;
+		if (this.childEnergy > maxChildEnergy) this.childEnergy = maxChildEnergy;
 	}
 
 	rand = seededNoise() * 100;
@@ -188,18 +188,29 @@ Creature.prototype.mutate = function () {
 	rand = seededNoise() * 100;
 
 	let selectedEye = this.eyes[Math.floor(seededNoise() * this.eyes.length)];
-	
+
 	if (this.eyes.length > 0) {
 		if (rand < this.mutability.eyes.angle) {
 			selectedEye.angle += seededNoise(-maxEyeAngleChange, maxEyeAngleChange);
 			if (selectedEye.angle < 0) selectedEye.angle = 0;
 			else if (selectedEye.angle > 2 * Math.PI) selectedEye.angle = 2 * Math.PI;
 		}
-		
+
 		if (rand < this.mutability.eyes.distance) {
 			selectedEye.distance += seededNoise() * 10 - 5;
 			if (selectedEye.distance < minEyeDistance) selectedEye.distance = minEyeDistance;
 			else if (selectedEye.distance > maxEyeDistance) selectedEye.angle = maxEyeDistance;
+		}
+	}
+
+	rand = seededNoise() * 100;
+
+	for (let property in this.mutability) {
+		if (rand < this.mutability.mutability) {
+			this.mutability[property] += seededNoise(-maxMutabilityChange, maxMutabilityChange);
+
+			if (this.mutability[property] < minMutability[property]) this.mutability[property] = minMutability[property];
+			else if (this.mutability[property] > maxMutability[property]) this.mutability[property] = maxMutability[property];
 		}
 	}
 };

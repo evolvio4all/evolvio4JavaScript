@@ -13,7 +13,8 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 			number: seededNoise(minMutability.eyes.number, maxMutability.eyes.number),
 			angle: seededNoise(minMutability.eyes.angle, maxMutability.eyes.angle),
 			distance: seededNoise(minMutability.eyes.distance, maxMutability.eyes.distance)
-		}
+		},
+		mutability: seededNoise(minMutability.mutability, maxMutability.mutability)
 	};
 
 	this.energyGraph = {
@@ -87,7 +88,8 @@ Creature.prototype.randomize = function () {
 			number: seededNoise(minMutability.eyes.number, maxMutability.eyes.number),
 			angle: seededNoise(minMutability.eyes.angle, maxMutability.eyes.angle),
 			distance: seededNoise(minMutability.eyes.distance, maxMutability.eyes.distance)
-		}
+		},
+		mutability: seededNoise(minMutability.mutability, maxMutability.mutability)
 	};
 
 	this.energyGraph = {

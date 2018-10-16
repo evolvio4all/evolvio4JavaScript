@@ -1,6 +1,6 @@
 function main() {
 	let odate = new Date();
-	if (creatures.length > 5000) return;
+	if (creatures.length > 3000) return;
 	if (timescale >= 1) { // Can timescale ever go below 1?
 		for (let ts = 0; ts < timescale; ts++) {
 			update();

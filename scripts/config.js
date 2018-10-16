@@ -13,7 +13,7 @@ let maxTileFood = 10; // Maximum food in a tile
 const growSeasonGrowRate = 0.03; // How fast food regrows
 const dieSeasonGrowRate = 0.02; // How fast food regrows
 
-const waterBias = 0.4; // Becomes unstable above about 0.75
+const waterBias = 0.2; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
 const continentSize = 80; // How large the islands are (maintains water ratio)
 
@@ -24,11 +24,11 @@ const mapUpdateDelay = 30; // How many ticks before the map tiles update
 
 // CREATURES //
 const minCreatures = 50; // Minimum number of creatures
-const minFirstGen = 10; // Minimum number of first generation creatures
+const minFirstGen = 50; // Minimum number of first generation creatures
 
-const creatureEnergy = 30; // Max creature energy
+const creatureEnergy = 50; // Max creature energy
 
-const speciesDiversity = 6; // Diversity of each species
+const speciesDiversity = 20; // Diversity of each species
 const speciesColorChange = 20; // Color change between species
 
 const maxCreatureSize = 100; // Maximum creature size
@@ -45,7 +45,7 @@ const rotationSpeed = 1; // Speed % how fast creatures rotate
 let oldest = 0; // Oldest creature's age
 
 const minInitEyes = 0; // Minimum "eyes" a first generation creature can have
-const maxInitEyes = 6; // Maximum "eyes" a first generation creature can have
+const maxInitEyes = 3; // Maximum "eyes" a first generation creature can have
 
 const minEyes = 0; // Minimum number of "eyes" a creature can have
 const maxEyes = 6; // Maximum number of "eyes" a creature can have
@@ -59,26 +59,26 @@ const maxEyeDistanceChange = 30;
 const minChildren = 1; // Minimum children a creature is allowed to produce
 const maxChildren = 10; // Maximum children a creature is allowed to produce
 
-const minChildEnergy = 0.1; // Min % of creatures energy to be given to a single child
-const maxChildEnergy = 0.8; // Max % of creatures energy to be given to a single child
+const minChildEnergy = 0.2; // Min % of creatures energy to be given to a single child
+const maxChildEnergy = 0.9; // Max % of creatures energy to be given to a single child
 
 const energy = { // Energy cost per tick
-    eat: 0.1, // Energy cost to eat
+    eat: 0.08, // Energy cost to eat
     move: 0.04, // Energy cost to move
-    attack: 0.08 // Energy cost to attack
+    attack: 0.04 // Energy cost to attack
 };
 
 const eatEffeciency = 1; // Eat effeciency %
 const birthEffeciency = 0.9; // Birth effeciency %
 
 const attackEffeciency = 0.95; // Attack effeciency %
-const attackPower = 3.00; // Attack power %
+const attackPower = 3.00; // Attack power % (damage)
 
 const minEatPower = 0.0; // Minimum eating strength (anything lower will be 0)
 const minSpawnPower = 0.0; // Minimum output to reproduce (anything lower will be 0)
 const minAttackPower = 0.0; // Minimum attack strength (anything lower will be 0)
 
-const reproduceAge = 800; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+const reproduceAge = 600; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
 const minReproduceTime = 300; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
@@ -86,18 +86,19 @@ const offset = 0.0; // Amount to offset the value of a neuron
 
 const minMutability = {
   brain: 2,
-  children: 5,
-  childEnergy: 5,
-  size: 5,
+  children: 2,
+  childEnergy: 2,
+  size: 2,
   eyes: {
-    number: 5,
-    angle: 5,
-    distance: 5
-  }
+    number: 2,
+    angle: 2,
+    distance: 2
+  },
+  mutability: 2
 };
 
 const maxMutability = {
-  brain: 50,
+  brain: 15,
   children: 20,
   childEnergy: 20,
   size: 20,
@@ -105,10 +106,13 @@ const maxMutability = {
     number: 20,
     angle: 20,
     distance: 20
-  }
+  },
+  mutability: 20
 };
 
-const connectionDensity = 0.4; // % of axons initially connected in the brain
+const maxMutabilityChange = 2;
+
+const connectionDensity = 0.3; // % of axons initially connected in the brain
 
 const memories = 3; // # of memories a creature can store (outputs that do nothing, except store a value)
 

@@ -67,8 +67,8 @@ Creature.prototype.reproduce = function (t) {
 			}
       
       child.mutability = [];
-			for (let value of this.mutability) {
-				child.mutability.push(value);
+			for (let value in this.mutability) {
+				child.mutability[value] = this.mutability[value];
 			}
 
 			child.mutate();
