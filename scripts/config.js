@@ -10,8 +10,8 @@ const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 40; // How far around creatures can you click to select them
 
 let maxTileFood = 10; // Maximum food in a tile
-const growSeasonGrowRate = 0.04; // How fast food regrows
-const dieSeasonGrowRate = 0.03; // How fast food regrows
+const growSeasonGrowRate = 0.03; // How fast food regrows
+const dieSeasonGrowRate = 0.02; // How fast food regrows
 
 const waterBias = 0.4; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
@@ -40,7 +40,7 @@ const swimmingSpeed = 0.3; // Movement speed % in water
 const lifeSpan = 1200; // Max lifespan of a creature in ticks (lifeSpan / 30 = lifespan in seconds) determines metabolism
 const eatingSpeed = 0.2; // Movement speed % while eating
 
-const rotationSpeed = 0.5; // Speed % how fast creatures rotate
+const rotationSpeed = 1; // Speed % how fast creatures rotate
 
 let oldest = 0; // Oldest creature's age
 
@@ -52,6 +52,9 @@ const maxEyes = 6; // Maximum number of "eyes" a creature can have
 
 const minEyeDistance = 0; // Minimum distance an "eye" can be from a creature
 const maxEyeDistance = 1000; // Maximum distance an "eye" can be from a creature
+
+const maxEyeAngleChange = 1;
+const maxEyeDistanceChange = 30;
 
 const minChildren = 1; // Minimum children a creature is allowed to produce
 const maxChildren = 10; // Maximum children a creature is allowed to produce
@@ -67,19 +70,44 @@ const energy = { // Energy cost per tick
 
 const eatEffeciency = 1; // Eat effeciency %
 const birthEffeciency = 0.9; // Birth effeciency %
-const attackEffeciency = 2.9; // Attack effeciency %
+
+const attackEffeciency = 0.95; // Attack effeciency %
 const attackPower = 3.00; // Attack power %
 
 const minEatPower = 0.0; // Minimum eating strength (anything lower will be 0)
 const minSpawnPower = 0.0; // Minimum output to reproduce (anything lower will be 0)
 const minAttackPower = 0.0; // Minimum attack strength (anything lower will be 0)
 
-const reproduceAge = 600; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+const reproduceAge = 800; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
 const minReproduceTime = 300; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
 const offset = 0.0; // Amount to offset the value of a neuron
-const mutability = 4; // Chance of mutating a single axon
+
+const minMutability = {
+  brain: 2,
+  children: 5,
+  childEnergy: 5,
+  size: 5,
+  eyes: {
+    number: 5,
+    angle: 5,
+    distance: 5
+  }
+};
+
+const maxMutability = {
+  brain: 50,
+  children: 20,
+  childEnergy: 20,
+  size: 20,
+  eyes: {
+    number: 20,
+    angle: 20,
+    distance: 20
+  }
+};
+
 const connectionDensity = 0.4; // % of axons initially connected in the brain
 
 const memories = 3; // # of memories a creature can store (outputs that do nothing, except store a value)

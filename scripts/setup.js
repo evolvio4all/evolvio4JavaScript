@@ -64,9 +64,13 @@ function newColor() {
 }
 
 let grv = 1;
-function seededNoise() {
+function seededNoise(a, b) {
 	grv++;
-	return Math.abs(seed * Math.tan(grv / Math.sin(grv * seed))) % 1;
+	
+	let r1 = a || 0;
+	let r2 = b || 1;
+	
+	return (Math.abs(seed * Math.tan(grv / Math.sin(grv * seed))) % 1) * (r2 - r1) + r1;
 }
 
 function strDifference(str1, str2) {

@@ -139,49 +139,49 @@ Creature.prototype.feedForward = function (input) {
 Creature.prototype.mutate = function () {
 	let rand = seededNoise() * 100;
 
-	if (rand < 10) {
+	if (rand < this.mutability.children / 2) {
 		this.children += 1;
 		if (this.children < minChildren) this.children = minChildren;
-	} else if (rand < 20) {
+	} else if (rand < this.mutability.children) {
 		this.children -= 1;
 	  if (this.children > maxChildren) this.children = maxChildren;
 	}
 
 	rand = seededNoise() * 100;
 
-	if (rand < 10) {
+	if (rand < this.mutability.size / 2) {
 		this.size /= 1.03;
 		if (this.size < minCreatureSize) this.size = minCreatureSize;
-	} else if (rand < 20) {
+	} else if (rand < this.mutability.size) {
 		this.size *= 1.03;
 		if (this.size > maxCreatureSize) this.size = maxCreatureSize;
 	}
 
 	rand = seededNoise() * 100;
 
-	if (rand < 2) {
+	if (rand < this.mutability.size / 10) {
 		this.size /= 1.1;
 		if (this.size < minCreatureSize) this.size = minCreatureSize;
-	} else if (rand < 4) {
+	} else if (rand < this.mutability.size / 5) {
 		this.size *= 1.1;
 		if (this.size > maxCreatureSize) this.size = maxCreatureSize;
 	}
 
 	rand = seededNoise() * 100;
 
-	if (rand < 10) {
+	if (rand < this.mutability.childEnergy / 2) {
 		this.childEnergy /= 1.03;
 		if (this.childEnergy < minChildEnergy) this.childEnergy = minChildEnergy;
-	} else if (rand < 20) {
+	} else if (rand < this.mutability.childEnergy) {
 		this.childEnergy *= 1.03;
 	  if (this.childEnergy > maxChildEnergy) this.childEnergy = maxChildEnergy;
 	}
 
 	rand = seededNoise() * 100;
 
-	if (rand < 5 && this.eyes.length < maxEyes) {
+	if (rand < this.mutability.eyes.number / 2 && this.eyes.length < maxEyes) {
 		this.eyes.push(new this.eye(this));
-	} else if (rand < 10 && this.eyes.length > minEyes) {
+	} else if (rand < this.mutability.eyes.number && this.eyes.length > minEyes) {
 		this.eyes.splice(Math.floor(seededNoise() * this.eyes.length), 1);
 	}
 
@@ -190,12 +190,14 @@ Creature.prototype.mutate = function () {
 	let selectedEye = this.eyes[Math.floor(seededNoise() * this.eyes.length)];
 	
 	if (this.eyes.length > 0) {
-		if (rand < 5) {
-			selectedEye.angle += (seededNoise * 2 * Math.PI - Math.PI) / 180;
+		if (rand < this.mutability.eyes.angle) {
+			selectedEye.angle += seededNoise(-maxEyeAngleChange, maxEyeAngleChange);
 			if (selectedEye.angle < 0) selectedEye.angle = 0;
 			else if (selectedEye.angle > 2 * Math.PI) selectedEye.angle = 2 * Math.PI;
-		} else if (rand < 10) {
-			selectedEye.distance += seededNoise * 10 - 5;
+		}
+		
+		if (rand < this.mutability.eyes.distance) {
+			selectedEye.distance += seededNoise() * 10 - 5;
 			if (selectedEye.distance < minEyeDistance) selectedEye.distance = minEyeDistance;
 			else if (selectedEye.distance > maxEyeDistance) selectedEye.angle = maxEyeDistance;
 		}
@@ -209,12 +211,12 @@ Brain.prototype.mutate = function () {
 			for (let j = 0; j < this.network[brain].axons[i].length; j++) {
 				for (let k = 0; k < this.network[brain].axons[i][j].length; k++) {
 					let weight = this.network[brain].axons[i][j][k];
-					let randomNumber = seededNoise() * 100;
+					let randomNumber = seededNoise(0, 100);
 					const numMutations = 2;
 
-					if (randomNumber < mutability * 1 / numMutations) {
+					if (randomNumber < this.mutability[0] * 1 / numMutations) {
 						weight += (seededNoise() * (1 - minStepAmount) + minStepAmount) * stepAmount - stepAmount / 2;
-					} else if (randomNumber < mutability * 2 / numMutations) {
+					} else if (randomNumber < this.mutability[0] * 2 / numMutations) {
 						weight = 0;
 					}
 
