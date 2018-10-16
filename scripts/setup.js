@@ -55,8 +55,8 @@ let toggle = false;
 // FUNCTIONS //
 
 function newColor() {
-	let h = Math.floor(seededNoise() * 360);
-	let s = Math.floor(seededNoise() * 60 + 20);
+	let h = Math.floor(seededNoise(0, 360));
+	let s = Math.floor(seededNoise(20, 80));
   let l = 50;
   
   

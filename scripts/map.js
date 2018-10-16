@@ -46,7 +46,7 @@ function Tile(x, y) {
     // We increase odds of tile being water if it is further away from center (affected by distanceSmoothing)
     tile -= Math.sqrt(Math.pow(x - mapSize/2, 2) + Math.pow(y - mapSize/2, 2)) / (mapSize / 2) * distanceSmoothing;
     this.type = tile < 0 ? 0 : 1;
-    this.maxFood = seededNoise() * 0.1 * maxTileFood + 0.9 * maxTileFood;
+    this.maxFood = seededNoise(0.9 * maxTileFood, maxTileFood);
     this.food = this.maxFood;
     
     this.x = x;

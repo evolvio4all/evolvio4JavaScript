@@ -70,7 +70,7 @@ Creature.prototype.initAxons = function () {
 					let weight = 0;
 
 					if (seededNoise() < connectionDensity) {
-						weight = Math.round(seededNoise() * (maxInitialAxonValue - minInitialAxonValue) + minInitialAxonValue);
+						weight = Math.round(seededNoise(minInitialAxonValue, maxInitialAxonValue));
 					}
 
 					neuronWeights.push(weight);
@@ -137,7 +137,7 @@ Creature.prototype.feedForward = function (input) {
 
 // Modifies weights of the axons
 Creature.prototype.mutate = function () {
-	let rand = seededNoise() * 100;
+	let rand = seededNoise(0, 100);
 
 	if (rand < this.mutability.children / 2) {
 		this.children += 1;
@@ -147,7 +147,7 @@ Creature.prototype.mutate = function () {
 		if (this.children > maxChildren) this.children = maxChildren;
 	}
 
-	rand = seededNoise() * 100;
+	rand = seededNoise(0, 100);
 
 	if (rand < this.mutability.size / 2) {
 		this.size /= 1.03;
@@ -157,7 +157,7 @@ Creature.prototype.mutate = function () {
 		if (this.size > maxCreatureSize) this.size = maxCreatureSize;
 	}
 
-	rand = seededNoise() * 100;
+	rand = seededNoise(0, 100);
 
 	if (rand < this.mutability.size / 10) {
 		this.size /= 1.1;
@@ -167,7 +167,7 @@ Creature.prototype.mutate = function () {
 		if (this.size > maxCreatureSize) this.size = maxCreatureSize;
 	}
 
-	rand = seededNoise() * 100;
+	rand = seededNoise(0, 100);
 
 	if (rand < this.mutability.childEnergy / 2) {
 		this.childEnergy /= 1.03;
@@ -177,17 +177,17 @@ Creature.prototype.mutate = function () {
 		if (this.childEnergy > maxChildEnergy) this.childEnergy = maxChildEnergy;
 	}
 
-	rand = seededNoise() * 100;
+	rand = seededNoise(0, 100);
 
 	if (rand < this.mutability.eyes.number / 2 && this.eyes.length < maxEyes) {
 		this.eyes.push(new this.eye(this));
 	} else if (rand < this.mutability.eyes.number && this.eyes.length > minEyes) {
-		this.eyes.splice(Math.floor(seededNoise() * this.eyes.length), 1);
+		this.eyes.splice(Math.floor(seededNoise(0, this.eyes.length)), 1);
 	}
 
-	rand = seededNoise() * 100;
+	rand = seededNoise(0, 100);
 
-	let selectedEye = this.eyes[Math.floor(seededNoise() * this.eyes.length)];
+	let selectedEye = this.eyes[Math.floor(seededNoise(0, this.eyes.length))];
 
 	if (this.eyes.length > 0) {
 		if (rand < this.mutability.eyes.angle) {
@@ -197,16 +197,27 @@ Creature.prototype.mutate = function () {
 		}
 
 		if (rand < this.mutability.eyes.distance) {
-			selectedEye.distance += seededNoise() * 10 - 5;
+			selectedEye.distance += seededNoise(-maxEyeDistanceChange, maxEyeDistanceChange);
 			if (selectedEye.distance < minEyeDistance) selectedEye.distance = minEyeDistance;
 			else if (selectedEye.distance > maxEyeDistance) selectedEye.angle = maxEyeDistance;
 		}
 	}
 
-	rand = seededNoise() * 100;
-
 	for (let property in this.mutability) {
-		if (rand < this.mutability.mutability) {
+		rand = seededNoise(0, 100);
+		
+		if (property == "eyes") {
+			for (let sec in this.mutability[property]) {
+				rand = seededNoise(0, 100);
+
+				if (rand < this.mutability.mutability) {
+					this.mutability[property][sec] += seededNoise(-maxMutabilityChange, maxMutabilityChange);
+
+					if (this.mutability[property][sec] < minMutability[property][sec]) this.mutability[property][sec] = minMutability[property][sec];
+					else if (this.mutability[property][sec] > maxMutability[property][sec]) this.mutability[property][sec] = maxMutability[property][sec];
+				}
+			}
+		} else if (rand < this.mutability.mutability) {
 			this.mutability[property] += seededNoise(-maxMutabilityChange, maxMutabilityChange);
 
 			if (this.mutability[property] < minMutability[property]) this.mutability[property] = minMutability[property];
@@ -226,7 +237,7 @@ Brain.prototype.mutate = function () {
 					const numMutations = 2;
 
 					if (randomNumber < this.mutability[0] * 1 / numMutations) {
-						weight += (seededNoise() * (1 - minStepAmount) + minStepAmount) * stepAmount - stepAmount / 2;
+						weight += seededNoise(-stepAmount, stepAmount);
 					} else if (randomNumber < this.mutability[0] * 2 / numMutations) {
 						weight = 0;
 					}

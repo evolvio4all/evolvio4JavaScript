@@ -59,7 +59,7 @@ Creature.prototype.reproduce = function (t) {
 	if (this.age > reproduceAge && this.reproduceTime > minReproduceTime) {
 		for (let i = 0; i < this.children; i++) {
 			if (this.energy < this.childEnergy) break;
-			let child = new Creature(this.x + Math.round(seededNoise() * 3 - 1.5) * tileSize, this.y + Math.round(seededNoise() * 3 - 1.5) * tileSize, this.size, this.color, this.species, this.speciesGeneration, this.generation + 1);
+			let child = new Creature(this.x + Math.round(seededNoise(-1.5, 1.5)) * tileSize, this.y + Math.round(seededNoise(-1.5, 1.5)) * tileSize, this.size, this.color, this.species, this.speciesGeneration, this.generation + 1);
 
 			child.eyes = [];
 			for (let eye of this.eyes) {

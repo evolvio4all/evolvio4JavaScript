@@ -116,7 +116,6 @@ const connectionDensity = 0.3; // % of axons initially connected in the brain
 
 const memories = 3; // # of memories a creature can store (outputs that do nothing, except store a value)
 
-const minStepAmount = 0.01; // Minimum amount an axon can be changed by in mutation (Number.EPSILON is the smallest positive number)
 const stepAmount = 2; // Maximum amount an axon can be changed by in mutation
 
 const minInitialAxonValue = -4; // Minimum power of an axon intially
