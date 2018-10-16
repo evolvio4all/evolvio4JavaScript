@@ -15,7 +15,7 @@ const dieSeasonGrowRate = 0.03; // How fast food regrows
 
 const waterBias = 0.4; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
-const continentSize = 50; // How large the islands are (maintains water ratio)
+const continentSize = 80; // How large the islands are (maintains water ratio)
 
 const growSeasonLength = 600; // Grow season length
 const dieSeasonLength = 600; // Die season length
@@ -37,8 +37,8 @@ const minCreatureSize = 30; // Minimum creature size
 const maxCreatureSpeed = 50; // Maximum creature speed
 const swimmingSpeed = 0.3; // Movement speed % in water
 
-const lifeSpan = 900; // Max lifespan of a creature in ticks (lifeSpan / 30 = lifespan in seconds) determines metabolism
-const eatingSpeed = 0.6; // Movement speed % while eating
+const lifeSpan = 1200; // Max lifespan of a creature in ticks (lifeSpan / 30 = lifespan in seconds) determines metabolism
+const eatingSpeed = 0.2; // Movement speed % while eating
 
 const rotationSpeed = 0.5; // Speed % how fast creatures rotate
 
@@ -49,6 +49,8 @@ const maxInitEyes = 6; // Maximum "eyes" a first generation creature can have
 
 const minEyes = 0; // Minimum number of "eyes" a creature can have
 const maxEyes = 6; // Maximum number of "eyes" a creature can have
+
+const minEyeDistance = 0; // Minimum distance an "eye" can be from a creature
 const maxEyeDistance = 1000; // Maximum distance an "eye" can be from a creature
 
 const minChildren = 1; // Minimum children a creature is allowed to produce
@@ -59,12 +61,12 @@ const maxChildEnergy = 0.8; // Max % of creatures energy to be given to a single
 
 const energy = { // Energy cost per tick
     eat: 0.1, // Energy cost to eat
-    move: 0.1, // Energy cost to move
-    attack: 0.1 // Energy cost to attack
+    move: 0.04, // Energy cost to move
+    attack: 0.08 // Energy cost to attack
 };
 
 const eatEffeciency = 1; // Eat effeciency %
-const birthEffeciency = 0.85; // Birth effeciency %
+const birthEffeciency = 0.9; // Birth effeciency %
 const attackEffeciency = 2.9; // Attack effeciency %
 const attackPower = 3.00; // Attack power %
 
@@ -72,8 +74,8 @@ const minEatPower = 0.0; // Minimum eating strength (anything lower will be 0)
 const minSpawnPower = 0.0; // Minimum output to reproduce (anything lower will be 0)
 const minAttackPower = 0.0; // Minimum attack strength (anything lower will be 0)
 
-const reproduceAge = 300; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
-const minReproduceTime = 200; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
+const reproduceAge = 600; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+const minReproduceTime = 300; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
 const offset = 0.0; // Amount to offset the value of a neuron

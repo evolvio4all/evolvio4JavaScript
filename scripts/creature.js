@@ -237,7 +237,7 @@ Math.clamp = function (num, min, max) {
 Creature.prototype.eye = function (parent, angle, distance) {
 	this.parent = parent;
 	this.angle = angle || seededNoise() * 2 * Math.PI;
-	this.distance = distance || seededNoise() * (maxEyeDistance - this.parent.size) + this.parent.size;
+	this.distance = distance || seededNoise() * (maxEyeDistance - minEyeDistance) + minEyeDistance;
 
 	this.see = function () {
 		let out;

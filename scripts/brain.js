@@ -187,16 +187,16 @@ Creature.prototype.mutate = function () {
 
 	rand = seededNoise() * 100;
 
-	var selectedEye = this.eyes[Math.floor(seededNoise() * this.eyes.length - Number.EPSILON)];
+	let selectedEye = this.eyes[Math.floor(seededNoise() * this.eyes.length)];
 	
 	if (this.eyes.length > 0) {
 		if (rand < 5) {
-			selectedEye.angle += seededNoise * 2 / 90 - 1 / 90;
+			selectedEye.angle += (seededNoise * 2 * Math.PI - Math.PI) / 180;
 			if (selectedEye.angle < 0) selectedEye.angle = 0;
 			else if (selectedEye.angle > 2 * Math.PI) selectedEye.angle = 2 * Math.PI;
 		} else if (rand < 10) {
 			selectedEye.distance += seededNoise * 10 - 5;
-			if (selectedEye.distance < 0) selectedEye.distance = 0;
+			if (selectedEye.distance < minEyeDistance) selectedEye.distance = minEyeDistance;
 			else if (selectedEye.distance > maxEyeDistance) selectedEye.angle = maxEyeDistance;
 		}
 	}

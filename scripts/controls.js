@@ -24,7 +24,7 @@ function checkKey(key) {
 	if (keyDown(controls.gif)) {
 	  gifMode = !gifMode;
 	  
-	  if (gifMode) document.body.style.background = "black";
+	  if (gifMode) document.body.style.background = "aqua";
 	  else document.body.style.background = "url('./water.gif') center center repeat fixed";
 	}
 }
