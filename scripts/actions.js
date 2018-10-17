@@ -72,13 +72,14 @@ Creature.prototype.reproduce = function (t) {
 				child.mutability[value] = this.mutability[value];
 			}
 
+			child.energy = creatureEnergy * this.childEnergy * birthEffeciency;
+			child.children = this.children;
+			child.childEnergy = this.childEnergy;
+			
 			child.mutate();
 
 			child.createNeuralNetwork();
 			child.copyNeuralNetwork(this);
-
-			child.energy = creatureEnergy * this.childEnergy * birthEffeciency;
-			child.children = this.children;
 
 			child.network.mutate();
 
