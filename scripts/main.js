@@ -86,7 +86,7 @@ function update() {
 		clampSize(creature);
 
 		let size = ((creature.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
-		let energy = creature.energy / (creatureEnergy * creature.size / maxCreatureSize);
+		let energy = creature.energy / creatureEnergy;
 		let pos = creature.getPosition();
 
 		// UNUSED SENSES //
@@ -119,14 +119,14 @@ function update() {
 			}
 		
 			let memory = [];
-			let age = creature.age / lifeSpan;
+			let age = creature.age / metabolismScaleTime;
 			let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5); */
 
 		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
 
 		let rotation = creature.rotation / (2 * Math.PI);
 
-		creature.input = [Math.E / 5, rotation, size, energy, tileFood, season / (growSeasonLength + dieSeasonLength)];
+		creature.input = [0.865, energy, season / (growSeasonLength + dieSeasonLength)];
 
 		for (let eye of creature.eyes) {
 			if (eye.see()[1] == "tile") {
@@ -146,7 +146,7 @@ function update() {
 		creature.maxSpeed = maxCreatureSpeed;
 
 		creature.eat(pos);
-		
+
 		if (map[pos[0]][pos[1]].type === 0) creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
 
 		creature.move();
@@ -154,12 +154,12 @@ function update() {
 		creature.reproduce();
 		creature.metabolize();
 		creature.tick();
-		
+
 		creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
 		creature.energyGraph.gross.push(creature.energy);
-    
-    creature.lastEnergy = creature.energy;
-    
+
+		creature.lastEnergy = creature.energy;
+
 		if (creature == selectedCreature && zoomLevel > 0.424) {
 			cropx -= (cropx - (creature.x * zoomLevel - canvas.width / 2)) / (50 / zoomLevel);
 			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / (50 / zoomLevel);
@@ -192,9 +192,11 @@ function render() {
 
 	for (let creature of creatures) {
 		ctx.fillStyle = "rgba(255, 0, 0, " + creature.output[3] + ")";
-		let pos = creature.getPosition();
-		if (creature.output[3] > minAttackPower && debugMode) ctx.fillRect(pos[0] * zoomLevel * tileSize - cropx, pos[1] * zoomLevel * tileSize - cropy, tileSize * zoomLevel, tileSize * zoomLevel);
-
+		let pos = [Math.floor((creature.x + Math.cos(creature.rotation) * tileSize) / tileSize), Math.floor((creature.y + Math.sin(creature.rotation) * tileSize) / tileSize)];
+		if (creature.output[3] > minAttackPower && debugMode) {
+		  ctx.fillRect(pos[0] * zoomLevel * tileSize - cropx, pos[1] * zoomLevel * tileSize - cropy, tileSize * zoomLevel, tileSize * zoomLevel);
+		}
+		
 		ctx.strokeStyle = "#ffffff";
 
 		if (selectedCreature == creature) {
@@ -298,44 +300,69 @@ function render() {
 
 		ctz.lineWidth = 3;
 
-		for (let j = 0; j < selectedCreature.network.forget.neurons[0].length; j++) {
-			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 14, j * (nnui.size * 2 + 5) + nnui.yoffset, nnui.size, nnui.stroke);
-		}
+		if (infoMode) {
+			for (let j = 0; j < selectedCreature.network.forget.neurons[0].length; j++) {
+				ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 14, j * (nnui.size * 2 + 5) + nnui.yoffset, nnui.size, nnui.stroke);
+			}
 
-		for (let j = 0; j < selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1].length; j++) {
-			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
-		}
+			for (let j = 0; j < selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1].length; j++) {
+				ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+			}
 
-		for (let j = 0; j < selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1].length; j++) {
-			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 8, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
-		}
+			for (let j = 0; j < selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1].length; j++) {
+				ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 8, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+			}
 
-		for (let j = 0; j < selectedCreature.network.modify.neurons[selectedCreature.network.modify.neurons.length - 1].length; j++) {
-			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 6, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
-		}
+			for (let j = 0; j < selectedCreature.network.modify.neurons[selectedCreature.network.modify.neurons.length - 1].length; j++) {
+				ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 6, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+			}
 
-		for (let j = 0; j < selectedCreature.network.main.neurons[selectedCreature.network.main.neurons.length - 1].length; j++) {
-			ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 3, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
-		}
+			for (let j = 0; j < selectedCreature.network.main.neurons[selectedCreature.network.main.neurons.length - 1].length; j++) {
+				ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 3, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+			}
 
-		for (let i = 0; i < selectedCreature.network.cellState.length; i++) {
-			ctz.fillCircle(1920 - 60, i * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
-		}
+			for (let i = 0; i < selectedCreature.network.cellState.length; i++) {
+				ctz.fillCircle(1920 - 60, i * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+			}
 
-		if (debugMode) {
-		  ctz.strokeStyle = "#000000";
-		  
-		  ctz.beginPath();
-		  ctz.moveTo(0, 900);
-		  ctz.lineTo(1400, 900);
-		  ctz.stroke();
-		  
+			ctz.lineWidth = 2;
+
 			ctz.strokeStyle = "#ffffff";
 			let x = 0;
 			ctz.beginPath();
 			for (let point of selectedCreature.energyGraph.gross) {
 				if (x * 10 >= 1400) selectedCreature.energyGraph.gross.splice(0, 1);
 				ctz.lineTo(x * 10, 900 - point * 10);
+				x++;
+			}
+			ctz.stroke();
+
+			ctz.strokeStyle = "#aaffff";
+			x = 0;
+			ctz.beginPath();
+			for (let point of selectedCreature.energyGraph.net) {
+				if (x * 10 >= 1400) selectedCreature.energyGraph.net.splice(0, 1);
+				ctz.lineTo(x * 10, 900 - point * 100);
+				x++;
+			}
+			ctz.stroke();
+
+			ctz.strokeStyle = "#ffaa00";
+			x = 0;
+			ctz.beginPath();
+			for (let point of selectedCreature.energyGraph.metabolism) {
+				if (x * 10 >= 1400) selectedCreature.energyGraph.metabolism.splice(0, 1);
+				ctz.lineTo(x * 10, 900 - point * 100);
+				x++;
+			}
+			ctz.stroke();
+
+			ctz.strokeStyle = "#ff2233";
+			x = 0;
+			ctz.beginPath();
+			for (let point of selectedCreature.energyGraph.attack) {
+				if (x * 10 >= 1400) selectedCreature.energyGraph.attack.splice(0, 1);
+				ctz.lineTo(x * 10, 900 - point * 100);
 				x++;
 			}
 			ctz.stroke();
@@ -360,93 +387,69 @@ function render() {
 			}
 			ctz.stroke();
 
-			ctz.strokeStyle = "#ffaa00";
-			x = 0;
+			ctz.strokeStyle = "#000000";
 			ctz.beginPath();
-			for (let point of selectedCreature.energyGraph.metabolism) {
-				if (x * 10 >= 1400) selectedCreature.energyGraph.metabolism.splice(0, 1);
-				ctz.lineTo(x * 10, 900 - point * 100);
-				x++;
-			}
+			ctz.moveTo(0, 900);
+			ctz.lineTo(1400, 900);
 			ctz.stroke();
-			
-			ctz.strokeStyle = "#ff2233";
-			x = 0;
-			ctz.beginPath();
-			for (let point of selectedCreature.energyGraph.attack) {
-				if (x * 10 >= 1400) selectedCreature.energyGraph.attack.splice(0, 1);
-				ctz.lineTo(x * 10, 900 - point * 100);
-				x++;
+
+			ctz.strokeStyle = "#000000";
+			ctz.fillStyle = "#ffffff";
+
+			ctz.textAlign = "left";
+			ctz.strokeText(selectedCreature.species, 20, 1080 - 20);
+			ctz.fillText(selectedCreature.species, 20, 1080 - 20);
+			ctz.textAlign = "center";
+
+			ctz.strokeText("Cell State", 1920 - 60, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+
+			ctz.strokeText("Left", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+			ctz.strokeText("Right", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
+			ctz.strokeText("Eat", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
+			ctz.strokeText("Attack", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
+			ctz.strokeText("Reproduce", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
+
+			for (let i = 0; i < memories; i++) {
+				ctz.strokeText("Mem. " + i, nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
 			}
-			ctz.stroke();
-			
-			ctz.strokeStyle = "#aaffff";
-			x = 0;
-			ctz.beginPath();
-			for (let point of selectedCreature.energyGraph.net) {
-				if (x * 10 >= 1400) selectedCreature.energyGraph.net.splice(0, 1);
-				ctz.lineTo(x * 10, 900 - point * 100);
-				x++;
+
+			ctz.fillText("Cell State", 1920 - 60, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+
+			ctz.fillText("Left", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+			ctz.fillText("Right", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
+			ctz.fillText("Eat", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
+			ctz.fillText("Attack", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
+			ctz.fillText("Reproduce", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
+
+			for (let i = 0; i < memories; i++) {
+				ctz.fillText("Mem. " + i, nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
 			}
-			ctz.stroke();
-		}
 
-		ctz.strokeStyle = "#000000";
-		ctz.fillStyle = "#ffffff";
+			ctz.font = "bold 21px Calibri";
 
-		ctz.textAlign = "left";
-		ctz.strokeText(selectedCreature.species, 20, 1080 - 20);
-		ctz.fillText(selectedCreature.species, 20, 1080 - 20);
-		ctz.textAlign = "center";
+			for (let j = 0; j < selectedCreature.network.forget.neurons[0].length; j++) {
+				ctz.fillText(selectedCreature.network.forget.neurons[0][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 14, j * (nnui.size * 2 + 5) + nnui.yoffset + 6);
+			}
 
-		ctz.strokeText("Cell State", 1920 - 60, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+			for (let j = 0; j < selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1].length; j++) {
+				ctz.fillText(selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+			}
 
-		ctz.strokeText("Left", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
-		ctz.strokeText("Right", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
-		ctz.strokeText("Eat", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
-		ctz.strokeText("Attack", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
-		ctz.strokeText("Reproduce", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
+			for (let j = 0; j < selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1].length; j++) {
+				ctz.fillText(selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 8, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+			}
 
-		for (let i = 0; i < memories; i++) {
-			ctz.strokeText("Mem. " + i, nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
-		}
+			for (let j = 0; j < selectedCreature.network.modify.neurons[selectedCreature.network.modify.neurons.length - 1].length; j++) {
+				ctz.fillText(selectedCreature.network.modify.neurons[selectedCreature.network.modify.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 6, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+			}
 
-		ctz.fillText("Cell State", 1920 - 60, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+			for (let j = 0; j < selectedCreature.network.main.neurons[selectedCreature.network.main.neurons.length - 1].length; j++) {
+				ctz.fillText(selectedCreature.network.main.neurons[selectedCreature.network.main.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 3, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+			}
 
-		ctz.fillText("Left", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
-		ctz.fillText("Right", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
-		ctz.fillText("Eat", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
-		ctz.fillText("Attack", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
-		ctz.fillText("Reproduce", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
-
-		for (let i = 0; i < memories; i++) {
-			ctz.fillText("Mem. " + i, nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * (i + 5) - nnui.size - 12);
-		}
-
-		ctz.font = "bold 21px Calibri";
-
-		for (let j = 0; j < selectedCreature.network.forget.neurons[0].length; j++) {
-			ctz.fillText(selectedCreature.network.forget.neurons[0][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 14, j * (nnui.size * 2 + 5) + nnui.yoffset + 6);
-		}
-
-		for (let j = 0; j < selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1].length; j++) {
-			ctz.fillText(selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
-		}
-
-		for (let j = 0; j < selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1].length; j++) {
-			ctz.fillText(selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 8, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
-		}
-
-		for (let j = 0; j < selectedCreature.network.modify.neurons[selectedCreature.network.modify.neurons.length - 1].length; j++) {
-			ctz.fillText(selectedCreature.network.modify.neurons[selectedCreature.network.modify.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 6, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
-		}
-
-		for (let j = 0; j < selectedCreature.network.main.neurons[selectedCreature.network.main.neurons.length - 1].length; j++) {
-			ctz.fillText(selectedCreature.network.main.neurons[selectedCreature.network.main.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 3, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
-		}
-
-		for (let i = 0; i < selectedCreature.network.cellState.length; i++) {
-			ctz.fillText(selectedCreature.network.cellState[i].toFixed(1), 1920 - 60, i * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+			for (let i = 0; i < selectedCreature.network.cellState.length; i++) {
+				ctz.fillText(selectedCreature.network.cellState[i].toFixed(1), 1920 - 60, i * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+			}
 		}
 	}
 }

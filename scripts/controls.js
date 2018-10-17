@@ -17,6 +17,10 @@ function checkKey(key) {
 	  debugMode = !debugMode;
 	}
 	
+	if (keyDown(controls.info)) {
+	  infoMode = !infoMode;
+	}
+	
 	if (keyDown(controls.auto)) {
 	  autoMode = !autoMode;
 	}

@@ -27,16 +27,17 @@ Creature.prototype.eat = function (p) {
 };
 
 Creature.prototype.metabolize = function () {
-	let tenergy = -(this.age / lifeSpan) * (this.age / lifeSpan);
-	this.energy -= (this.age / lifeSpan) * (this.age / lifeSpan);
+  let scale = Math.min((this.age / metabolismScaleTime) * (this.age / metabolismScaleTime), 1);
+	let tenergy = -(scale * (maxMetabolism - minMetabolism) + minMetabolism);
+	this.energy -= scale * (maxMetabolism - minMetabolism) + minMetabolism;
 
 	this.energyGraph.metabolism.push(tenergy);
 };
 
 Creature.prototype.move = function () {
-	let tenergy = -energy.move * (Math.abs(this.output[1]) + Math.abs(this.output[0]));
+	let tenergy = -energy.move * (Math.abs(this.output[1]) + Math.abs(this.output[0])) / 2;
 
-	this.energy -= energy.move * (Math.abs(this.output[1]) + Math.abs(this.output[0]));
+	this.energy -= energy.move * (Math.abs(this.output[1]) + Math.abs(this.output[0])) / 2;
 
 	this.rotation += (this.output[1] - this.output[0]) * rotationSpeed;
 
@@ -59,7 +60,7 @@ Creature.prototype.reproduce = function (t) {
 	if (this.age > reproduceAge && this.reproduceTime > minReproduceTime) {
 		for (let i = 0; i < this.children; i++) {
 			if (this.energy < this.childEnergy) break;
-			let child = new Creature(this.x + Math.round(seededNoise(-1.5, 1.5)) * tileSize, this.y + Math.round(seededNoise(-1.5, 1.5)) * tileSize, this.size, this.color, this.species, this.speciesGeneration, this.generation + 1);
+			let child = new Creature(this.x + Math.floor(seededNoise(-2, 2)) * tileSize, this.y + Math.floor(seededNoise(-2, 2)) * tileSize, this.size, this.color, this.species, this.speciesGeneration, this.generation + 1);
 
 			child.eyes = [];
 			for (let eye of this.eyes) {
@@ -142,8 +143,8 @@ Creature.prototype.attack = function () {
 	for (let creature of creatures) {
 		if (creature === this) continue;
 
-		if (Math.round(this.x / tileSize) == Math.round(creature.x / tileSize)) {
-			if (Math.round(this.y / tileSize) == Math.round(creature.y / tileSize)) {
+		if (Math.floor((this.x + Math.cos(this.rotation) * tileSize) / tileSize) == Math.floor(creature.x / tileSize)) {
+			if (Math.floor((this.y + Math.sin(this.rotation) * tileSize) / tileSize) == Math.floor(creature.y / tileSize)) {
 				creature.energy -= att * attackPower;
 
 				this.energy += att * attackPower * attackEffeciency;
