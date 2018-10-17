@@ -1,4 +1,4 @@
-function Creature(x, y, s, c, spec, sgen, gen) {
+function Creature(x, y, spec) {
 	let tile = Math.floor(seededNoise(0, spawnTiles.length));
 
 	this.x = x || spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
@@ -29,7 +29,7 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 		gross: []
 	};
 
-	this.size = s || seededNoise(minCreatureSize, maxCreatureSize);
+	this.size = seededNoise(minCreatureSize, maxCreatureSize);
 
 	this.energy = creatureEnergy;
 	this.lastEnergy = creatureEnergy;
@@ -39,7 +39,7 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 	this.childEnergy = seededNoise(minChildEnergy, maxChildEnergy);
 	this.children = Math.floor(seededNoise(minChildren, maxChildren));
 
-	this.color = c || newColor();
+	this.color = newColor();
 
 	this.genes = [this.color, this.children, this.childEnergy];
 
@@ -52,9 +52,9 @@ function Creature(x, y, s, c, spec, sgen, gen) {
 	this.createNeuralNetwork();
 
 	this.geneticID = "";
-	this.generation = gen || 0;
+	this.generation = 0;
 	this.species = spec;
-	this.speciesGeneration = sgen || 0;
+	this.speciesGeneration = 0;
 	this.species = this.setSpecies();
 
 	this.rotation = 0;
