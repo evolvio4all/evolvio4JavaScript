@@ -250,11 +250,11 @@ Brain.prototype.mutate = function () {
 }
 
 Creature.prototype.copyNeuralNetwork = function (copy) {
-	for (let brain in this.network) {
+	for (let brain in copy.network) {
 		if (brain == "cellState") break;
-		for (let i = 0, l = this.network[brain].axons.length; i < l; i++) {
-			for (let j = 0, m = this.network[brain].axons[i].length; j < m; j++) {
-				for (let k = 0, n = this.network[brain].axons[i][j].length; k < n; k++) {
+		for (let i = 0, l = copy.network[brain].axons.length; i < l; i++) {
+			for (let j = 0, m = copy.network[brain].axons[i].length; j < m; j++) {
+				for (let k = 0, n = copy.network[brain].axons[i][j].length; k < n; k++) {
 					this.network[brain].axons[i][j][k] = copy.network[brain].axons[i][j][k];
 				}
 			}

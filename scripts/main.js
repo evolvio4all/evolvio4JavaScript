@@ -182,55 +182,57 @@ function render() {
 	}
 
 	ctx.strokeStyle = "#ffffff";
-	ctx.lineWidth = 10 * zoomLevel;
+	ctx.lineWidth = 15 * zoomLevel;
+
+	ctx.beginPath();
 	for (let i in outline) {
-		ctx.beginPath();
 		ctx.moveTo(outline[i][0] * zoomLevel - cropx, outline[i][1] * zoomLevel - cropy);
 		ctx.lineTo(outline[i][2] * zoomLevel - cropx, outline[i][3] * zoomLevel - cropy);
-		ctx.stroke();
 	}
+	ctx.stroke();
+
+	ctx.strokeStyle = "#ffffff";
 
 	for (let creature of creatures) {
 		ctx.fillStyle = "rgba(255, 0, 0, " + creature.output[3] + ")";
 		let pos = [Math.floor((creature.x + Math.cos(creature.rotation) * tileSize) / tileSize), Math.floor((creature.y + Math.sin(creature.rotation) * tileSize) / tileSize)];
-		if (creature.output[3] > minAttackPower && debugMode) {
-		  ctx.fillRect(pos[0] * zoomLevel * tileSize - cropx, pos[1] * zoomLevel * tileSize - cropy, tileSize * zoomLevel, tileSize * zoomLevel);
-		}
-		
-		ctx.strokeStyle = "#ffffff";
 
-		if (selectedCreature == creature) {
-			ctx.strokeStyle = "#ff0000";
+		if (creature.output[3] > minAttackPower) {
+			ctx.fillRect(pos[0] * zoomLevel * tileSize - cropx, pos[1] * zoomLevel * tileSize - cropy, tileSize * zoomLevel, tileSize * zoomLevel);
 		}
+	}
+
+	for (let creature of creatures) {
+		ctx.lineWidth = 10 * zoomLevel;
 
 		ctx.fillStyle = creature.color;
 		ctx.fillCircle(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy, creature.size * zoomLevel, true);
+
+		ctx.beginPath();
+		ctx.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
+		ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * (creature.size + 75) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * (creature.size + 75) * zoomLevel);
 		ctx.stroke();
-	}
 
-	if (debugMode) {
-		ctz.strokeStyle = "#dddddd";
-		ctz.lineWidth = 20 * zoomLevel;
-		ctz.fillStyle = "#ff0000";
+		ctx.beginPath();
+		ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
+		ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation - Math.PI / 2) * ((creature.size - 3) * creature.network.output[0]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation - Math.PI / 2) * ((creature.size - 3) * creature.network.output[0]) * zoomLevel);
+		ctx.stroke();
 
-		for (let creature of creatures) {
-			ctz.beginPath();
-			ctz.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
-			ctz.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * 200 * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * 200 * zoomLevel);
-			ctz.stroke();
+		ctx.beginPath();
+		ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
+		ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * ((creature.size - 3) * creature.network.output[1]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * ((creature.size - 3) * creature.network.output[1]) * zoomLevel);
+		ctx.stroke();
 
-			ctz.beginPath();
-			ctz.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
-			ctz.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation - Math.PI / 2) * (100 * creature.network.output[0]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation - Math.PI / 2) * (100 * creature.network.output[0]) * zoomLevel);
-			ctz.stroke();
-
-			ctz.beginPath();
-			ctz.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
-			ctz.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * (100 * creature.network.output[1]) * zoomLevel);
-			ctz.stroke();
+		if (debugMode) {
+			ctx.lineWidth = 2 * zoomLevel;
 
 			for (let eye of creature.eyes) {
-				ctz.fillRect(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, 40 * zoomLevel, 40 * zoomLevel);
+				ctx.beginPath();
+				ctx.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
+				ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel);
+				ctx.stroke();
+
+				ctx.fillCircle(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel, 15 * zoomLevel, true);
 			}
 		}
 	}
@@ -262,40 +264,49 @@ function render() {
 		if (tilex >= 0 && tilex < mapSize && tiley >= 0 && tiley < mapSize) {
 			ctz.strokeText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 1.5 * zoomLevel);
 			ctz.fillText(map[tilex][tiley].food.toFixed(1), tilex * tileSize * zoomLevel - cropx + tileSize / 2 * zoomLevel, tiley * tileSize * zoomLevel - cropy + tileSize / 1.5 * zoomLevel);
-		}
 
-		ctz.strokeStyle = "#ffffff";
-		ctz.lineWidth = 2;
-		ctz.rect(tilex * tileSize * zoomLevel - cropx, tiley * tileSize * zoomLevel - cropy, tileSize * zoomLevel + 2, tileSize * zoomLevel + 2);
-		ctz.stroke();
+			ctz.beginPath();
+			ctz.strokeStyle = "#ffffff";
+			ctz.lineWidth = 2;
+			ctz.rect(tilex * tileSize * zoomLevel - cropx, tiley * tileSize * zoomLevel - cropy, tileSize * zoomLevel + 2, tileSize * zoomLevel + 2);
+			ctz.stroke();
+		}
 	}
 
 	if (selectedCreature !== null) {
 		ctz.font = "32px Calibri";
 		ctz.lineWidth = 10 * zoomLevel;
 
-		ctz.strokeStyle = "#222266";
+		ctz.strokeStyle = "#000000";
 		ctz.beginPath();
 		ctz.moveTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation) * selectedCreature.size * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation) * selectedCreature.size * zoomLevel);
-		ctz.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation - Math.PI / 2) * (100 * selectedCreature.network.output[0]) * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation - Math.PI / 2) * (100 * selectedCreature.network.output[0]) * zoomLevel);
+		ctz.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation - Math.PI / 2) * ((selectedCreature.size - 3) * selectedCreature.network.output[0]) * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation - Math.PI / 2) * ((selectedCreature.size - 3) * selectedCreature.network.output[0]) * zoomLevel);
 		ctz.stroke();
 
-		ctz.strokeStyle = "#994444"
+		ctz.strokeStyle = "#ffffff"
 		ctz.beginPath();
 		ctz.moveTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation) * selectedCreature.size * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation) * selectedCreature.size * zoomLevel);
-		ctz.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation + Math.PI / 2) * (100 * selectedCreature.network.output[1]) * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation + Math.PI / 2) * (100 * selectedCreature.network.output[1]) * zoomLevel);
+		ctz.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation + Math.PI / 2) * ((selectedCreature.size - 3) * selectedCreature.network.output[1]) * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation + Math.PI / 2) * ((selectedCreature.size - 3) * selectedCreature.network.output[1]) * zoomLevel);
 		ctz.stroke();
 
 		ctz.strokeStyle = "#ff8888";
 		ctz.beginPath();
 		ctz.moveTo(selectedCreature.x * zoomLevel - cropx, selectedCreature.y * zoomLevel - cropy);
-		ctz.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation) * 200 * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation) * 200 * zoomLevel);
+		ctz.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation) * (selectedCreature.size + 90) * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation) * (selectedCreature.size + 90) * zoomLevel);
 		ctz.stroke();
 
 		ctz.fillStyle = "#222222";
 		ctz.strokeStyle = "hsl(0, 0%, 100%)";
+
+		ctx.lineWidth = 2 * zoomLevel;
+		ctx.fillStyle = selectedCreature.color;
 		for (let eye of selectedCreature.eyes) {
-			ctz.fillRect(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel - 20 * zoomLevel, 40 * zoomLevel, 40 * zoomLevel);
+			ctx.beginPath();
+			ctx.moveTo(selectedCreature.x * zoomLevel - cropx, selectedCreature.y * zoomLevel - cropy);
+			ctx.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel);
+			ctx.stroke();
+
+			ctx.fillCircle(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel, 15 * zoomLevel, true);
 		}
 
 		ctz.lineWidth = 3;

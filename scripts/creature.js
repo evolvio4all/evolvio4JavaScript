@@ -203,8 +203,6 @@ Creature.prototype.setSpecies = function () {
 		}
 	}
 
-	if (species !== undefined) species = species.split(" ")[0];
-
 	if (species === undefined || species == "undefined") {
 		while (specieslist[species] !== undefined) {
 			prefix = Math.floor(seededNoise(0, prefixes.length));
@@ -214,6 +212,8 @@ Creature.prototype.setSpecies = function () {
 		specieslist[species] = {};
 		specieslist[species].contains = [];
 	} else {
+	  species = species.split(" ")[0];
+	  
 		if (minGeneDiff >= speciesDiversity) {
 			this.speciesGeneration++;
 			if (this.speciesGeneration < suffixes.length) species += " " + suffixes[this.speciesGeneration];
@@ -267,7 +267,7 @@ Creature.prototype.eye = function (parent, angle, distance) {
 	this.see = function () {
 		let out;
 
-		let pos = [~~((this.parent.x + Math.cos(this.parent.rotation + this.angle) * this.distance) / tileSize), ~~((this.parent.y + Math.sin(this.parent.rotation + this.angle) * this.distance) / tileSize)];
+		let pos = [Math.floor((this.parent.x + Math.cos(this.parent.rotation + this.angle) * this.distance) / tileSize), Math.floor((this.parent.y + Math.sin(this.parent.rotation + this.angle) * this.distance) / tileSize)];
 
 		if (pos[0] < 0 || pos[0] >= mapSize || pos[1] < 0 || pos[1] >= mapSize) return [0, "oob"];
 
