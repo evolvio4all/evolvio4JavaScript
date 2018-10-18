@@ -18,16 +18,16 @@ Creature.prototype.eat = function (p) {
 		tenergy += (tile.food * eatEffeciency);
 		this.energy += (tile.food * eatEffeciency);
 	} else if (tile.food > 0) {
-		tile.food -= this.output[2];
-		tenergy += (this.output[2] * eatEffeciency);
-		this.energy += (this.output[2] * eatEffeciency);
+		tile.food -= this.output[2] * eatPower;
+		tenergy += (this.output[2] * eatPower * eatEffeciency);
+		this.energy += (this.output[2] * eatPower * eatEffeciency);
 	}
 
 	this.energyGraph.eat.push(tenergy);
 };
 
 Creature.prototype.metabolize = function () {
-  let scale = Math.min((this.age / metabolismScaleTime) * (this.age / metabolismScaleTime), 1);
+  let scale = Math.min((this.age / metabolismScaleTime), 1);
 	let tenergy = -(scale * (maxMetabolism - minMetabolism) + minMetabolism);
 	this.energy -= scale * (maxMetabolism - minMetabolism) + minMetabolism;
 

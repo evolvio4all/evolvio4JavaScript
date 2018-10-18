@@ -31,8 +31,8 @@ function Creature(x, y, spec) {
 
 	this.size = seededNoise(minCreatureSize, maxCreatureSize);
 
-	this.energy = creatureEnergy;
-	this.lastEnergy = creatureEnergy;
+	this.energy = creatureEnergy / 2;
+	this.lastEnergy = creatureEnergy / 2;
 
 	this.age = 0;
 	this.reproduceTime = 0;
@@ -106,8 +106,8 @@ Creature.prototype.randomize = function () {
 
 	this.size = seededNoise(minCreatureSize, maxCreatureSize);
 
-	this.energy = creatureEnergy;
-	this.lastEnergy = creatureEnergy;
+	this.energy = creatureEnergy / 2;
+	this.lastEnergy = creatureEnergy / 2;
 
 	this.age = 0;
 	this.reproduceTime = 0;
@@ -177,22 +177,7 @@ Creature.prototype.setSpecies = function () {
 
 	let minGeneDiff = Infinity;
 	for (let specie in specieslist) {
-		let avgGeneticID = [];
-		for (let i = 0; i < specieslist[specie].contains[0].geneticID.length; i++) {
-			avgGeneticID.push(0);
-		}
-
-		for (let creature of specieslist[specie].contains) {
-			for (let i = 0; i < creature.geneticID.length; i++) {
-				avgGeneticID[i] += creature.geneticID[i];
-			}
-		}
-
-		for (let gene of avgGeneticID) {
-			gene /= specieslist[specie].contains.length;
-		}
-
-		var geneDiff = arrayDifference(geneticID, avgGeneticID);
+		var geneDiff = arrayDifference(geneticID, specieslist[specie].contains[0].geneticID);
 
 		if (geneDiff < minGeneDiff) {
 			minGeneDiff = geneDiff;
