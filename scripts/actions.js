@@ -27,7 +27,7 @@ Creature.prototype.eat = function (p) {
 };
 
 Creature.prototype.metabolize = function () {
-  let scale = Math.min(Math.pow(this.age / metabolismScaleTime, 2), 1);
+  let scale = Math.min(Math.pow(this.age / metabolismScaleTime, 8), 1);
 	let tenergy = -(scale * (maxMetabolism - minMetabolism) + minMetabolism);
 	this.energy -= scale * (maxMetabolism - minMetabolism) + minMetabolism;
 

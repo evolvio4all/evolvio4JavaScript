@@ -17,15 +17,20 @@ function main() {
 	let ndate = new Date();
 
 	if (twice && !fastforward && autoMode) {
-		timescale *= 0.95;
+		if (timescale > 1) timescale--;
+		else timescale /= 1.01;
 	} else {
 		render();
 	}
 
-	if (ndate - odate >= 100) {
-	  twice = true;
-	} else {
-	  twice = false;
+	if (ndate - odate > 60) {
+		twice = true;
+	} else if (ndate - odate < 40) {
+		if (autoMode) {
+			if (timescale >= 1) timescale++;
+			else timescale *= 1.01;
+		}
+		twice = false;
 	}
 }
 
@@ -127,9 +132,9 @@ function update() {
 		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
 
 		let rotation = creature.rotation / (2 * Math.PI);
-    
-    let time = (tick % 15) / 15;
-    
+
+		let time = (tick % 15) / 15;
+
 		creature.input = [time, energy, season / (growSeasonLength + dieSeasonLength)];
 
 		for (let eye of creature.eyes) {
@@ -255,8 +260,8 @@ function render() {
 	ctz.fillText("Population: " + population, 40, 1040);
 
 	ctz.textAlign = "right";
-	ctz.strokeText(Math.floor(timescale) + "x", 1880, 1040);
-	ctz.fillText(Math.floor(timescale) + "x", 1880, 1040);
+	ctz.strokeText(timescale < 1 ? timescale.toFixed(1) : Math.ceil(timescale) + "x", 1880, 1040);
+	ctz.fillText(timescale < 1 ? timescale.toFixed(1) : Math.ceil(timescale) + "x", 1880, 1040);
 
 	ctz.textAlign = "center";
 
