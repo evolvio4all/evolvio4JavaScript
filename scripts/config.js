@@ -1,5 +1,5 @@
 // GLOBAL //
-const seed = Math.floor(Math.random() * 999 + 1); // 314
+const seed = 908; //Math.floor(Math.random() * 999 + 1); // 314
 let debugMode = false; // Shows debug info (angle, left and right turn outputs, and tile food)
 let gifMode = false; // removes background
 let autoMode = false; // automatically calculate timescale
@@ -10,7 +10,7 @@ const mapSize = 150; // Size of the map (height and width) in tiles
 const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
-let maxTileFood = 20; // Maximum food in a tile
+let maxTileFood = 2; // Maximum food in a tile
 const growSeasonGrowRate = 0.03; // How fast food regrows
 const dieSeasonGrowRate = 0.02; // How fast food regrows
 
@@ -18,7 +18,7 @@ const waterBias = 0.25; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
 const continentSize = 50; // How large the islands are (maintains water ratio)
 
-const growSeasonLength = 600; // Grow season length
+const growSeasonLength = 1800; // Grow season length
 const dieSeasonLength = 600; // Die season length
 
 const mapUpdateDelay = 30; // How many ticks before the map tiles update
@@ -27,7 +27,7 @@ const mapUpdateDelay = 30; // How many ticks before the map tiles update
 const minCreatures = 50; // Minimum number of creatures
 const minFirstGen = 20; // Minimum number of first generation creatures
 
-const creatureEnergy = 100; // Max creature energy
+const creatureEnergy = 10; // Max creature energy
 
 const metabolismScaleTime = 700; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
 const minMetabolism = 0.0; // Initial metabolism
@@ -42,7 +42,7 @@ const minCreatureSize = 30; // Minimum creature size
 const maxCreatureSpeed = 125; // Maximum creature speed
 const swimmingSpeed = 0.4; // Movement speed % in water
 
-const eatingSpeed = 0.02; // Movement speed % while eating
+const eatingSpeed = 0.0; // Movement speed % while eating
 
 const rotationSpeed = 0.5; // Speed % how fast creatures rotate
 
@@ -67,12 +67,12 @@ const minChildEnergy = 0.05; // Min % of creatures energy to be given to a singl
 const maxChildEnergy = 0.95; // Max % of creatures energy to be given to a single child
 
 const energy = { // Energy cost per tick
-    eat: 0.2, // Energy cost to eat
+    eat: 0.1, // Energy cost to eat
     move: 0.1, // Energy cost to move
     attack: 0.2 // Energy cost to attack
 };
 
-const eatEffeciency = 0.90; // Eat effeciency %
+const eatEffeciency = 0.9; // Eat effeciency %
 const eatPower = 1;
 
 const birthEffeciency = 0.9; // Birth effeciency %
@@ -84,8 +84,8 @@ const minEatPower = 0.0; // Minimum eating strength (anything lower will be 0)
 const minSpawnPower = 0.0; // Minimum output to reproduce (anything lower will be 0)
 const minAttackPower = 0.0; // Minimum attack strength (anything lower will be 0)
 
-const reproduceAge = 600; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
-const minReproduceTime = 500; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
+const reproduceAge = 300; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+const minReproduceTime = 300; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
 const bias = 0.25; // Amount to offset the value of a neuron

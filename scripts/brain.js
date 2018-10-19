@@ -136,24 +136,22 @@ Creature.prototype.feedForward = function (input) {
 
 			let nIL = neuronsInLayer;
 
-			for (let neuron = 0; neuron <= nIL; neuron++) {
-				if (this.network[brain].neurons[layer][neuron] === 0) continue;
+			for (let axon = 0; axon < neuronsInNextLayer; axon++) { // Loops through each axon
 				let value = 0;
-
-				for (let axon = 0; axon < neuronsInNextLayer; axon++) {
+				
+				for (let neuron = 0; neuron <= nIL; neuron++) { // For each axon position (neuron in next layer) loop through all of the neurons in this layer
 					if (neuron == nIL) {
 						value += this.network[brain].biasAxons[layer][axon] * bias;
 					} else {
-						if (this.network[brain].axons[layer][neuron][axon] === 0) continue;
-
 						value += this.network[brain].axons[layer][neuron][axon] * this.network[brain].neurons[layer][neuron];
 					}
+
 				}
 
 				if (brain == "forget" || brain == "modify" || brain == "main") {
-					this.network[brain].neurons[layer + 1][neuron] = 1 / (1 + Math.exp(-value));
+					this.network[brain].neurons[layer + 1][axon] = 1 / (1 + Math.exp(-value));
 				} else if (brain == "decide") {
-					this.network[brain].neurons[layer + 1][neuron] = Math.tanh(value);
+					this.network[brain].neurons[layer + 1][axon] = Math.tanh(value);
 				}
 			}
 
@@ -266,16 +264,16 @@ Creature.prototype.mutate = function () {
 Network.prototype.mutate = function () {
 	for (let brain in this.network) {
 		if (brain == "cellState") break;
+
 		for (let layer = 0; layer < this.network[brain].axons.length; layer++) {
 			for (let neuron = 0; neuron < this.network[brain].axons[layer].length; neuron++) {
 				for (let axon = 0; axon < this.network[brain].axons[layer][neuron].length; axon++) {
 					let weight = this.network[brain].axons[layer][neuron][axon];
 					let randomNumber = seededNoise(0, 100);
-					const numMutations = 2;
 
-					if (randomNumber < this.mutability.brain * 1 / numMutations) {
+					if (randomNumber < this.mutability.brain / 2) {
 						weight += seededNoise(-stepAmount, stepAmount);
-					} else if (randomNumber < this.mutability.brain * 2 / numMutations) {
+					} else if (randomNumber < this.mutability.brain) {
 						weight = 0;
 					}
 
@@ -288,11 +286,10 @@ Network.prototype.mutate = function () {
 			for (let axon = 0; axon < this.network[brain].biasAxons[layer].length; axon++) {
 				let weight = this.network[brain].biasAxons[layer][axon];
 				let randomNumber = seededNoise(0, 100);
-				const numMutations = 2;
 
-				if (randomNumber < this.mutability.brain * 1 / numMutations) {
+				if (randomNumber < this.mutability.brain / 2) {
 					weight += seededNoise(-stepAmount, stepAmount);
-				} else if (randomNumber < this.mutability.brain * 2 / numMutations) {
+				} else if (randomNumber < this.mutability.brain) {
 					weight = 0;
 				}
 
@@ -305,17 +302,19 @@ Network.prototype.mutate = function () {
 Creature.prototype.copyNeuralNetwork = function (copy) {
 	for (let brain in copy.network) {
 		if (brain == "cellState") break;
-		for (let i = 0; i < Math.min(copy.network[brain].axons.length, this.network[brain].axons.length); i++) {
-			for (let j = 0; j < Math.min(copy.network[brain].axons[i].length, this.network[brain].axons[i].length); j++) {
-				for (let k = 0; k < Math.min(copy.network[brain].axons[i][j].length, this.network[brain].axons[i][j].length); k++) {
-					this.network[brain].axons[i][j][k] = copy.network[brain].axons[i][j][k];
+		let network = copy.network[brain].axons[0].length == Math.min(copy.network[brain].axons[0].length, this.network[brain].axons[0].length) ? copy.network[brain] : this.network[brain];
+
+		for (let layer = 0; layer < network.axons.length; layer++) {
+			for (let neuron = 0; neuron < network.axons[layer].length; neuron++) {
+				for (let axon = 0; axon < network.axons[layer][neuron].length; axon++) {
+					this.network[brain].axons[layer][neuron][axon] = copy.network[brain].axons[layer][neuron][axon];
 				}
 			}
 		}
 
 		for (let layer = 0; layer < copy.network[brain].biasAxons.length; layer++) {
-			for (let neuron = 0; neuron < copy.network[brain].biasAxons[layer].length; neuron++) {
-				this.network[brain].biasAxons[layer][neuron] = copy.network[brain].biasAxons[layer][neuron];
+			for (let axon = 0; axon < copy.network[brain].biasAxons[layer].length; axon++) {
+				this.network[brain].biasAxons[layer][axon] = copy.network[brain].biasAxons[layer][axon];
 			}
 		}
 	}
