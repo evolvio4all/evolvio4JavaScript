@@ -42,7 +42,7 @@ const minCreatureSize = 30; // Minimum creature size
 const maxCreatureSpeed = 125; // Maximum creature speed
 const swimmingSpeed = 0.4; // Movement speed % in water
 
-const eatingSpeed = 0.0; // Movement speed % while eating
+const eatingSpeed = 0.02; // Movement speed % while eating
 
 const rotationSpeed = 0.5; // Speed % how fast creatures rotate
 
@@ -88,7 +88,7 @@ const reproduceAge = 600; // Minimum number of ticks before a creature spawn chi
 const minReproduceTime = 500; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
-const bias = 0.275; // Amount to offset the value of a neuron
+const bias = 0.25; // Amount to offset the value of a neuron
 
 const minMutability = { // Minimum mutability in various categories
   brain: 2,
@@ -118,7 +118,7 @@ const maxMutability = { // Maximum mutability in various categories
 
 const maxMutabilityChange = 2; // Maximum amount any mutability can change by
 
-const connectionDensity = 0.3; // % of axons initially connected in the brain
+const connectionDensity = 0.5; // % of axons initially connected in the brain
 
 const memories = 3; // # of memories a creature can store (outputs that do nothing, except store a value)
 

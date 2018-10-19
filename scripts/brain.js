@@ -1,5 +1,5 @@
 // BRAIN INFO //
-const inputs = 3;
+const inputs = 4;
 const outputs = 5 + memories;
 
 const testInput = [];
@@ -73,16 +73,16 @@ Creature.prototype.initAxons = function () {
 		for (let layer = 0; layer < this.network[brain].layers.length; layer++) {
 			let layerWeights = [];
 			let neuronsInNextLayer = this.network[brain].layers[layer + 1];
-			
+
 			if (neuronsInNextLayer === undefined) break;
-			
+
 			for (let neuron = 0; neuron < this.network[brain].layers[layer]; neuron++) {
 				let neuronWeights = [];
 				for (let axon = 0; axon < neuronsInNextLayer; axon++) {
 					let weight = 0;
 
 					if (seededNoise() < connectionDensity) {
-						weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue) / Math.sqrt(this.network[brain].layers[layer]);
+						weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue);
 					}
 
 					neuronWeights.push(weight);
@@ -95,13 +95,13 @@ Creature.prototype.initAxons = function () {
 		for (let layer = 0; layer < this.network[brain].layers.length; layer++) {
 			let layerWeights = [];
 			let neuronsInNextLayer = this.network[brain].layers[layer + 1];
-      if (neuronsInNextLayer === undefined) break;
-      
+			if (neuronsInNextLayer === undefined) break;
+
 			for (let axon = 0; axon < neuronsInNextLayer; axon++) {
 				let weight = 0;
 
 				if (seededNoise() < connectionDensity) {
-					weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue) / Math.sqrt(this.network[brain].layers[layer]);
+					weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue);
 				}
 
 				layerWeights.push(weight);
@@ -137,23 +137,23 @@ Creature.prototype.feedForward = function (input) {
 			let nIL = neuronsInLayer;
 
 			for (let neuron = 0; neuron <= nIL; neuron++) {
+				if (this.network[brain].neurons[layer][neuron] === 0) continue;
 				let value = 0;
-        
+
 				for (let axon = 0; axon < neuronsInNextLayer; axon++) {
 					if (neuron == nIL) {
 						value += this.network[brain].biasAxons[layer][axon] * bias;
 					} else {
 						if (this.network[brain].axons[layer][neuron][axon] === 0) continue;
-						if (this.network[brain].neurons[layer][neuron] === 0) break;
 
 						value += this.network[brain].axons[layer][neuron][axon] * this.network[brain].neurons[layer][neuron];
 					}
+				}
 
-					if (brain == "forget" || brain == "modify" || brain == "main") {
-						this.network[brain].neurons[layer + 1][axon] = 1 / (1 + Math.exp(-value));
-					} else if (brain == "decide") {
-						this.network[brain].neurons[layer + 1][axon] = Math.tanh(value);
-					}
+				if (brain == "forget" || brain == "modify" || brain == "main") {
+					this.network[brain].neurons[layer + 1][neuron] = 1 / (1 + Math.exp(-value));
+				} else if (brain == "decide") {
+					this.network[brain].neurons[layer + 1][neuron] = Math.tanh(value);
 				}
 			}
 
@@ -305,9 +305,9 @@ Network.prototype.mutate = function () {
 Creature.prototype.copyNeuralNetwork = function (copy) {
 	for (let brain in copy.network) {
 		if (brain == "cellState") break;
-		for (let i = 0; i < copy.network[brain].axons.length; i++) {
-			for (let j = 0; j < copy.network[brain].axons[i].length; j++) {
-				for (let k = 0; k < copy.network[brain].axons[i][j].length; k++) {
+		for (let i = 0; i < Math.min(copy.network[brain].axons.length, this.network[brain].axons.length); i++) {
+			for (let j = 0; j < Math.min(copy.network[brain].axons[i].length, this.network[brain].axons[i].length); j++) {
+				for (let k = 0; k < Math.min(copy.network[brain].axons[i][j].length, this.network[brain].axons[i][j].length); k++) {
 					this.network[brain].axons[i][j][k] = copy.network[brain].axons[i][j][k];
 				}
 			}
@@ -315,7 +315,7 @@ Creature.prototype.copyNeuralNetwork = function (copy) {
 
 		for (let layer = 0; layer < copy.network[brain].biasAxons.length; layer++) {
 			for (let neuron = 0; neuron < copy.network[brain].biasAxons[layer].length; neuron++) {
-			  this.network[brain].biasAxons[layer][neuron] = copy.network[brain].biasAxons[layer][neuron];
+				this.network[brain].biasAxons[layer][neuron] = copy.network[brain].biasAxons[layer][neuron];
 			}
 		}
 	}
