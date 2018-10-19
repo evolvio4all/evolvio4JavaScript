@@ -128,7 +128,7 @@ function update() {
 
 		let rotation = creature.rotation / (2 * Math.PI);
 
-		creature.input = [0.865, rotation, energy, season / (growSeasonLength + dieSeasonLength)];
+		creature.input = [rotation, energy, season / (growSeasonLength + dieSeasonLength)];
 
 		for (let eye of creature.eyes) {
 			if (eye.see()[1] == "tile") {

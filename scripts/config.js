@@ -11,14 +11,14 @@ const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
 let maxTileFood = 2; // Maximum food in a tile
-const growSeasonGrowRate = 0.005; // How fast food regrows
+const growSeasonGrowRate = 0.003; // How fast food regrows
 const dieSeasonGrowRate = 0.002; // How fast food regrows
 
 const waterBias = 0.25; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
 const continentSize = 50; // How large the islands are (maintains water ratio)
 
-const growSeasonLength = 1200; // Grow season length
+const growSeasonLength = 600; // Grow season length
 const dieSeasonLength = 600; // Die season length
 
 const mapUpdateDelay = 30; // How many ticks before the map tiles update
@@ -44,7 +44,7 @@ const swimmingSpeed = 0.4; // Movement speed % in water
 
 const eatingSpeed = 0.0; // Movement speed % while eating
 
-const rotationSpeed = 0.2; // Speed % how fast creatures rotate
+const rotationSpeed = 0.5; // Speed % how fast creatures rotate
 
 let oldest = 0; // Oldest creature's age
 
@@ -88,7 +88,7 @@ const reproduceAge = 600; // Minimum number of ticks before a creature spawn chi
 const minReproduceTime = 500; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
-const offset = 0; // Amount to offset the value of a neuron
+const bias = 0.875; // Amount to offset the value of a neuron
 
 const minMutability = { // Minimum mutability in various categories
   brain: 2,
