@@ -10,9 +10,9 @@ const mapSize = 150; // Size of the map (height and width) in tiles
 const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
-let maxTileFood = 2; // Maximum food in a tile
-const growSeasonGrowRate = 0.003; // How fast food regrows
-const dieSeasonGrowRate = 0.002; // How fast food regrows
+let maxTileFood = 20; // Maximum food in a tile
+const growSeasonGrowRate = 0.03; // How fast food regrows
+const dieSeasonGrowRate = 0.02; // How fast food regrows
 
 const waterBias = 0.25; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
@@ -27,11 +27,11 @@ const mapUpdateDelay = 30; // How many ticks before the map tiles update
 const minCreatures = 50; // Minimum number of creatures
 const minFirstGen = 20; // Minimum number of first generation creatures
 
-const creatureEnergy = 10; // Max creature energy
+const creatureEnergy = 100; // Max creature energy
 
 const metabolismScaleTime = 700; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
-const minMetabolism = 0.00; // Initial metabolism
-const maxMetabolism = 0.01; // End metabolism (metabolism when age == metabolismScaleTime)
+const minMetabolism = 0.0; // Initial metabolism
+const maxMetabolism = 0.1; // End metabolism (metabolism when age == metabolismScaleTime)
 
 const speciesDiversity = 10; // Diversity of each species
 const speciesColorChange = 20; // Color change between species
@@ -67,13 +67,13 @@ const minChildEnergy = 0.05; // Min % of creatures energy to be given to a singl
 const maxChildEnergy = 0.95; // Max % of creatures energy to be given to a single child
 
 const energy = { // Energy cost per tick
-    eat: 0.02, // Energy cost to eat
-    move: 0.01, // Energy cost to move
-    attack: 0.03 // Energy cost to attack
+    eat: 0.2, // Energy cost to eat
+    move: 0.1, // Energy cost to move
+    attack: 0.2 // Energy cost to attack
 };
 
 const eatEffeciency = 0.90; // Eat effeciency %
-const eatPower = 0.1;
+const eatPower = 1;
 
 const birthEffeciency = 0.9; // Birth effeciency %
 
@@ -88,7 +88,7 @@ const reproduceAge = 600; // Minimum number of ticks before a creature spawn chi
 const minReproduceTime = 500; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
-const bias = 0.875; // Amount to offset the value of a neuron
+const bias = 0.275; // Amount to offset the value of a neuron
 
 const minMutability = { // Minimum mutability in various categories
   brain: 2,
@@ -118,7 +118,7 @@ const maxMutability = { // Maximum mutability in various categories
 
 const maxMutabilityChange = 2; // Maximum amount any mutability can change by
 
-const connectionDensity = 0.5; // % of axons initially connected in the brain
+const connectionDensity = 0.3; // % of axons initially connected in the brain
 
 const memories = 3; // # of memories a creature can store (outputs that do nothing, except store a value)
 
