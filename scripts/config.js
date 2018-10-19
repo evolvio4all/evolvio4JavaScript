@@ -2,8 +2,8 @@
 const seed = 908; //Math.floor(Math.random() * 999 + 1); // 314
 let debugMode = false; // Shows debug info (angle, left and right turn outputs, and tile food)
 let gifMode = false; // removes background
-let autoMode = false; // automatically calculate timescale
 let infoMode = true; // shows and hides info (neural network and graph)
+let autoMode = false; // automatically calculate timescale (max 40ms to 60ms update time)
 
 // MAP //
 const mapSize = 150; // Size of the map (height and width) in tiles
@@ -11,8 +11,8 @@ const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
 let maxTileFood = 2; // Maximum food in a tile
-const growSeasonGrowRate = 0.03; // How fast food regrows
-const dieSeasonGrowRate = 0.02; // How fast food regrows
+const growSeasonGrowRate = 0.003; // How fast food regrows
+const dieSeasonGrowRate = 0.002; // How fast food regrows
 
 const waterBias = 0.25; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
@@ -29,7 +29,7 @@ const minFirstGen = 20; // Minimum number of first generation creatures
 
 const creatureEnergy = 10; // Max creature energy
 
-const metabolismScaleTime = 700; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
+const metabolismScaleTime = 900; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
 const minMetabolism = 0.0; // Initial metabolism
 const maxMetabolism = 0.1; // End metabolism (metabolism when age == metabolismScaleTime)
 
@@ -67,13 +67,13 @@ const minChildEnergy = 0.05; // Min % of creatures energy to be given to a singl
 const maxChildEnergy = 0.95; // Max % of creatures energy to be given to a single child
 
 const energy = { // Energy cost per tick
-    eat: 0.1, // Energy cost to eat
-    move: 0.1, // Energy cost to move
-    attack: 0.2 // Energy cost to attack
+    eat: 0.01, // Energy cost to eat
+    move: 0.01, // Energy cost to move
+    attack: 0.02 // Energy cost to attack
 };
 
 const eatEffeciency = 0.9; // Eat effeciency %
-const eatPower = 1;
+const eatPower = 0.1;
 
 const birthEffeciency = 0.9; // Birth effeciency %
 
