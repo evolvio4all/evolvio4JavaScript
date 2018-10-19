@@ -2,14 +2,19 @@
 const inputs = 4;
 const outputs = 5 + memories;
 
+const testInput = [];
+for (let i = 0; i < inputs; i++) {
+	testInput.push(seededNoise(-1, 1));
+}
+
 // Creature.prototype creates a neural network composed of layers and axons
 Creature.prototype.createNeuralNetwork = function () {
 	// VARIABLES //
 	this.inputs = inputs + this.eyes.length * 2;
 
-	let layers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
+	let layers = [inputs + outputs, Math.ceil((inputs + outputs * 2) / 2), outputs];
 	let forgetLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
-	let decideLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
+	let decideLayers = [inputs + outputs, Math.ceil((inputs + outputs * 2) / 2), outputs];
 	let modifyLayers = [inputs + outputs * 2, Math.ceil((inputs + outputs * 3) / 2), outputs];
 
 	this.network = new Brain(forgetLayers, decideLayers, modifyLayers, layers);
@@ -70,7 +75,7 @@ Creature.prototype.initAxons = function () {
 					let weight = 0;
 
 					if (seededNoise() < connectionDensity) {
-						weight = Math.round(seededNoise(minInitialAxonValue, maxInitialAxonValue));
+						weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue) / Math.sqrt(this.network[brain].layers[layer]);
 					}
 
 					neuronWeights.push(weight);
@@ -97,7 +102,7 @@ Creature.prototype.feedForward = function (input) {
 		}
 
 		for (let cs = 0; cs < this.network.cellState.length; cs++) {
-			this.network[brain].neurons[0][this.inputs + outputs + cs] = this.network.cellState[cs] || 0;
+			if (brain == "forget" || brain == "modify") this.network[brain].neurons[0][this.inputs + outputs + cs] = this.network.cellState[cs] || 0;
 		}
 
 		for (let neuronsInLayer of this.network[brain].layers) {

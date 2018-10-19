@@ -27,7 +27,7 @@ Creature.prototype.eat = function (p) {
 };
 
 Creature.prototype.metabolize = function () {
-  let scale = Math.min((this.age / metabolismScaleTime), 1);
+  let scale = Math.min(Math.pow(this.age / metabolismScaleTime, 4), 1);
 	let tenergy = -(scale * (maxMetabolism - minMetabolism) + minMetabolism);
 	this.energy -= scale * (maxMetabolism - minMetabolism) + minMetabolism;
 
@@ -59,7 +59,7 @@ Creature.prototype.reproduce = function (t) {
 
 	if (this.age > reproduceAge && this.reproduceTime > minReproduceTime) {
 		for (let i = 0; i < this.children; i++) {
-			if (this.energy < this.childEnergy) break;
+			if (this.energy < creatureEnergy * this.childEnergy) break;
 			let child = new Creature(this.x + Math.floor(seededNoise(-2, 2)) * tileSize, this.y + Math.floor(seededNoise(-2, 2)) * tileSize, this.species);
 
 			child.eyes = [];

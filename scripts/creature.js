@@ -150,11 +150,6 @@ Creature.prototype.setSpecies = function () {
 
 	this.spIn = species;
 
-	let testInput = [];
-	for (let i = 0; i < inputs; i++) {
-		testInput.push(0.8);
-	}
-
 	for (let i = 0; i < 3; i++) {
 		this.feedForward(testInput);
 

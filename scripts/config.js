@@ -11,8 +11,8 @@ const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
 let maxTileFood = 2; // Maximum food in a tile
-const growSeasonGrowRate = 0.01; // How fast food regrows
-const dieSeasonGrowRate = 0.005; // How fast food regrows
+const growSeasonGrowRate = 0.005; // How fast food regrows
+const dieSeasonGrowRate = 0.002; // How fast food regrows
 
 const waterBias = 0.25; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
@@ -27,7 +27,7 @@ const mapUpdateDelay = 30; // How many ticks before the map tiles update
 const minCreatures = 50; // Minimum number of creatures
 const minFirstGen = 20; // Minimum number of first generation creatures
 
-const creatureEnergy = 20; // Max creature energy
+const creatureEnergy = 10; // Max creature energy
 
 const metabolismScaleTime = 700; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
 const minMetabolism = 0.00; // Initial metabolism
@@ -84,11 +84,11 @@ const minEatPower = 0.0; // Minimum eating strength (anything lower will be 0)
 const minSpawnPower = 0.0; // Minimum output to reproduce (anything lower will be 0)
 const minAttackPower = 0.0; // Minimum attack strength (anything lower will be 0)
 
-const reproduceAge = 800; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+const reproduceAge = 600; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
 const minReproduceTime = 500; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
-const offset = 0.1; // Amount to offset the value of a neuron
+const offset = 0; // Amount to offset the value of a neuron
 
 const minMutability = { // Minimum mutability in various categories
   brain: 2,
@@ -120,11 +120,10 @@ const maxMutabilityChange = 2; // Maximum amount any mutability can change by
 
 const connectionDensity = 0.5; // % of axons initially connected in the brain
 
-const memories = 8; // # of memories a creature can store (outputs that do nothing, except store a value)
+const memories = 3; // # of memories a creature can store (outputs that do nothing, except store a value)
 
 const stepAmount = 6; // Maximum amount an axon can be changed by in mutation
 
-const minInitialAxonValue = -6; // Minimum power of an axon intially
 const maxInitialAxonValue = 6; // Maximum power of an axon intially
 
 // ZOOM //
