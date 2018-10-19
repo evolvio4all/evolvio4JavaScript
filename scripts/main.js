@@ -16,15 +16,17 @@ function main() {
 
 	let ndate = new Date();
 
-	if (ndate - odate < 100) twice = false;
-
 	if (twice && !fastforward && autoMode) {
 		timescale *= 0.95;
 	} else {
 		render();
 	}
 
-	if (ndate - odate >= 100) twice = true;
+	if (ndate - odate >= 100) {
+	  twice = true;
+	} else {
+	  twice = false;
+	}
 }
 
 function wallLock(creature) {
@@ -126,7 +128,7 @@ function update() {
 
 		let rotation = creature.rotation / (2 * Math.PI);
 
-		creature.input = [0.865, energy, season / (growSeasonLength + dieSeasonLength)];
+		creature.input = [0.865, rotation, energy, season / (growSeasonLength + dieSeasonLength)];
 
 		for (let eye of creature.eyes) {
 			if (eye.see()[1] == "tile") {

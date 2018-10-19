@@ -25,7 +25,7 @@ const mapUpdateDelay = 30; // How many ticks before the map tiles update
 
 // CREATURES //
 const minCreatures = 50; // Minimum number of creatures
-const minFirstGen = 50; // Minimum number of first generation creatures
+const minFirstGen = 20; // Minimum number of first generation creatures
 
 const creatureEnergy = 20; // Max creature energy
 
@@ -67,9 +67,9 @@ const minChildEnergy = 0.05; // Min % of creatures energy to be given to a singl
 const maxChildEnergy = 0.95; // Max % of creatures energy to be given to a single child
 
 const energy = { // Energy cost per tick
-    eat: 0.01, // Energy cost to eat
+    eat: 0.02, // Energy cost to eat
     move: 0.01, // Energy cost to move
-    attack: 0.01 // Energy cost to attack
+    attack: 0.03 // Energy cost to attack
 };
 
 const eatEffeciency = 0.90; // Eat effeciency %

@@ -1,5 +1,5 @@
 // BRAIN INFO //
-const inputs = 3;
+const inputs = 4;
 const outputs = 5 + memories;
 
 // Creature.prototype creates a neural network composed of layers and axons

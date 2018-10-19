@@ -19,6 +19,8 @@ let pause = false;
 let timescale = 1;
 let fastforward = false;
 
+let twice = false;
+
 let debugToggle = false;
 
 let population = 0;
