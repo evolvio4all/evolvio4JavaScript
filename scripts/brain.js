@@ -45,8 +45,8 @@ function Network(forget, decide, modify, main, par) {
 
 	this.output = [];
 	for (let i = 0; i < outputs; i++) this.output.push(0);
-	
-  this.parent = par;
+
+	this.parent = par;
 }
 
 Creature.prototype.initNeurons = function () {
@@ -70,7 +70,7 @@ Creature.prototype.initAxons = function () {
 		if (brain == "cellState") break;
 
 		this.network[brain].axons = [];
-		
+
 		this.network[brain].biasAxons = [];
 
 		for (let layer = 0; layer < this.network[brain].layers.length; layer++) {
@@ -215,29 +215,29 @@ Creature.prototype.mutate = function () {
 		if (this.childEnergy > maxChildEnergy) this.childEnergy = maxChildEnergy;
 	}
 
-	rand = seededNoise(0, 100);
+	for (let eye of this.eyes) {
+		rand = seededNoise(0, 100);
 
-	if (rand < this.mutability.eyes.number / 2 && this.eyes.length < maxEyes) {
-		this.eyes.push(new this.eye(this));
-	} else if (rand < this.mutability.eyes.number && this.eyes.length > minEyes) {
-		this.eyes.splice(Math.floor(seededNoise(0, this.eyes.length)), 1);
-	}
-
-	rand = seededNoise(0, 100);
-
-	let selectedEye = this.eyes[Math.floor(seededNoise(0, this.eyes.length))];
-
-	if (this.eyes.length > 0) {
 		if (rand < this.mutability.eyes.angle) {
-			selectedEye.angle += seededNoise(-maxEyeAngleChange, maxEyeAngleChange);
-			if (selectedEye.angle < 0) selectedEye.angle = 0;
-			else if (selectedEye.angle > 2 * Math.PI) selectedEye.angle = 2 * Math.PI;
+			eye.angle += seededNoise(-maxEyeAngleChange, maxEyeAngleChange);
+			if (eye.angle < 0) selectedEye.angle = 0;
+			else if (eye.angle > 2 * Math.PI) eye.angle = 2 * Math.PI;
 		}
 
+		rand = seededNoise(0, 100);
+
 		if (rand < this.mutability.eyes.distance) {
-			selectedEye.distance += seededNoise(-maxEyeDistanceChange, maxEyeDistanceChange);
-			if (selectedEye.distance < minEyeDistance) selectedEye.distance = minEyeDistance;
-			else if (selectedEye.distance > maxEyeDistance) selectedEye.angle = maxEyeDistance;
+			eye.distance += seededNoise(-maxEyeDistanceChange, maxEyeDistanceChange);
+			if (eye.distance < minEyeDistance) eye.distance = minEyeDistance;
+			else if (eye.distance > maxEyeDistance) eye.angle = maxEyeDistance;
+		}
+
+		rand = seededNoise(0, 100);
+
+		if (rand < this.mutability.eyes.number / 2 && this.eyes.length < maxEyes) {
+			this.eyes.push(new this.eye(this));
+		} else if (rand < this.mutability.eyes.number && this.eyes.length > minEyes) {
+			this.eyes.splice(this.eyes.indexOf(eye), 1);
 		}
 	}
 
@@ -288,7 +288,7 @@ Network.prototype.mutate = function () {
 			for (let axon = 0; axon < this[brain].biasAxons[layer].length; axon++) {
 				let weight = this[brain].biasAxons[layer][axon];
 				let randomNumber = seededNoise(0, 100);
-        
+
 				if (randomNumber < this.parent.mutability.brain / 2) {
 					weight += seededNoise(-stepAmount, stepAmount);
 				} else if (randomNumber < this.parent.mutability.brain) {

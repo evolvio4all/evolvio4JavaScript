@@ -16,12 +16,10 @@ function main() {
 
 	let ndate = new Date();
 
-	if (ndate - odate > 50 && !fastforward && autoMode) {
+	if (ndate - odate > 60 && !fastforward && autoMode) {
 		if (timescale > 1) timescale--;
-		else timescale /= 1.01;
 	} else if (ndate - odate < 40 && !fastforward && autoMode) {
 		if (timescale >= 1) timescale++;
-		else timescale *= 1.01;
 	}
 
 	render();
@@ -51,14 +49,16 @@ function clampSize(creature) {
 
 function update() {
 	tick++;
-	if (seasonUp) {
-		season++;
-	} else season--;
-
-	if (season >= growSeasonLength + dieSeasonLength || season < 0) {
-		seasonUp = !seasonUp;
-		if (seasonUp) year++;
+  
+  if (season == 0) {
+		seasonUp = true;
+		year++;
+	} else if (season == growSeasonLength + dieSeasonLength) {
+		seasonUp = false;
 	}
+  
+	if (seasonUp) season++;
+	else season--;
 
 	if (season % mapUpdateDelay == 0) {
 		for (let i in map) {
@@ -144,16 +144,18 @@ function update() {
 		creature.output = creature.feedForward(creature.input);
 
 		creature.maxSpeed = maxCreatureSpeed;
-
 		if (map[pos[0]][pos[1]].type === 0) creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
 
 		creature.eat(pos);
 		creature.move();
-		
+		wallLock(creature);
+
 		creature.reproduce();
 		creature.attack();
 		creature.metabolize();
 		creature.tick();
+
+		clampSize(creature);
 
 		creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
 		creature.energyGraph.gross.push(creature.energy);
@@ -161,12 +163,9 @@ function update() {
 		creature.lastEnergy = creature.energy;
 
 		if (creature == selectedCreature && zoomLevel > 0.05) {
-			cropx -= (cropx - (creature.x * zoomLevel - canvas.width / 2)) / (50 / zoomLevel);
-			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / (50 / zoomLevel);
+			cropx -= (cropx - (creature.x * zoomLevel - canvas.width / 2)) / ((1 / panSpeed) / zoomLevel);
+			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / ((1 / panSpeed) / zoomLevel);
 		}
-
-		wallLock(creature);
-		clampSize(creature);
 	}
 
 	population = creatures.length;
@@ -179,9 +178,10 @@ function render() {
 	for (let i in map) {
 		for (let j in map[i]) {
 			if (map[i][j].type === 0) continue;
-			let hue = Math.max(100 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 2 * 50, 50) + "," + Math.floor(map[i][j].food / maxTileFood * 100);
+			let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
+			let saturation = Math.floor(map[i][j].food / maxTileFood * 100);
 
-			ctx.fillStyle = "hsl(" + hue + "%, 22%)";
+			ctx.fillStyle = "hsl(" + hue + ", " + saturation + "%, 22%)";
 			ctx.fillRect(i * tileSize * zoomLevel - cropx - 1, j * tileSize * zoomLevel - cropy - 1, tileSize * zoomLevel + 2, tileSize * zoomLevel + 2);
 		}
 	}
@@ -247,9 +247,10 @@ function render() {
 	ctz.strokeStyle = "#000000";
 	ctz.font = "48px Calibri";
 	ctz.lineWidth = 5;
-
-	ctz.strokeText("Year " + year, 1920 / 2, 50);
-	ctz.fillText("Year " + year, 1920 / 2, 50);
+  
+  let yearProgress = seasonUp ? season / (growSeasonLength + dieSeasonLength) / 2 : 1 - (season / (growSeasonLength + dieSeasonLength) / 2);
+	ctz.strokeText("Year " + (year + yearProgress).toFixed(1), 1920 / 2, 50);
+	ctz.fillText("Year " + (year + yearProgress).toFixed(1), 1920 / 2, 50);
 
 	ctz.textAlign = "left";
 	ctz.strokeText("Population: " + population, 40, 1040);

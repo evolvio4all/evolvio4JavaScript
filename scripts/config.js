@@ -14,26 +14,26 @@ const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
 let maxTileFood = 15; // Maximum food in a tile
-const growSeasonGrowRate = 0.025; // How fast food regrows
-const dieSeasonGrowRate = 0.015; // How fast food regrows
+const growSeasonGrowRate = 0.022; // How fast food regrows
+const dieSeasonGrowRate = 0.018; // How fast food regrows
 
-const waterBias = 0.25; // Becomes unstable above about 0.75
+const waterBias = 0.23; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
 const continentSize = 50; // How large the islands are (maintains water ratio)
 
-const growSeasonLength = 1200; // Grow season length
-const dieSeasonLength = 600; // Die season length
+const growSeasonLength = 300; // Grow season length (growSeasonLength * 2 / 30 = growSeasonLength in seconds)
+const dieSeasonLength = 150; // Die season length (dieSeasonLength * 2 / 30 = dieSeasonLength in seconds)
 
 const mapUpdateDelay = 30; // How many ticks before the map tiles update
 
 // CREATURES //
-const minCreatures = 50; // Minimum number of creatures
-const minFirstGen = 20; // Minimum number of first generation creatures
+const minCreatures = 80; // Minimum number of creatures
+const minFirstGen = 60; // Minimum number of first generation creatures
 
 const creatureEnergy = 80; // Max creature energy
 
 const metabolismScaleTime = 1000; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds), 8th power'd ATM
-const minMetabolism = 0.01; // Initial metabolism
+const minMetabolism = 0.02; // Initial metabolism
 const maxMetabolism = 0.2; // End metabolism (metabolism when age == metabolismScaleTime)
 
 const speciesDiversity = 5; // Diversity of each species
@@ -47,12 +47,12 @@ const swimmingSpeed = 0.4; // Movement speed % in water
 
 const eatingSpeed = 0.0; // Movement speed % while eating
 
-const rotationSpeed = 0.5; // Speed % how fast creatures rotate
+const rotationSpeed = 0.1; // Speed % how fast creatures rotate
 
 let oldest = 0; // Oldest creature's age
 
 const minInitEyes = 1; // Minimum "eyes" a first generation creature can have
-const maxInitEyes = 12; // Maximum "eyes" a first generation creature can have
+const maxInitEyes = 6; // Maximum "eyes" a first generation creature can have
 
 const minEyes = 1; // Minimum number of "eyes" a creature can have
 const maxEyes = 12; // Maximum number of "eyes" a creature can have
@@ -71,8 +71,8 @@ const maxChildEnergy = 0.95; // Max % of creatures energy to be given to a singl
 
 const energy = { // Energy cost per tick
     eat: 0.2, // Energy cost to eat
-    move: 0.1, // Energy cost to move
-    attack: 0.2 // Energy cost to attack
+    move: 0.06, // Energy cost to move
+    attack: 0.3 // Energy cost to attack
 };
 
 const eatEffeciency = 0.9; // Eat effeciency %
@@ -83,11 +83,11 @@ const birthEffeciency = 0.9; // Birth effeciency %
 const attackEffeciency = 0.95; // Attack effeciency %
 const attackPower = 2; // Attack power % (damage)
 
-const minEatPower = 0.0; // Minimum eating strength (anything lower will be 0)
-const minSpawnPower = 0.0; // Minimum output to reproduce (anything lower will be 0)
-const minAttackPower = 0.0; // Minimum attack strength (anything lower will be 0)
+const minEatPower = 0.05; // Minimum eating strength (anything lower will be 0)
+const minSpawnPower = 0.05; // Minimum output to reproduce (anything lower will be 0)
+const minAttackPower = 0.05; // Minimum attack strength (anything lower will be 0)
 
-const reproduceAge = 600; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+const reproduceAge = 900; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
 const minReproduceTime = 300; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
@@ -121,7 +121,7 @@ const maxMutability = { // Maximum mutability in various categories
 
 const maxMutabilityChange = 3; // Maximum amount any mutability can change by
 
-const connectionDensity = 0.5; // % of axons initially connected in the brain
+const connectionDensity = 0.6; // % of axons initially connected in the brain
 
 const memories = 2; // # of memories a creature can store (outputs that do nothing, except store a value)
 
@@ -130,10 +130,12 @@ const stepAmount = 4; // Maximum amount an axon can be changed by in mutation
 const maxInitialAxonValue = 12; // Maximum power of an axon intially
 
 // ZOOM //
-const zoomSpeed = 0.01; // How fast the zoom happens
+const zoomSpeed = 0.005; // How fast the zoom happens
 const minZoomLevel = 0.0424 / 2; // Furthest zoom
-const maxZoomLevel = 4;  // Nearest zoom
+const maxZoomLevel = 0.4;  // Nearest zoom
 let zoomLevel = 0.0424; // Default zoom
+
+const panSpeed = 0.1;
 
 // CENTER MAP (AUTOMATIC) //
 let cropx = -(1920 - tileSize * mapSize * zoomLevel) / 2;
