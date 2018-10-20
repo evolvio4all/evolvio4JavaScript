@@ -220,7 +220,7 @@ Creature.prototype.mutate = function () {
 
 		if (rand < this.mutability.eyes.angle) {
 			eye.angle += seededNoise(-maxEyeAngleChange, maxEyeAngleChange);
-			if (eye.angle < 0) selectedEye.angle = 0;
+			if (eye.angle < 0) eye.angle = 0;
 			else if (eye.angle > 2 * Math.PI) eye.angle = 2 * Math.PI;
 		}
 
