@@ -4,13 +4,14 @@ function checkKey(key) {
 	
 	if (keyDown(controls.play)) {
 		timescale = 1;
+		autoMode = false;
 	} else if (keyDown(controls.fastForward) && !fastforward) {
 		timescale *= 3;
 		fastforward = true;
 	} else if (keyDown(controls.stop)) {
 		timescale = 0;
-	} else if (keyDown(controls.speedUp)) {
-		timescale *= 2;
+	} if (keyDown(controls.auto)) {
+	  autoMode = true;
 	}
 	
 	if (keyDown(controls.debug)) {
@@ -21,9 +22,6 @@ function checkKey(key) {
 	  infoMode = !infoMode;
 	}
 	
-	if (keyDown(controls.auto)) {
-	  autoMode = !autoMode;
-	}
 	
 	if (keyDown(controls.gif)) {
 	  gifMode = !gifMode;

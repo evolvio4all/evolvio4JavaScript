@@ -27,7 +27,7 @@ Creature.prototype.eat = function (p) {
 };
 
 Creature.prototype.metabolize = function () {
-  let scale = Math.min(Math.pow(this.age / metabolismScaleTime, 8), 1);
+	let scale = Math.min(Math.pow(this.age / metabolismScaleTime, 8), 1);
 	let tenergy = -(scale * (maxMetabolism - minMetabolism) + minMetabolism);
 	this.energy -= scale * (maxMetabolism - minMetabolism) + minMetabolism;
 
@@ -49,7 +49,7 @@ Creature.prototype.move = function () {
 	this.energyGraph.move.push(tenergy);
 };
 
-Creature.prototype.reproduce = function (t) {
+Creature.prototype.reproduce = function () {
 	let tenergy = 0;
 
 	if (this.output[4] <= minSpawnPower) {
@@ -60,14 +60,15 @@ Creature.prototype.reproduce = function (t) {
 	if (this.age > reproduceAge && this.reproduceTime > minReproduceTime) {
 		for (let i = 0; i < this.children; i++) {
 			if (this.energy < creatureEnergy * this.childEnergy) break;
-			let child = new Creature(this.x + Math.floor(seededNoise(-2, 2)) * tileSize, this.y + Math.floor(seededNoise(-2, 2)) * tileSize, this.species);
+			
+			let child = new Creature(this.x, this.y, this.species, this.speciesGeneration);
 
 			child.eyes = [];
 			for (let eye of this.eyes) {
 				child.eyes.push(new child.eye(child, eye.angle, eye.distance));
 			}
-      
-      child.mutability = [];
+
+			child.mutability = {};
 			for (let value in this.mutability) {
 				child.mutability[value] = this.mutability[value];
 			}
@@ -78,8 +79,7 @@ Creature.prototype.reproduce = function (t) {
 			child.color = this.color;
 			child.size = this.size;
 			child.generation = this.generation + 1;
-			child.speciesGeneration = this.speciesGeneration;
-			
+
 			child.mutate();
 
 			child.createNeuralNetwork();
@@ -96,8 +96,6 @@ Creature.prototype.reproduce = function (t) {
 	}
 
 	this.energyGraph.spawn.push(tenergy);
-
-	population = creatures.length;
 };
 
 Creature.prototype.die = function () {
@@ -129,8 +127,6 @@ Creature.prototype.die = function () {
 			console.error(this.species);
 		}
 	}
-
-	population = creatures.length;
 };
 
 Creature.prototype.attack = function () {

@@ -1,4 +1,4 @@
-function Creature(x, y, spec) {
+function Creature(x, y, spec, specGen) {
 	let tile = Math.floor(seededNoise(0, spawnTiles.length));
 
 	this.x = x || spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
@@ -54,7 +54,7 @@ function Creature(x, y, spec) {
 	this.geneticID = "";
 	this.generation = 0;
 	this.species = spec;
-	this.speciesGeneration = 0;
+	this.speciesGeneration = specGen || 0;
 	this.species = this.setSpecies();
 
 	this.rotation = 0;
@@ -170,9 +170,11 @@ Creature.prototype.setSpecies = function () {
 		}
 	}
 
+	this.geneticID = geneticID;
+	
 	let minGeneDiff = Infinity;
 	for (let specie in specieslist) {
-		var geneDiff = arrayDifference(geneticID, specieslist[specie].contains[0].geneticID);
+		var geneDiff = arrayDifference(this.geneticID, specieslist[specie].contains[0].geneticID);
 
 		if (geneDiff < minGeneDiff) {
 			minGeneDiff = geneDiff;
@@ -194,8 +196,11 @@ Creature.prototype.setSpecies = function () {
 	} else {
 	  species = species.split(" ")[0];
 	  
-		if (minGeneDiff >= speciesDiversity) {
+	  this.minGeneDiff = minGeneDiff;
+	  
+		if (this.minGeneDiff >= speciesDiversity) {
 			this.speciesGeneration++;
+			
 			if (this.speciesGeneration < suffixes.length) species += " " + suffixes[this.speciesGeneration];
 			else {
 				if (this.speciesGeneration < 40) {
@@ -230,7 +235,6 @@ Creature.prototype.setSpecies = function () {
 
 	specieslist[species].contains.push(this);
 
-	this.geneticID = geneticID;
 
 	return species;
 };
