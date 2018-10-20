@@ -1,13 +1,13 @@
 function main() {
 	let odate = new Date();
-	if (creatures.length > 3000) return;
+	if (creatures.length > 8000) return;
 	if (timescale >= 1) { // Can timescale ever go below 1?
 		for (let ts = 0; ts < timescale; ts++) {
 			update();
 		}
 	} else {
 		tc++;
-		if (tc > 1 / timescale) {
+		if (tc >= 1 / timescale) {
 			update();
 
 			tc = 0;
@@ -16,22 +16,15 @@ function main() {
 
 	let ndate = new Date();
 
-	if (twice && !fastforward && autoMode) {
+	if (ndate - odate > 50 && !fastforward && autoMode) {
 		if (timescale > 1) timescale--;
 		else timescale /= 1.01;
-	} else {
-		render();
+	} else if (ndate - odate < 40 && !fastforward && autoMode) {
+		if (timescale >= 1) timescale++;
+		else timescale *= 1.01;
 	}
 
-	if (ndate - odate > 60) {
-		twice = true;
-	} else if (ndate - odate < 40) {
-		if (autoMode) {
-			if (timescale >= 1) timescale++;
-			else timescale *= 1.01;
-		}
-		twice = false;
-	}
+	render();
 }
 
 function wallLock(creature) {
@@ -89,8 +82,6 @@ function update() {
 	for (let creature of creatures) {
 		if (creature.age > oldest) oldest = creature.age;
 		if (creature.generation === 0) firstGen++;
-		wallLock(creature);
-		clampSize(creature);
 
 		let size = ((creature.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
 		let energy = creature.energy / creatureEnergy;
@@ -135,7 +126,7 @@ function update() {
 
 		let time = (tick % 15) / 15;
 
-		creature.input = [time, energy, season / (growSeasonLength + dieSeasonLength)];
+		creature.input = [time, rotation, energy, season / (growSeasonLength + dieSeasonLength)];
 
 		for (let eye of creature.eyes) {
 			if (eye.see()[1] == "tile") {
@@ -154,13 +145,13 @@ function update() {
 
 		creature.maxSpeed = maxCreatureSpeed;
 
-		creature.eat(pos);
-
 		if (map[pos[0]][pos[1]].type === 0) creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
 
+		creature.eat(pos);
 		creature.move();
-		creature.attack();
+		
 		creature.reproduce();
+		creature.attack();
 		creature.metabolize();
 		creature.tick();
 
@@ -169,11 +160,16 @@ function update() {
 
 		creature.lastEnergy = creature.energy;
 
-		if (creature == selectedCreature && zoomLevel > 0.424) {
+		if (creature == selectedCreature && zoomLevel > 0.05) {
 			cropx -= (cropx - (creature.x * zoomLevel - canvas.width / 2)) / (50 / zoomLevel);
 			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / (50 / zoomLevel);
 		}
+
+		wallLock(creature);
+		clampSize(creature);
 	}
+
+	population = creatures.length;
 }
 
 function render() {
@@ -260,8 +256,8 @@ function render() {
 	ctz.fillText("Population: " + population, 40, 1040);
 
 	ctz.textAlign = "right";
-	ctz.strokeText(timescale < 1 ? timescale.toFixed(1) : Math.ceil(timescale) + "x", 1880, 1040);
-	ctz.fillText(timescale < 1 ? timescale.toFixed(1) : Math.ceil(timescale) + "x", 1880, 1040);
+	ctz.strokeText((timescale < 1 ? timescale.toFixed(1) : Math.ceil(timescale)) + "x", 1880, 1040);
+	ctz.fillText((timescale < 1 ? timescale.toFixed(1) : Math.ceil(timescale)) + "x", 1880, 1040);
 
 	ctz.textAlign = "center";
 
@@ -352,7 +348,7 @@ function render() {
 			ctz.beginPath();
 			for (let point of selectedCreature.energyGraph.gross) {
 				if (x * 10 >= 1400) selectedCreature.energyGraph.gross.splice(0, 1);
-				ctz.lineTo(x * 10, 900 - point * 10);
+				ctz.lineTo(x * 10, 900 - point * graphMult / 10);
 				x++;
 			}
 			ctz.stroke();
@@ -362,7 +358,7 @@ function render() {
 			ctz.beginPath();
 			for (let point of selectedCreature.energyGraph.net) {
 				if (x * 10 >= 1400) selectedCreature.energyGraph.net.splice(0, 1);
-				ctz.lineTo(x * 10, 900 - point * 1000);
+				ctz.lineTo(x * 10, 900 - point * graphMult);
 				x++;
 			}
 			ctz.stroke();
@@ -372,7 +368,7 @@ function render() {
 			ctz.beginPath();
 			for (let point of selectedCreature.energyGraph.metabolism) {
 				if (x * 10 >= 1400) selectedCreature.energyGraph.metabolism.splice(0, 1);
-				ctz.lineTo(x * 10, 900 - point * 1000);
+				ctz.lineTo(x * 10, 900 - point * graphMult);
 				x++;
 			}
 			ctz.stroke();
@@ -382,7 +378,7 @@ function render() {
 			ctz.beginPath();
 			for (let point of selectedCreature.energyGraph.attack) {
 				if (x * 10 >= 1400) selectedCreature.energyGraph.attack.splice(0, 1);
-				ctz.lineTo(x * 10, 900 - point * 1000);
+				ctz.lineTo(x * 10, 900 - point * graphMult);
 				x++;
 			}
 			ctz.stroke();
@@ -392,7 +388,7 @@ function render() {
 			ctz.beginPath();
 			for (let point of selectedCreature.energyGraph.move) {
 				if (x * 10 >= 1400) selectedCreature.energyGraph.move.splice(0, 1);
-				ctz.lineTo(x * 10, 900 - point * 1000);
+				ctz.lineTo(x * 10, 900 - point * graphMult);
 				x++;
 			}
 			ctz.stroke();
@@ -402,7 +398,7 @@ function render() {
 			ctz.beginPath();
 			for (let point of selectedCreature.energyGraph.eat) {
 				if (x * 10 >= 1400) selectedCreature.energyGraph.eat.splice(0, 1);
-				ctz.lineTo(x * 10, 900 - point * 1000);
+				ctz.lineTo(x * 10, 900 - point * graphMult);
 				x++;
 			}
 			ctz.stroke();
