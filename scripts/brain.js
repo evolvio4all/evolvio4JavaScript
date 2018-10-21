@@ -118,6 +118,7 @@ Creature.prototype.initAxons = function () {
 
 // Creature.prototype feeds the neuron values through the axons, and all the way to the end of the network.
 Creature.prototype.feedForward = function (input) {
+	let cellStateLength = this.network.cellState.length;
 	for (let brain in this.network) {
 		if (brain == "cellState") break;
 
@@ -130,7 +131,6 @@ Creature.prototype.feedForward = function (input) {
 		}
 
 		if (brain == "forget" || brain == "modify") {
-			let cellStateLength = this.network.cellState.length;
 			for (let cs = 0; cs < cellStateLength; cs++) {
 				this.network[brain].neurons[0][this.inputs + outputs + cs] = this.network.cellState[cs] || 0;
 			}
@@ -163,7 +163,7 @@ Creature.prototype.feedForward = function (input) {
 		}
 	}
 
-	for (let i = 0; i < this.network.cellState.length; i++) {
+	for (let i = 0; i < cellStateLength; i++) {
 		this.network.cellState[i] *= this.network.forget.neurons[this.network.forget.neurons.length - 1][i];
 		this.network.cellState[i] += this.network.decide.neurons[this.network.decide.neurons.length - 1][i] * this.network.modify.neurons[this.network.modify.neurons.length - 1][i];
 		this.network.main.neurons[this.network.main.neurons.length - 1][i] *= Math.tanh(this.network.cellState[i]);
@@ -216,10 +216,12 @@ Creature.prototype.mutate = function () {
 		if (this.childEnergy > maxChildEnergy) this.childEnergy = maxChildEnergy;
 	}
 
-	for (let eye of this.eyes) {
+	let eyes = this.eyes.length;
+	for (let i = eyes - 1; i >= 0; i--) {
 		rand = seededNoise(0, 100);
-
 		if (rand < this.mutability.eyes.angle) {
+			let eye = this.eyes[i];
+
 			eye.angle += seededNoise(-maxEyeAngleChange, maxEyeAngleChange);
 			if (eye.angle < 0) eye.angle = 0;
 			else if (eye.angle > 2 * Math.PI) eye.angle = 2 * Math.PI;
@@ -228,6 +230,8 @@ Creature.prototype.mutate = function () {
 		rand = seededNoise(0, 100);
 
 		if (rand < this.mutability.eyes.distance) {
+			let eye = this.eyes[i];
+
 			eye.distance += seededNoise(-maxEyeDistanceChange, maxEyeDistanceChange);
 			if (eye.distance < minEyeDistance) eye.distance = minEyeDistance;
 			else if (eye.distance > maxEyeDistance) eye.angle = maxEyeDistance;
@@ -238,6 +242,8 @@ Creature.prototype.mutate = function () {
 		if (rand < this.mutability.eyes.number / 2 && this.eyes.length < maxEyes) {
 			this.eyes.push(new this.eye(this));
 		} else if (rand < this.mutability.eyes.number && this.eyes.length > minEyes) {
+			let eye = this.eyes[i];
+
 			this.eyes.splice(this.eyes.indexOf(eye), 1);
 		}
 	}

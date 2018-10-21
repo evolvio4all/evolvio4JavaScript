@@ -50,7 +50,7 @@ function clampSize(creature) {
 function update() {
 	tick++;
 
-	if (season == 0) {
+	if (season === 0) {
 		seasonUp = true;
 		year++;
 	} else if (season == growSeasonLength + dieSeasonLength) {
@@ -60,18 +60,19 @@ function update() {
 	if (seasonUp) season++;
 	else season--;
 
-	if (season % mapUpdateDelay == 0) {
-		for (let i in map) {
-			for (let j in map[i]) {
-				if (map[i][j].type == 1) {
+	if (season % mapUpdateDelay === 0) {
+		for (let row = 0; row < mapSize; row++) {
+			for (let column = 0; column < mapSize; column++) {
+				let tile = map[row][column];
+				if (tile.type == 1) {
 					if (season < growSeasonLength) {
-						map[i][j].food += growSeasonGrowRate * mapUpdateDelay;
+						tile.food += growSeasonGrowRate * mapUpdateDelay;
 					} else {
-						map[i][j].food += dieSeasonGrowRate * mapUpdateDelay;
+						tile.food += dieSeasonGrowRate * mapUpdateDelay;
 					}
 
-					if (map[i][j].food > map[i][j].maxFood) map[i][j].food = map[i][j].maxFood;
-					else if (map[i][j].food < 0) map[i][j].food = 0;
+					if (tile.food > tile.maxFood) tile.food = tile.maxFood;
+					else if (tile.food < 0) tile.food = 0;
 				}
 			}
 		}
@@ -79,48 +80,16 @@ function update() {
 
 	firstGen = 0;
 
-	for (let creature of creatures) {
+	population = creatures.length;
+	for (let i = population - 1; i >= 0; i--) {
+		let creature = creatures[i];
+
 		if (creature.age > oldest) oldest = creature.age;
 		if (creature.generation === 0) firstGen++;
 
 		let size = ((creature.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
+
 		let energy = creature.energy / creatureEnergy;
-		let pos = creature.getPosition();
-
-		// UNUSED SENSES //
-		/* let x = (creature.x / (tileSize * mapSize));
-			let y = (creature.y / (tileSize * mapSize));
-			let color = creature.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
-			let lastContactX = 0;
-			let lastContactY = 0;
-			let lastContactPos = [0, 0];
-			let lastContactSize = 1;
-			let lastContactColor = [0, 0, 0];
-			let lastContactEnergy = 0;
-
-			for (let creature2 of creatures) {
-				if (creature2 == creature) continue;
-				if (Math.floor(creature.x / tileSize) == Math.floor(creature2.x / tileSize)) {
-					if (Math.floor(creature.y / tileSize) == Math.floor(creature2.y / tileSize)) {
-						creature.lastContact = creature2;
-					}
-				}
-			}
-
-			if (typeof creature.lastContact !== "undefined") {
-				lastContactPos = creature.lastContact.getPosition();
-				lastContactSize = ((creature.lastContact.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
-				lastContactX = creature.lastContact.x / (tileSize * mapSize);
-				lastContactY = creature.lastContact.y / (tileSize * mapSize);
-				lastContactColor = creature.lastContact.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
-				lastContactEnergy = creature.lastContact.energy / (creatureEnergy * creature.size / maxCreatureSize);
-			}
-		
-			let memory = [];
-			let age = creature.age / metabolismScaleTime;
-			let reproduceTime = creature.reproduceTime / (minReproduceTime * 2.5); */
-
-		let tileFood = map[pos[0]][pos[1]].food / maxTileFood;
 
 		let rotation = creature.rotation / (2 * Math.PI);
 
@@ -128,7 +97,9 @@ function update() {
 
 		creature.input = [time, rotation, energy];
 
-		for (let eye of creature.eyes) {
+		let eyes = creature.eyes.length;
+		for (let i = 0; i < eyes; i++) {
+			let eye = creature.eyes[i];
 			let sight = eye.see();
 
 			if (sight[1] == "tile") {
@@ -148,13 +119,16 @@ function update() {
 
 		creature.output = creature.feedForward(creature.input);
 
-		if (map[pos[0]][pos[1]].type === 0) {
+		let pos = creature.getPosition();
+		tile = map[pos[0]][pos[1]];
+
+		if (tile.type === 0) {
 			creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
 		} else {
 			creature.maxSpeed = maxCreatureSpeed;
+			creature.eat(pos);
 		}
 
-		creature.eat(pos);
 		creature.move();
 		wallLock(creature);
 
@@ -162,8 +136,7 @@ function update() {
 		creature.attack();
 		creature.metabolize();
 		creature.tick();
-
-		clampSize(creature);
+		clampSize(creatures[i]);
 
 		creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
 		creature.energyGraph.gross.push(creature.energy);
@@ -175,22 +148,22 @@ function update() {
 			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / ((1 / panSpeed) / zoomLevel);
 		}
 	}
-
-	population = creatures.length;
 }
 
 function render() {
 	ctx.clearRect(0, 0, display.width, display.height);
 	ctz.clearRect(0, 0, viewport.width, viewport.height);
 
-	for (let i in map) {
-		for (let j in map[i]) {
-			if (map[i][j].type === 0) continue;
+	for (let row = 0; row < mapSize; row++) {
+		for (let column = 0; column < mapSize; column++) {
+		  let tile = map[row][column];
+			if (tile.type === 0) continue;
+			
 			let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
-			let saturation = Math.floor(map[i][j].food / maxTileFood * 100);
+			let saturation = Math.floor(tile.food / maxTileFood * 100);
 
 			ctx.fillStyle = "hsl(" + hue + ", " + saturation + "%, 22%)";
-			ctx.fillRect(i * tileSize * zoomLevel - cropx - 1, j * tileSize * zoomLevel - cropy - 1, tileSize * zoomLevel + 2, tileSize * zoomLevel + 2);
+			ctx.fillRect(row * tileSize * zoomLevel - cropx - 1, column * tileSize * zoomLevel - cropy - 1, tileSize * zoomLevel + 2, tileSize * zoomLevel + 2);
 		}
 	}
 
@@ -198,7 +171,8 @@ function render() {
 	ctx.lineWidth = 15 * zoomLevel;
 
 	ctx.beginPath();
-	for (let i in outline) {
+	let length = outline.length;
+	for (let i = 0; i < length; i++) {
 		ctx.moveTo(outline[i][0] * zoomLevel - cropx, outline[i][1] * zoomLevel - cropy);
 		ctx.lineTo(outline[i][2] * zoomLevel - cropx, outline[i][3] * zoomLevel - cropy);
 	}
@@ -206,7 +180,8 @@ function render() {
 
 	ctx.strokeStyle = "#ffffff";
 
-	for (let creature of creatures) {
+	for (let i = 0; i < creatures.length; i++) {
+	  let creature = creatures[i];
 		if (creature.output[3] > minAttackPower) {
 			ctx.fillStyle = "rgba(255, 0, 0, " + creature.output[3] + ")";
 
@@ -238,8 +213,10 @@ function render() {
 
 		if (debugMode) {
 			ctx.lineWidth = 2 * zoomLevel;
-
-			for (let eye of creature.eyes) {
+      
+      let eyes = creature.eyes.length;
+			for (let i = 0; i < eyes; i++) {
+			  let eye = creature.eyes[i];
 				ctx.beginPath();
 				ctx.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
 				ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel);

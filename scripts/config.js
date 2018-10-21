@@ -27,8 +27,8 @@ const dieSeasonLength = 150; // Die season length (dieSeasonLength * 2 / 30 = di
 const mapUpdateDelay = 30; // How many ticks before the map tiles update
 
 // CREATURES //
-const minCreatures = 80; // Minimum number of creatures
-const minFirstGen = 60; // Minimum number of first generation creatures
+const minCreatures = 50; // Minimum number of creatures
+const minFirstGen = 50; // Minimum number of first generation creatures
 
 const creatureEnergy = 80; // Max creature energy
 

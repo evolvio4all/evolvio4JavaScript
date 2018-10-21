@@ -78,7 +78,7 @@ Creature.prototype.randomize = function () {
 
 	this.x = spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
 	this.y = spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
-	
+
 	this.mutability = {
 		brain: seededNoise(minMutability.brain, maxMutability.brain),
 		children: seededNoise(minMutability.children, maxMutability.children),
@@ -152,26 +152,31 @@ Creature.prototype.setSpecies = function () {
 
 	for (let i = 0; i < 3; i++) {
 		this.feedForward(testInput);
-
-		for (let neuronValue of this.network.forget.neurons[this.network.forget.neurons.length - 1]) {
-			geneticID.push(neuronValue);
+    
+    
+    let forgetOutputs = this.network.forget.neurons[this.network.forget.neurons.length - 1];
+		for (let i = 0; i < forgetOutputs.length; i++) {
+			geneticID.push(forgetOutputs[i]);
+		}
+    
+    let decideOutputs = this.network.decide.neurons[this.network.decide.neurons.length - 1];
+		for (let i = 0; i < decideOutputs.length; i++) {
+			geneticID.push((decideOutputs[i] + 1) / 2);
 		}
 
-		for (let neuronValue of this.network.decide.neurons[this.network.decide.neurons.length - 1]) {
-			geneticID.push((neuronValue + 1) / 2);
+		let modifyOutputs = this.network.modify.neurons[this.network.modify.neurons.length - 1];
+		for (let i = 0; i < modifyOutputs.length; i++) {
+			geneticID.push(modifyOutputs[i]);
 		}
 
-		for (let neuronValue of this.network.modify.neurons[this.network.modify.neurons.length - 1]) {
-			geneticID.push(neuronValue);
-		}
-
-		for (let neuronValue of this.network.main.neurons[this.network.main.neurons.length - 1]) {
-			geneticID.push(neuronValue);
+		let mainOutputs = this.network.main.neurons[this.network.main.neurons.length - 1];
+		for (let i = 0; i < mainOutputs.length; i++) {
+			geneticID.push(mainOutputs[i]);
 		}
 	}
 
 	this.geneticID = geneticID;
-	
+
 	let minGeneDiff = Infinity;
 	for (let specie in specieslist) {
 		var geneDiff = arrayDifference(this.geneticID, specieslist[specie].contains[0].geneticID);
@@ -194,13 +199,13 @@ Creature.prototype.setSpecies = function () {
 		specieslist[species] = {};
 		specieslist[species].contains = [];
 	} else {
-	  species = species.split(" ")[0];
-	  
-	  this.minGeneDiff = minGeneDiff;
-	  
+		species = species.split(" ")[0];
+
+		this.minGeneDiff = minGeneDiff;
+
 		if (this.minGeneDiff >= speciesDiversity) {
 			this.speciesGeneration++;
-			
+
 			if (this.speciesGeneration < suffixes.length) species += " " + suffixes[this.speciesGeneration];
 			else {
 				if (this.speciesGeneration < 40) {
@@ -235,7 +240,6 @@ Creature.prototype.setSpecies = function () {
 
 	specieslist[species].contains.push(this);
 
-
 	return species;
 };
 
@@ -247,29 +251,34 @@ Creature.prototype.eye = function (parent, angle, distance) {
 	this.parent = parent;
 	this.x = Math.floor(seededNoise(minEyeDistance, maxEyeDistance)) * tileSize;
 	this.y = Math.floor(seededNoise(-maxEyeDistance, maxEyeDistance)) * tileSize;
-	
+
 	this.angle = angle || Math.atan2(this.y, this.x);
 	this.distance = distance || Math.sqrt(this.x * this.x + this.y * this.y);
 
 	this.see = function () {
 		let out;
-
-		let pos = [Math.floor((this.parent.x + Math.cos(this.parent.rotation + this.angle) * this.distance) / tileSize), Math.floor((this.parent.y + Math.sin(this.parent.rotation + this.angle) * this.distance) / tileSize)];
-
-		if (pos[0] < 0 || pos[0] >= mapSize || pos[1] < 0 || pos[1] >= mapSize) return [0, "oob"];
+    let tile;
     
-		if (map[pos[0]][pos[1]].type) out = [map[pos[0]][pos[1]], "tile"];
-    else out = [map[pos[0]][pos[1]], "water"];
-		for (let creature of creatures) {
+		let pos = [Math.floor((this.parent.x + Math.cos(this.parent.rotation + this.angle) * this.distance) / tileSize), Math.floor((this.parent.y + Math.sin(this.parent.rotation + this.angle) * this.distance) / tileSize)];
+    let row = map[pos[0]];
+    if (row) {
+      tile = row[pos[1]];
+      if (tile == undefined) return [0, "oob"];
+    } else return [0, "oob"];
+    
+    let length = creatures.length;
+		for (let i = 0; i < length; i++) {
+		  let creature = creatures[i];
+		  
 			if (creature == this.parent) continue;
-			if (Math.floor(creature.x / tileSize) == pos[0]) {
-				if (Math.floor(creature.y / tileSize) == pos[1]) {
-					out = [creature, "creature"];
-				}
+			if (Math.floor(creature.x / tileSize) == pos[0] && Math.floor(creature.y / tileSize) == pos[1]) {
+			  return [creature, "creature"];
 			}
 		}
 
-		return out;
+		if (tile.type == 1) return [tile, "tile"];
+		
+		return [tile, "water"];
 	}
 }
 

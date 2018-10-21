@@ -1,3 +1,5 @@
+let background = document.body.style.background;
+
 function checkKey(key) {
 	// checks an incoming key
 	lastKey = key;
@@ -26,8 +28,8 @@ function checkKey(key) {
 	if (keyDown(controls.gif)) {
 	  gifMode = !gifMode;
 	  
-	  if (gifMode) document.body.style.background = "rgb(10, 90, 180)";
-	  else document.body.style.background = "url('./water.gif') center center repeat fixed";
+	  if (gifMode) background = "rgb(10, 90, 180)";
+	  else background = "url('./water.gif') center center repeat fixed";
 	}
 }
 

@@ -60,11 +60,13 @@ Creature.prototype.reproduce = function () {
 	if (this.age > reproduceAge && this.reproduceTime > minReproduceTime) {
 		for (let i = 0; i < this.children; i++) {
 			if (this.energy < creatureEnergy * this.childEnergy) break;
-			
+
 			let child = new Creature(this.x, this.y, this.species, this.speciesGeneration);
 
 			child.eyes = [];
-			for (let eye of this.eyes) {
+			let eyes = this.eyes.length;
+			for (let i = 0; i < eyes; i++) {
+				let eye = this.eyes[i];
 				child.eyes.push(new child.eye(child, eye.angle, eye.distance));
 			}
 
@@ -141,7 +143,9 @@ Creature.prototype.attack = function () {
 
 	this.energy -= att * energy.attack;
 
-	for (let creature of creatures) {
+	let length = creatures.length;
+	for (let i = 0; i < length; i++) {
+		creature = creatures[i];
 		if (creature === this) continue;
 
 		if (Math.floor((this.x + Math.cos(this.rotation) * tileSize) / tileSize) == Math.floor(creature.x / tileSize)) {
