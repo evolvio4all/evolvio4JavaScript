@@ -9,7 +9,7 @@ let graphMult = 100;
 
 
 // MAP //
-const mapSize = 150; // Size of the map (height and width) in tiles
+const mapSize = 100; // Size of the map (height and width) in tiles
 const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
@@ -58,7 +58,7 @@ const minEyes = 1; // Minimum number of "eyes" a creature can have
 const maxEyes = 12; // Maximum number of "eyes" a creature can have
 
 const minEyeDistance = 0; // Minimum distance an "eye" can be from a creature
-const maxEyeDistance = 750; // Maximum distance an "eye" can be from a creature
+const maxEyeDistance = 3; // Maximum distance an "eye" can be from a creature
 
 const maxEyeAngleChange = 1;
 const maxEyeDistanceChange = 30;
@@ -78,7 +78,7 @@ const energy = { // Energy cost per tick
 const eatEffeciency = 0.9; // Eat effeciency %
 const eatPower = 1;
 
-const birthEffeciency = 0.9; // Birth effeciency %
+const birthEffeciency = 0.8; // Birth effeciency %
 
 const attackEffeciency = 0.95; // Attack effeciency %
 const attackPower = 2; // Attack power % (damage)
@@ -87,8 +87,8 @@ const minEatPower = 0.05; // Minimum eating strength (anything lower will be 0)
 const minSpawnPower = 0.05; // Minimum output to reproduce (anything lower will be 0)
 const minAttackPower = 0.05; // Minimum attack strength (anything lower will be 0)
 
-const reproduceAge = 900; // Minimum number of ticks before a creature spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
-const minReproduceTime = 300; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
+const reproduceAge = 750; // Minimum number of ticks before a creature can spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+const minReproduceTime = 600; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
 const bias = 0.1; // Amount to offset the value of a neuron
@@ -107,12 +107,12 @@ const minMutability = { // Minimum mutability in various categories
 };
 
 const maxMutability = { // Maximum mutability in various categories
-  brain: 12,
+  brain: 6,
   children: 10,
   childEnergy: 10,
   size: 20,
   eyes: {
-    number: 10,
+    number: 50,
     angle: 20,
     distance: 20
   },
@@ -125,7 +125,7 @@ const connectionDensity = 0.6; // % of axons initially connected in the brain
 
 const memories = 2; // # of memories a creature can store (outputs that do nothing, except store a value)
 
-const stepAmount = 4; // Maximum amount an axon can be changed by in mutation
+const stepAmount = 8; // Maximum amount an axon can be changed by in mutation
 
 const maxInitialAxonValue = 12; // Maximum power of an axon intially
 

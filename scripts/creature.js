@@ -245,8 +245,11 @@ Math.clamp = function (num, min, max) {
 
 Creature.prototype.eye = function (parent, angle, distance) {
 	this.parent = parent;
-	this.angle = angle || seededNoise(0, 2 * Math.PI);
-	this.distance = distance || seededNoise(minEyeDistance, maxEyeDistance);
+	this.x = Math.floor(seededNoise(-maxEyeDistance, maxEyeDistance)) * tileSize;
+	this.y = Math.floor(seededNoise(-maxEyeDistance, maxEyeDistance)) * tileSize;
+	
+	this.angle = angle || Math.atan2(this.x, this.y);
+	this.distance = distance || Math.sqrt(this.x * this.x + this.y * this.y);
 
 	this.see = function () {
 		let out;
@@ -254,9 +257,9 @@ Creature.prototype.eye = function (parent, angle, distance) {
 		let pos = [Math.floor((this.parent.x + Math.cos(this.parent.rotation + this.angle) * this.distance) / tileSize), Math.floor((this.parent.y + Math.sin(this.parent.rotation + this.angle) * this.distance) / tileSize)];
 
 		if (pos[0] < 0 || pos[0] >= mapSize || pos[1] < 0 || pos[1] >= mapSize) return [0, "oob"];
-
-		out = [map[pos[0]][pos[1]], "tile"];
-
+    
+		if (map[pos[0]][pos[1]].type) out = [map[pos[0]][pos[1]], "tile"];
+    else out = [map[pos[0]][pos[1]], "water"];
 		for (let creature of creatures) {
 			if (creature == this.parent) continue;
 			if (Math.floor(creature.x / tileSize) == pos[0]) {

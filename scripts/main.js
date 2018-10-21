@@ -126,14 +126,17 @@ function update() {
 
 		let time = (tick % 15) / 15;
 
-		creature.input = [time, rotation, energy, season / (growSeasonLength + dieSeasonLength)];
+		creature.input = [time, rotation, energy];
 
 		for (let eye of creature.eyes) {
 			let sight = eye.see();
 
 			if (sight[1] == "tile") {
 				creature.input.push(sight[0].food / maxTileFood);
-				creature.input.push(Math.max(100 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 2 * 50, 50) / 360);
+				creature.input.push(Math.max(60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40, 50) / 360);
+			} else if (sight[1] == "water") {
+			  creature.input.push(0);
+			  creature.input.push(220 / 360);
 			} else if (sight[1] == "creature") {
 				creature.input.push(sight[0].energy / creatureEnergy);
 				creature.input.push((parseInt(sight[0].color.split(",")[0].replace("hsl(", "")) % 360) / 360);
@@ -264,7 +267,7 @@ function render() {
 
 	ctz.textAlign = "center";
 
-	if (debugMode) {
+	if (infoMode) {
 		ctz.font = zoomLevel * 128 + "px Calibri";
 
 		let tilex = Math.floor((mouse.current.x + cropx) / tileSize / zoomLevel);
