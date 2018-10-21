@@ -1,25 +1,27 @@
 function main() {
-	let odate = new Date();
-	if (creatures.length > 8000) return;
-	if (timescale >= 1) { // Can timescale ever go below 1?
-		for (let ts = 0; ts < timescale; ts++) {
-			update();
+	if (population < 2000) {
+		let odate = new Date();
+		
+		if (timescale >= 1) { // Can timescale ever go below 1?
+			for (let ts = 0; ts < timescale; ts++) {
+				update();
+			}
+		} else {
+			tc++;
+			if (tc >= 1 / timescale) {
+				update();
+
+				tc = 0;
+			}
 		}
-	} else {
-		tc++;
-		if (tc >= 1 / timescale) {
-			update();
 
-			tc = 0;
+		let ndate = new Date();
+
+		if (ndate - odate > 60 && !fastforward && autoMode) {
+			if (timescale > 1) timescale--;
+		} else if (ndate - odate < 40 && !fastforward && autoMode) {
+			if (timescale >= 1) timescale++;
 		}
-	}
-
-	let ndate = new Date();
-
-	if (ndate - odate > 60 && !fastforward && autoMode) {
-		if (timescale > 1) timescale--;
-	} else if (ndate - odate < 40 && !fastforward && autoMode) {
-		if (timescale >= 1) timescale++;
 	}
 
 	render();
@@ -84,8 +86,8 @@ function update() {
 	for (let i = population - 1; i >= 0; i--) {
 		let creature = creatures[i];
 		if (creature.age > oldest) oldest = creature.age;
-		if (creature.generation === 0) firstGen++;
-		
+		if (creature.speciesGeneration === 0) firstGen++;
+
 		let energy = creature.energy / creatureEnergy;
 		let rotation = creature.rotation / (2 * Math.PI);
 		let time = (tick % 15) / 15;
@@ -94,7 +96,7 @@ function update() {
 
 		let vision = creature.see();
 		for (let i = 0; i < vision.length; i++) {
-		  creature.input.push(vision[i]);
+			creature.input.push(vision[i]);
 		}
 
 		creature.output = creature.feedForward(creature.input);
@@ -115,7 +117,7 @@ function update() {
 
 		creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
 		creature.energyGraph.gross.push(creature.energy);
-		
+
 		creature.lastEnergy = creature.energy;
 
 		if (zoomLevel >= 0.05 && creature == selectedCreature) {
@@ -131,9 +133,9 @@ function render() {
 
 	for (let row = 0; row < mapSize; row++) {
 		for (let column = 0; column < mapSize; column++) {
-		  let tile = map[row][column];
+			let tile = map[row][column];
 			if (tile.type === 0) continue;
-			
+
 			let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
 			let saturation = Math.floor(tile.food / maxTileFood * 100);
 
@@ -156,7 +158,7 @@ function render() {
 	ctx.strokeStyle = "#ffffff";
 
 	for (let i = 0; i < creatures.length; i++) {
-	  let creature = creatures[i];
+		let creature = creatures[i];
 		if (creature.output[3] > minAttackPower) {
 			ctx.fillStyle = "rgba(255, 0, 0, " + creature.output[3] + ")";
 
@@ -188,10 +190,10 @@ function render() {
 
 		if (debugMode) {
 			ctx.lineWidth = 2 * zoomLevel;
-      
-      let eyes = creature.eyes.length;
+
+			let eyes = creature.eyes.length;
 			for (let i = 0; i < eyes; i++) {
-			  let eye = creature.eyes[i];
+				let eye = creature.eyes[i];
 				ctx.beginPath();
 				ctx.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
 				ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel);

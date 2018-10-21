@@ -9,13 +9,13 @@ let graphMult = 100;
 
 
 // MAP //
-const mapSize = 100; // Size of the map (height and width) in tiles
+const mapSize = 150; // Size of the map (height and width) in tiles
 const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
 let maxTileFood = 15; // Maximum food in a tile
-const growSeasonGrowRate = 0.022; // How fast food regrows
-const dieSeasonGrowRate = 0.018; // How fast food regrows
+const growSeasonGrowRate = 0.025; // How fast food regrows
+const dieSeasonGrowRate = 0.02; // How fast food regrows
 
 const waterBias = 0.23; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
@@ -33,8 +33,8 @@ const minFirstGen = 50; // Minimum number of first generation creatures
 const creatureEnergy = 80; // Max creature energy
 
 const metabolismScaleTime = 1000; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds), 8th power'd ATM
-const minMetabolism = 0.02; // Initial metabolism
-const maxMetabolism = 0.2; // End metabolism (metabolism when age == metabolismScaleTime)
+const minMetabolism = 0.0; // Initial metabolism
+const maxMetabolism = 0.1; // End metabolism (metabolism when age == metabolismScaleTime)
 
 const speciesDiversity = 5; // Diversity of each species
 const speciesColorChange = 20; // Color change between species

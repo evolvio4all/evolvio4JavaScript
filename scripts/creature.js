@@ -150,25 +150,26 @@ Creature.prototype.setSpecies = function () {
 
 	this.spIn = species;
 
+	let network = this.network;
 	for (let i = 0; i < 3; i++) {
 		this.feedForward(testInput);
 
-		let forgetOutputs = this.network.forget.neurons[this.network.forget.neurons.length - 1];
+		let forgetOutputs = network.forget.neurons[network.forget.neurons.length - 1];
 		for (let i = 0; i < forgetOutputs.length; i++) {
 			geneticID.push(forgetOutputs[i]);
 		}
 
-		let decideOutputs = this.network.decide.neurons[this.network.decide.neurons.length - 1];
+		let decideOutputs = network.decide.neurons[network.decide.neurons.length - 1];
 		for (let i = 0; i < decideOutputs.length; i++) {
 			geneticID.push((decideOutputs[i] + 1) / 2);
 		}
 
-		let modifyOutputs = this.network.modify.neurons[this.network.modify.neurons.length - 1];
+		let modifyOutputs = network.modify.neurons[network.modify.neurons.length - 1];
 		for (let i = 0; i < modifyOutputs.length; i++) {
 			geneticID.push(modifyOutputs[i]);
 		}
 
-		let mainOutputs = this.network.main.neurons[this.network.main.neurons.length - 1];
+		let mainOutputs = network.main.neurons[network.main.neurons.length - 1];
 		for (let i = 0; i < mainOutputs.length; i++) {
 			geneticID.push(mainOutputs[i]);
 		}
@@ -178,23 +179,25 @@ Creature.prototype.setSpecies = function () {
 
 	let minGeneDiff = Infinity;
 	for (let specie in specieslist) {
-		var geneDiff = arrayDifference(this.geneticID, specieslist[specie].contains[0].geneticID);
+		let speciesL = specieslist[specie];
+		var geneDiff = arrayDifference(this.geneticID, speciesL.contains[0].geneticID);
 
 		if (geneDiff < minGeneDiff) {
 			minGeneDiff = geneDiff;
+
 			if (minGeneDiff < speciesDiversity) {
 				species = specie.split(" ")[0];
-				this.speciesGeneration = specieslist[specie].contains[0].speciesGeneration;
+				this.speciesGeneration = speciesL.contains[0].speciesGeneration;
 			}
 		}
 	}
 
-	if (species === undefined || species == "undefined") {
+	if (species === undefined) {
 		while (specieslist[species] !== undefined) {
 			prefix = Math.floor(seededNoise(0, prefixes.length));
-			species = prefixes[prefix] + " " + suffixes[this.speciesGeneration];
+			species = prefixes[prefix] + " " + suffixes[0];
 		}
-
+		
 		specieslist[species] = {};
 		specieslist[species].contains = [];
 	} else {
