@@ -152,14 +152,13 @@ Creature.prototype.setSpecies = function () {
 
 	for (let i = 0; i < 3; i++) {
 		this.feedForward(testInput);
-    
-    
-    let forgetOutputs = this.network.forget.neurons[this.network.forget.neurons.length - 1];
+
+		let forgetOutputs = this.network.forget.neurons[this.network.forget.neurons.length - 1];
 		for (let i = 0; i < forgetOutputs.length; i++) {
 			geneticID.push(forgetOutputs[i]);
 		}
-    
-    let decideOutputs = this.network.decide.neurons[this.network.decide.neurons.length - 1];
+
+		let decideOutputs = this.network.decide.neurons[this.network.decide.neurons.length - 1];
 		for (let i = 0; i < decideOutputs.length; i++) {
 			geneticID.push((decideOutputs[i] + 1) / 2);
 		}
@@ -257,27 +256,27 @@ Creature.prototype.eye = function (parent, angle, distance) {
 
 	this.see = function () {
 		let out;
-    let tile;
-    
+		let tile;
+
 		let pos = [Math.floor((this.parent.x + Math.cos(this.parent.rotation + this.angle) * this.distance) / tileSize), Math.floor((this.parent.y + Math.sin(this.parent.rotation + this.angle) * this.distance) / tileSize)];
-    let row = map[pos[0]];
-    if (row) {
-      tile = row[pos[1]];
-      if (tile == undefined) return [0, "oob"];
-    } else return [0, "oob"];
-    
-    let length = creatures.length;
+		let row = map[pos[0]];
+		if (row) {
+			tile = row[pos[1]];
+			if (tile == undefined) return [0, "oob"];
+		} else return [0, "oob"];
+
+		let length = creatures.length;
 		for (let i = 0; i < length; i++) {
-		  let creature = creatures[i];
-		  
+			let creature = creatures[i];
+
 			if (creature == this.parent) continue;
 			if (Math.floor(creature.x / tileSize) == pos[0] && Math.floor(creature.y / tileSize) == pos[1]) {
-			  return [creature, "creature"];
+				return [creature, "creature"];
 			}
 		}
 
 		if (tile.type == 1) return [tile, "tile"];
-		
+
 		return [tile, "water"];
 	}
 }
@@ -291,4 +290,37 @@ Creature.prototype.makeEyes = function () {
 	}
 
 	return eyes;
+}
+
+Creature.prototype.see = function () {
+	let eyes = this.eyes.length;
+	let output = [];
+	for (let i = 0; i < eyes; i++) {
+		let eye = this.eyes[i];
+		let sight = eye.see();
+
+		if (sight[1] == "tile") {
+			output.push(sight[0].food / maxTileFood);
+			output.push(Math.max(60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40, 50) / 360);
+		} else if (sight[1] == "water") {
+			output.push(0);
+			output.push(220 / 360);
+		} else if (sight[1] == "creature") {
+			output.push(sight[0].energy / creatureEnergy);
+			output.push(((sight[0].color.split(",")[0].replace("hsl(", "") - 0) % 360) / 360);
+		} else if (sight[1] == "oob") {
+			output.push(sight[0]);
+			output.push(sight[0]);
+		}
+	}
+
+	return output;
+}
+
+Creature.prototype.act = function () {
+	this.attack();
+	this.reproduce();
+	this.metabolize();
+	this.tick();
+	this.move();
 }

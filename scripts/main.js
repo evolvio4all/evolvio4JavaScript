@@ -83,38 +83,18 @@ function update() {
 	population = creatures.length;
 	for (let i = population - 1; i >= 0; i--) {
 		let creature = creatures[i];
-
 		if (creature.age > oldest) oldest = creature.age;
 		if (creature.generation === 0) firstGen++;
-
-		let size = ((creature.size - minCreatureSize) / (maxCreatureSize - minCreatureSize));
-
+		
 		let energy = creature.energy / creatureEnergy;
-
 		let rotation = creature.rotation / (2 * Math.PI);
-
 		let time = (tick % 15) / 15;
 
 		creature.input = [time, rotation, energy];
 
-		let eyes = creature.eyes.length;
-		for (let i = 0; i < eyes; i++) {
-			let eye = creature.eyes[i];
-			let sight = eye.see();
-
-			if (sight[1] == "tile") {
-				creature.input.push(sight[0].food / maxTileFood);
-				creature.input.push(Math.max(60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40, 50) / 360);
-			} else if (sight[1] == "water") {
-				creature.input.push(0);
-				creature.input.push(220 / 360);
-			} else if (sight[1] == "creature") {
-				creature.input.push(sight[0].energy / creatureEnergy);
-				creature.input.push(((sight[0].color.split(",")[0].replace("hsl(", "") - 0) % 360) / 360);
-			} else if (sight[1] == "oob") {
-				creature.input.push(sight[0]);
-				creature.input.push(sight[0]);
-			}
+		let vision = creature.see();
+		for (let i = 0; i < vision.length; i++) {
+		  creature.input.push(vision[i]);
 		}
 
 		creature.output = creature.feedForward(creature.input);
@@ -129,18 +109,13 @@ function update() {
 			creature.eat(pos);
 		}
 
-		creature.move();
+		creature.act();
 		wallLock(creature);
-
-		creature.reproduce();
-		creature.attack();
-		creature.metabolize();
-		creature.tick();
 		clampSize(creatures[i]);
 
 		creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
 		creature.energyGraph.gross.push(creature.energy);
-
+		
 		creature.lastEnergy = creature.energy;
 
 		if (zoomLevel >= 0.05 && creature == selectedCreature) {

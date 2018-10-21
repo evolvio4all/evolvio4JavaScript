@@ -24,7 +24,7 @@ const continentSize = 50; // How large the islands are (maintains water ratio)
 const growSeasonLength = 300; // Grow season length (growSeasonLength * 2 / 30 = growSeasonLength in seconds)
 const dieSeasonLength = 150; // Die season length (dieSeasonLength * 2 / 30 = dieSeasonLength in seconds)
 
-const mapUpdateDelay = 30; // How many ticks before the map tiles update
+const mapUpdateDelay = 20; // How many ticks before the map tiles update
 
 // CREATURES //
 const minCreatures = 50; // Minimum number of creatures
