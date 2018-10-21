@@ -49,14 +49,14 @@ function clampSize(creature) {
 
 function update() {
 	tick++;
-  
-  if (season == 0) {
+
+	if (season == 0) {
 		seasonUp = true;
 		year++;
 	} else if (season == growSeasonLength + dieSeasonLength) {
 		seasonUp = false;
 	}
-  
+
 	if (seasonUp) season++;
 	else season--;
 
@@ -129,15 +129,17 @@ function update() {
 		creature.input = [time, rotation, energy, season / (growSeasonLength + dieSeasonLength)];
 
 		for (let eye of creature.eyes) {
-			if (eye.see()[1] == "tile") {
-				creature.input.push(eye.see()[0].food / maxTileFood);
+			let sight = eye.see();
+
+			if (sight[1] == "tile") {
+				creature.input.push(sight[0].food / maxTileFood);
 				creature.input.push(Math.max(100 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 2 * 50, 50) / 360);
-			} else if (eye.see()[1] == "creature") {
-				creature.input.push(eye.see()[0].energy / creatureEnergy);
-				creature.input.push((parseInt(eye.see()[0].color.split(",")[0].replace("hsl(", "")) % 360) / 360);
-			} else if (eye.see()[1] == "oob") {
-				creature.input.push(eye.see()[0]);
-				creature.input.push(eye.see()[0]);
+			} else if (sight[1] == "creature") {
+				creature.input.push(sight[0].energy / creatureEnergy);
+				creature.input.push((parseInt(sight[0].color.split(",")[0].replace("hsl(", "")) % 360) / 360);
+			} else if (sight[1] == "oob") {
+				creature.input.push(sight[0]);
+				creature.input.push(sight[0]);
 			}
 		}
 
@@ -247,8 +249,8 @@ function render() {
 	ctz.strokeStyle = "#000000";
 	ctz.font = "48px Calibri";
 	ctz.lineWidth = 5;
-  
-  let yearProgress = seasonUp ? season / (growSeasonLength + dieSeasonLength) / 2 : 1 - (season / (growSeasonLength + dieSeasonLength) / 2);
+
+	let yearProgress = seasonUp ? season / (growSeasonLength + dieSeasonLength) / 2 : 1 - (season / (growSeasonLength + dieSeasonLength) / 2);
 	ctz.strokeText("Year " + (year + yearProgress).toFixed(1), 1920 / 2, 50);
 	ctz.fillText("Year " + (year + yearProgress).toFixed(1), 1920 / 2, 50);
 

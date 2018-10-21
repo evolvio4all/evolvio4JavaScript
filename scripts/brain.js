@@ -186,7 +186,7 @@ Creature.prototype.mutate = function () {
 	}
 
 	rand = seededNoise(0, 100);
-
+  
 	if (rand < this.mutability.size / 2) {
 		this.size /= 1.03;
 		if (this.size < minCreatureSize) this.size = minCreatureSize;
@@ -233,7 +233,7 @@ Creature.prototype.mutate = function () {
 		}
 
 		rand = seededNoise(0, 100);
-
+		
 		if (rand < this.mutability.eyes.number / 2 && this.eyes.length < maxEyes) {
 			this.eyes.push(new this.eye(this));
 		} else if (rand < this.mutability.eyes.number && this.eyes.length > minEyes) {
