@@ -220,7 +220,7 @@ Creature.prototype.setSpecies = function () {
 			let tempcolor = this.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
 
 			let rand = Math.floor(seededNoise(0, 2));
-			tempcolor[0] = Math.floor((parseInt(tempcolor[0]) + Math.floor(speciesColorChange * minGeneDiff / speciesDiversity * seededNoise(0.5, 1))) % 360).toString();
+			tempcolor[0] = Math.floor(((tempcolor[0] - 0) + Math.floor(speciesColorChange * minGeneDiff / speciesDiversity * seededNoise(0.5, 1))) % 360).toString();
 			this.color = "hsl(" + tempcolor.join(",") + ")";
 		} else {
 			if (this.speciesGeneration < 40) {

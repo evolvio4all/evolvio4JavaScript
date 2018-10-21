@@ -100,8 +100,8 @@ function update() {
 
 			for (let creature2 of creatures) {
 				if (creature2 == creature) continue;
-				if (~~(creature.x / tileSize) == ~~(creature2.x / tileSize)) {
-					if (~~(creature.y / tileSize) == ~~(creature2.y / tileSize)) {
+				if (Math.floor(creature.x / tileSize) == Math.floor(creature2.x / tileSize)) {
+					if (Math.floor(creature.y / tileSize) == Math.floor(creature2.y / tileSize)) {
 						creature.lastContact = creature2;
 					}
 				}
@@ -135,11 +135,11 @@ function update() {
 				creature.input.push(sight[0].food / maxTileFood);
 				creature.input.push(Math.max(60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40, 50) / 360);
 			} else if (sight[1] == "water") {
-			  creature.input.push(0);
-			  creature.input.push(220 / 360);
+				creature.input.push(0);
+				creature.input.push(220 / 360);
 			} else if (sight[1] == "creature") {
 				creature.input.push(sight[0].energy / creatureEnergy);
-				creature.input.push((parseInt(sight[0].color.split(",")[0].replace("hsl(", "")) % 360) / 360);
+				creature.input.push(((sight[0].color.split(",")[0].replace("hsl(", "") - 0) % 360) / 360);
 			} else if (sight[1] == "oob") {
 				creature.input.push(sight[0]);
 				creature.input.push(sight[0]);
@@ -148,8 +148,11 @@ function update() {
 
 		creature.output = creature.feedForward(creature.input);
 
-		creature.maxSpeed = maxCreatureSpeed;
-		if (map[pos[0]][pos[1]].type === 0) creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
+		if (map[pos[0]][pos[1]].type === 0) {
+			creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
+		} else {
+			creature.maxSpeed = maxCreatureSpeed;
+		}
 
 		creature.eat(pos);
 		creature.move();
@@ -167,7 +170,7 @@ function update() {
 
 		creature.lastEnergy = creature.energy;
 
-		if (creature == selectedCreature && zoomLevel > 0.05) {
+		if (zoomLevel >= 0.05 && creature == selectedCreature) {
 			cropx -= (cropx - (creature.x * zoomLevel - canvas.width / 2)) / ((1 / panSpeed) / zoomLevel);
 			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / ((1 / panSpeed) / zoomLevel);
 		}
@@ -204,15 +207,13 @@ function render() {
 	ctx.strokeStyle = "#ffffff";
 
 	for (let creature of creatures) {
-		ctx.fillStyle = "rgba(255, 0, 0, " + creature.output[3] + ")";
-		let pos = [Math.floor((creature.x + Math.cos(creature.rotation) * tileSize) / tileSize), Math.floor((creature.y + Math.sin(creature.rotation) * tileSize) / tileSize)];
-
 		if (creature.output[3] > minAttackPower) {
+			ctx.fillStyle = "rgba(255, 0, 0, " + creature.output[3] + ")";
+
+			let pos = [Math.floor((creature.x + Math.cos(creature.rotation) * tileSize) / tileSize), Math.floor((creature.y + Math.sin(creature.rotation) * tileSize) / tileSize)];
 			ctx.fillRect(pos[0] * zoomLevel * tileSize - cropx, pos[1] * zoomLevel * tileSize - cropy, tileSize * zoomLevel, tileSize * zoomLevel);
 		}
-	}
 
-	for (let creature of creatures) {
 		ctx.lineWidth = 10 * zoomLevel;
 
 		ctx.fillStyle = creature.color;
@@ -223,15 +224,17 @@ function render() {
 		ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * (creature.size + 75) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * (creature.size + 75) * zoomLevel);
 		ctx.stroke();
 
-		ctx.beginPath();
-		ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
-		ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation - Math.PI / 2) * ((creature.size - 3) * creature.network.output[0]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation - Math.PI / 2) * ((creature.size - 3) * creature.network.output[0]) * zoomLevel);
-		ctx.stroke();
+		if (infoMode) {
+			ctx.beginPath();
+			ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
+			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation - Math.PI / 2) * ((creature.size - 3) * creature.network.output[0]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation - Math.PI / 2) * ((creature.size - 3) * creature.network.output[0]) * zoomLevel);
+			ctx.stroke();
 
-		ctx.beginPath();
-		ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
-		ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * ((creature.size - 3) * creature.network.output[1]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * ((creature.size - 3) * creature.network.output[1]) * zoomLevel);
-		ctx.stroke();
+			ctx.beginPath();
+			ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
+			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * ((creature.size - 3) * creature.network.output[1]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * ((creature.size - 3) * creature.network.output[1]) * zoomLevel);
+			ctx.stroke();
+		}
 
 		if (debugMode) {
 			ctx.lineWidth = 2 * zoomLevel;
