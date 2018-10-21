@@ -29,6 +29,7 @@ const mapUpdateDelay = 20; // How many ticks before the map tiles update
 // CREATURES //
 const minCreatures = 50; // Minimum number of creatures
 const minFirstGen = 50; // Minimum number of first generation creatures
+const creatureLimit = 5000; // Maximum number of creatures (when population = creatureLimit, the game pauses)
 
 const creatureEnergy = 80; // Max creature energy
 
