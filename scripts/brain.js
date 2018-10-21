@@ -89,7 +89,7 @@ Creature.prototype.initAxons = function () {
 					let weight = 0;
 
 					if (seededNoise() < connectionDensity) {
-						weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue) / neurons;
+						weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue);
 					}
 
 					neuronWeights.push(weight);

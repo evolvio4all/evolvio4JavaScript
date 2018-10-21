@@ -130,7 +130,7 @@ const stepAmount = 8; // Maximum amount an axon can be changed by in mutation
 const maxInitialAxonValue = 12; // Maximum power of an axon intially
 
 // ZOOM //
-const zoomSpeed = 0.005; // How fast the zoom happens
+const zoomSpeed = 0.1; // How fast the zoom happens
 const minZoomLevel = 0.0424 / 2; // Furthest zoom
 const maxZoomLevel = 0.4;  // Nearest zoom
 let zoomLevel = 0.0424; // Default zoom

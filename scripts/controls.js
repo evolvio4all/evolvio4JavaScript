@@ -89,9 +89,10 @@ window.onmousemove = function (e) {
 
 window.onmousewheel = function (e) {
 	e.preventDefault();
-	zoomAmount = Math.max(Math.min(e.wheelDelta, 1), -1);
-	zoomLevel += zoomAmount * zoomSpeed;
-
+  zoomCache = zoomLevel;
+	zoomAmount = Math.max(Math.min(e.wheelDelta, 1), -1) * zoomSpeed * zoomCache;
+	zoomLevel += zoomAmount;
+	
 	if (zoomLevel < minZoomLevel) {
 		zoomLevel = minZoomLevel;
 	} else
@@ -102,12 +103,12 @@ window.onmousewheel = function (e) {
 		mouse.current.y = getMousePos(e)[1];
 
 		let bzoom = {};
-		zoomLevel -= zoomAmount * zoomSpeed;
+		zoomLevel -= zoomAmount;
 		bzoom.x = (cropx + mouse.current.x) / zoomLevel;
 		bzoom.y = (cropy + mouse.current.y) / zoomLevel;
 
 		let azoom = {};
-		zoomLevel += zoomAmount * zoomSpeed;
+		zoomLevel += zoomAmount;
 		azoom.x = (cropx + mouse.current.x) / zoomLevel;
 		azoom.y = (cropy + mouse.current.y) / zoomLevel;
 
