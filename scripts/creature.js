@@ -193,10 +193,14 @@ Creature.prototype.setSpecies = function () {
 	}
 
 	if (species === undefined) {
-		while (specieslist[species] !== undefined) {
+	  let tries = 0;
+		while (specieslist[species] !== undefined && tries < 100) {
+		  tries++;
 			prefix = Math.floor(seededNoise(0, prefixes.length));
 			species = prefixes[prefix] + " " + suffixes[0];
 		}
+		
+		if (tries == 100) species = "Dud Unus";
 		
 		specieslist[species] = {};
 		specieslist[species].contains = [];

@@ -29,15 +29,15 @@ function main() {
 
 function wallLock(creature) {
 	if (creature.x <= 0) {
-		creature.x = 0;
+		creature.x = tileSize / 2;
 	} else if (creature.x >= mapSize * tileSize) {
-		creature.x = mapSize * tileSize - 1;
+		creature.x = (mapSize - 1 / 2) * tileSize;
 	}
 
 	if (creature.y <= 0) {
-		creature.y = 0;
+		creature.y = tileSize / 2;
 	} else if (creature.y >= mapSize * tileSize) {
-		creature.y = mapSize * tileSize - 1;
+		creature.y = (mapSize - 1 / 2) * tileSize;
 	}
 }
 
@@ -83,11 +83,11 @@ function update() {
 	firstGen = 0;
 
 	population = creatures.length;
-	for (let i = population - 1; i >= 0; i--) {
+	for (let i = 0; i < creatures.length; i++) {
 		let creature = creatures[i];
 		if (creature.age > oldest) oldest = creature.age;
-		if (creature.speciesGeneration === 0) firstGen++;
-
+    if (creature.speciesGeneration === 0) firstGen++;
+    
 		let energy = creature.energy / creatureEnergy;
 		let rotation = creature.rotation / (2 * Math.PI);
 		let time = (tick % 15) / 15;
@@ -102,7 +102,7 @@ function update() {
 		creature.output = creature.feedForward(creature.input);
 
 		let pos = creature.getPosition();
-		tile = map[pos[0]][pos[1]];
+		let tile = map[pos[0]][pos[1]];
 
 		if (tile.type === 0) {
 			creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
@@ -112,8 +112,6 @@ function update() {
 		}
 
 		creature.act();
-		wallLock(creature);
-		clampSize(creatures[i]);
 
 		creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
 		creature.energyGraph.gross.push(creature.energy);
@@ -124,6 +122,11 @@ function update() {
 			cropx -= (cropx - (creature.x * zoomLevel - canvas.width / 2)) / ((1 / panSpeed) / zoomLevel);
 			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / ((1 / panSpeed) / zoomLevel);
 		}
+	}
+	
+	for (let i = population - 1; i >= 0; i--) {
+	  wallLock(creatures[i]);
+	  clampSize(creatures[i]);
 	}
 }
 
