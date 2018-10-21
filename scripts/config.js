@@ -57,8 +57,8 @@ const maxInitEyes = 6; // Maximum "eyes" a first generation creature can have
 const minEyes = 1; // Minimum number of "eyes" a creature can have
 const maxEyes = 12; // Maximum number of "eyes" a creature can have
 
-const minEyeDistance = 0; // Minimum distance an "eye" can be from a creature
-const maxEyeDistance = 3; // Maximum distance an "eye" can be from a creature
+const minEyeDistance = -1; // Minimum distance an "eye" can be from a creature
+const maxEyeDistance = 2; // Maximum distance an "eye" can be from a creature
 
 const maxEyeAngleChange = 1;
 const maxEyeDistanceChange = 30;
