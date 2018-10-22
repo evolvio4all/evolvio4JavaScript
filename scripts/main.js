@@ -135,8 +135,6 @@ function render() {
 
     let maxTileFoodOverHundred = maxTileFood / 100;
 	let multiple = tileSize * zoomLevel;
-	let multipleLower = multiple - 1;
-	let multipleHigher = multiple + 2;
     let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
     let huePrefix = "hsl(" + hue + ", ";
 
@@ -148,7 +146,7 @@ function render() {
 			let saturation = Math.floor(tile.food / maxTileFoodOverHundred);
 
 			ctx.fillStyle = huePrefix + saturation + "%, 22%)";
-			ctx.fillRect(row * multipleLower - cropx, column * multipleLower - cropy, multipleHigher, multipleHigher);
+			ctx.fillRect(row * multiple - cropx, column * multiple - cropy, multiple, multiple);
 		}
 	}
 
