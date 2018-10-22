@@ -133,16 +133,22 @@ function render() {
 	ctx.clearRect(0, 0, display.width, display.height);
 	ctz.clearRect(0, 0, viewport.width, viewport.height);
 
+    let maxTileFoodOverHundred = maxTileFood / 100;
+	let multiple = tileSize * zoomLevel;
+	let multipleLower = multiple - 1;
+	let multipleHigher = multiple + 2;
+    let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
+    let huePrefix = "hsl(" + hue + ", ";
+
 	for (let row = 0; row < mapSize; row++) {
 		for (let column = 0; column < mapSize; column++) {
 			let tile = map[row][column];
 			if (tile.type === 0) continue;
 
-			let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
-			let saturation = Math.floor(tile.food / maxTileFood * 100);
+			let saturation = Math.floor(tile.food / maxTileFoodOverHundred);
 
-			ctx.fillStyle = "hsl(" + hue + ", " + saturation + "%, 22%)";
-			ctx.fillRect(row * tileSize * zoomLevel - cropx - 1, column * tileSize * zoomLevel - cropy - 1, tileSize * zoomLevel + 2, tileSize * zoomLevel + 2);
+			ctx.fillStyle = huePrefix + saturation + "%, 22%)";
+			ctx.fillRect(row * multipleLower - cropx, column * multipleLower - cropy, multipleHigher, multipleHigher);
 		}
 	}
 
