@@ -14,8 +14,8 @@ const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
 let maxTileFood = 15; // Maximum food in a tile
-const growSeasonGrowRate = 0.02; // How fast food regrows
-const dieSeasonGrowRate = 0.015; // How fast food regrows
+const growSeasonGrowRate = 0.01; // How fast food regrows
+const dieSeasonGrowRate = 0.00; // How fast food regrows
 
 const waterBias = 0.23; // Becomes unstable above about 0.75
 const distanceSmoothing = 0.5; // less land further away from center
@@ -33,9 +33,9 @@ const creatureLimit = 5000; // Maximum number of creatures (when population = cr
 
 const creatureEnergy = 80; // Max creature energy
 
-const metabolismScaleTime = 1000; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds), 8th power'd ATM
+const metabolismScaleTime = 800; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds), 8th power'd ATM
 const minMetabolism = 0.0; // Initial metabolism
-const maxMetabolism = 0.1; // End metabolism (metabolism when age == metabolismScaleTime)
+const maxMetabolism = 0.2; // End metabolism (metabolism when age == metabolismScaleTime)
 
 const speciesDiversity = 10; // Diversity of each species
 const speciesColorChange = 20; // Color change between species
@@ -53,13 +53,16 @@ const rotationSpeed = 0.1; // Speed % how fast creatures rotate
 let oldest = 0; // Oldest creature's age
 
 const minInitEyes = 1; // Minimum "eyes" a first generation creature can have
-const maxInitEyes = 6; // Maximum "eyes" a first generation creature can have
+const maxInitEyes = 12; // Maximum "eyes" a first generation creature can have
 
 const minEyes = 1; // Minimum number of "eyes" a creature can have
 const maxEyes = 12; // Maximum number of "eyes" a creature can have
 
-const minEyeDistance = -1; // Minimum distance an "eye" can be from a creature
-const maxEyeDistance = 2; // Maximum distance an "eye" can be from a creature
+const minEyeDistance = 0; // Minimum eye distance in general (creatures will mutate the angle and distance)
+const maxEyeDistance = tileSize * 3; // Maximum eye distance in general (creatures will mutate the angle and distance)
+
+const initEyeDistanceH = 3; // Maximum distance an "eye" can be from a creature in tiles forward and backward initially
+const initEyeDistanceV = 1; // Maximum distance an "eye" can be from a creature in tiles to either side initially
 
 const maxEyeAngleChange = 1;
 const maxEyeDistanceChange = 30;
@@ -73,7 +76,7 @@ const maxChildEnergy = 0.95; // Max % of creatures energy to be given to a singl
 const energy = { // Energy cost per tick
     eat: 0.2, // Energy cost to eat
     move: 0.06, // Energy cost to move
-    attack: 0.3 // Energy cost to attack
+    attack: 0.6 // Energy cost to attack
 };
 
 const eatEffeciency = 0.9; // Eat effeciency %
@@ -88,8 +91,8 @@ const minEatPower = 0.05; // Minimum eating strength (anything lower will be 0)
 const minSpawnPower = 0.05; // Minimum output to reproduce (anything lower will be 0)
 const minAttackPower = 0.05; // Minimum attack strength (anything lower will be 0)
 
-const reproduceAge = 750; // Minimum number of ticks before a creature can spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
-const minReproduceTime = 600; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
+const reproduceAge = 600; // Minimum number of ticks before a creature can spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+const minReproduceTime = 300; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Neural Network //
 const bias = 0.1; // Amount to offset the value of a neuron

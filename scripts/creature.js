@@ -255,8 +255,8 @@ Math.clamp = function (num, min, max) {
 
 Creature.prototype.eye = function (parent, angle, distance) {
 	this.parent = parent;
-	this.x = Math.floor(seededNoise(minEyeDistance, maxEyeDistance)) * tileSize;
-	this.y = Math.floor(seededNoise(-maxEyeDistance, maxEyeDistance)) * tileSize;
+	this.x = Math.floor(seededNoise(-initEyeDistanceH, initEyeDistanceH)) * tileSize;
+	this.y = Math.floor(seededNoise(-initEyeDistanceV, initEyeDistanceV)) * tileSize;
 
 	this.angle = angle || Math.atan2(this.y, this.x);
 	this.distance = distance || Math.sqrt(this.x * this.x + this.y * this.y);
@@ -325,6 +325,7 @@ Creature.prototype.see = function () {
 }
 
 Creature.prototype.act = function () {
+  this.eat();
 	this.attack();
 	this.reproduce();
 	this.metabolize();

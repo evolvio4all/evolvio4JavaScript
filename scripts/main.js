@@ -1,5 +1,5 @@
 function main() {
-	if (population < 2000) {
+	if (population < creatureLimit) {
 		let odate = new Date();
 		
 		if (timescale >= 1) { // Can timescale ever go below 1?
@@ -18,9 +18,9 @@ function main() {
 		let ndate = new Date();
 
 		if (ndate - odate > 60 && !fastforward && autoMode) {
-			if (timescale > 1) timescale--;
+			timescale--;
 		} else if (ndate - odate < 40 && !fastforward && autoMode) {
-			if (timescale >= 1) timescale++;
+			timescale++;
 		}
 	}
 
@@ -113,7 +113,6 @@ function update() {
 			creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
 		} else {
 			creature.maxSpeed = maxCreatureSpeed;
-			creature.eat(pos);
 		}
 
 		creature.act();
