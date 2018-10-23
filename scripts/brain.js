@@ -159,7 +159,7 @@ Creature.prototype.feedForward = function (input) {
 				if (brain == "forget" || brain == "modify" || brain == "main") {
 					nbrain.neurons[layer + 1][axon] = 1 / (1 + Math.exp(-value)); // set neuron in next layer value to sigmoid
 				} else {
-					nbrain.neurons[layer + 1][axon] = Math.tanh(value); // set neuron in next layer value to tanh
+					nbrain.neurons[layer + 1][axon] = approximate_tanh(value); // set neuron in next layer value to tanh
 				}
 			}
 		}
@@ -172,7 +172,7 @@ Creature.prototype.feedForward = function (input) {
 	for (let i = 0; i < cellStateLength; i++) {
 		network.cellState[i] *= forgetOutput[i];
 		network.cellState[i] += decideOutput[i] * modifyOutput[i];
-		network.output[i] *= Math.tanh(network.cellState[i]);
+		network.output[i] *= approximate_tanh(network.cellState[i]);
 	}
 
 	return network.output;
