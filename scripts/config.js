@@ -14,10 +14,10 @@ const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
 let maxTileFood = 3; // Maximum food in a tile
-const growSeasonGrowRate = 0.012; // How fast food regrows
-const dieSeasonGrowRate = 0.005; // How fast food regrows
+const growSeasonGrowRate = 0.005; // How fast food regrows
+const dieSeasonGrowRate = 0.00; // How fast food regrows
 
-const waterBias = 0.23; // Becomes unstable above about 0.75
+const waterBias = 0.23; // Land vs. Water % (Becomes unstable above about 0.75)
 const distanceSmoothing = 0.5; // less land further away from center
 const continentSize = 50; // How large the islands are (maintains water ratio)
 
