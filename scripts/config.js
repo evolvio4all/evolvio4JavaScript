@@ -14,8 +14,8 @@ const tileSize = 250; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
 let maxTileFood = 3; // Maximum food in a tile
-const growSeasonGrowRate = 0.005; // How fast food regrows
-const dieSeasonGrowRate = 0.00; // How fast food regrows
+const growSeasonGrowRate = 0.012; // How fast food regrows
+const dieSeasonGrowRate = 0.005; // How fast food regrows
 
 const waterBias = 0.23; // Land vs. Water % (Becomes unstable above about 0.75)
 const distanceSmoothing = 0.5; // less land further away from center
@@ -24,14 +24,14 @@ const continentSize = 50; // How large the islands are (maintains water ratio)
 const growSeasonLength = 300; // Grow season length (growSeasonLength * 2 / 30 = growSeasonLength in seconds)
 const dieSeasonLength = 150; // Die season length (dieSeasonLength * 2 / 30 = dieSeasonLength in seconds)
 
-const mapUpdateDelay = 20; // How many ticks before the map tiles update
+const mapUpdateDelay = 15; // How many ticks before the map tiles update
 
 // CREATURES //
 const minCreatures = 50; // Minimum number of creatures
 const minFirstGen = 50; // Minimum number of first generation creatures
 const creatureLimit = 5000; // Maximum number of creatures (when population = creatureLimit, the game pauses)
 
-const creatureEnergy = 50; // Maximum creature energy
+const creatureEnergy = 30; // Maximum creature energy
 
 const metabolismScaleTime = 800; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds), 8th power'd ATM
 const minMetabolism = 0.0; // Initial metabolism

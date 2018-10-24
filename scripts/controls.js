@@ -23,13 +23,12 @@ function checkKey(key) {
 	if (keyDown(controls.info)) {
 	  infoMode = !infoMode;
 	}
-	
-	
+
 	if (keyDown(controls.gif)) {
 	  gifMode = !gifMode;
 	  
-	  if (gifMode) background = "rgb(10, 90, 180)";
-	  else background = "url('./water.gif') center center repeat fixed";
+	  if (gifMode) document.body.style.background = "rgb(10, 90, 180)";
+	  else document.body.style.background = "url('./water.gif') center center repeat fixed";
 	}
 }
 
