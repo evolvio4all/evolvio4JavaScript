@@ -12,6 +12,7 @@ function checkKey(key) {
 		fastforward = true;
 	} else if (keyDown(controls.stop)) {
 		timescale = 0;
+		autoMode = false;
 	} if (keyDown(controls.auto)) {
 	  autoMode = true;
 	}
@@ -114,6 +115,8 @@ window.onmousewheel = function (e) {
 		cropx += (bzoom.x - azoom.x) * zoomLevel;
 		cropy += (bzoom.y - azoom.y) * zoomLevel;
 	}
+	
+	multiple = tileSize * zoomLevel;
 };
 
 window.onkeydown = function (e) {

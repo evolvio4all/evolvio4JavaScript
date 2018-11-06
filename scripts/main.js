@@ -1,7 +1,6 @@
 function main() {
 	if (population < creatureLimit) {
 		let odate = new Date();
-		
 		if (timescale >= 1) { // Can timescale ever go below 1?
 			for (let ts = 0; ts < timescale; ts++) {
 				update();
@@ -14,17 +13,88 @@ function main() {
 				tc = 0;
 			}
 		}
-
 		let ndate = new Date();
-
-		if (ndate - odate > 60 && !fastforward && autoMode) {
+		if (ndate - odate > maxUpdateTime && !fastforward && autoMode) {
 			timescale--;
-		} else if (ndate - odate < 40 && !fastforward && autoMode) {
+		} else if (ndate - odate < minUpdateTime && !fastforward && autoMode) {
 			timescale++;
 		}
 	}
 
 	render();
+}
+
+function update() {
+	tick++;
+
+	if (season === 0) {
+		seasonUp = true;
+		year++;
+	} else if (season == growSeasonLength + dieSeasonLength) {
+		seasonUp = false;
+	}
+
+	if (seasonUp) season++;
+	else season--;
+
+	if (season % mapUpdateDelay === 0) {
+		for (let row = 0; row < mapSize; row++) {
+			for (let column = 0; column < mapSize; column++) {
+				let tile = map[row][column];
+				if (tile.type == 1) {
+					if (season < growSeasonLength) {
+						tile.food += growSeasonGrowRate * mapUpdateDelay;// * (tile.food / tile.maxFood + Number.EPSILON);
+					} else {
+						tile.food += dieSeasonGrowRate * mapUpdateDelay;// * (tile.food / tile.maxFood + Number.EPSILON);
+					}
+
+					if (tile.food > tile.maxFood) tile.food = tile.maxFood;
+				}
+			}
+		}
+	}
+
+	for (let i = creatures.length - 1; i >= 0; i--) {
+		wallLock(creatures[i]);
+		clampSize(creatures[i]);
+	}
+
+	firstGen = 0;
+	for (let i = 0; i < population; i++) {
+		let creature = creatures[i];
+		if (creature.age > oldest) oldest = creature.age;
+		if (creature.speciesGeneration === 0) firstGen++;
+
+		let energy = creature.energy / creatureEnergy;
+		let rotation = creature.rotation / (2 * Math.PI);
+		let time = (tick % 15) / 15;
+
+		let pos = creature.getPosition();
+		let tile = map[pos[0]][pos[1]];
+    let velx = creature.velocity.x;
+    let vely = creature.velocity.y;
+    
+		creature.input = [time, rotation, energy];
+
+		let vision = creature.see();
+		for (let i = 0; i < vision.length; i++) {
+			creature.input.push(vision[i]);
+		}
+
+		creature.output = creature.feedForward(creature.input);
+
+		creature.act();
+
+		creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
+		creature.energyGraph.gross.push(creature.energy);
+
+		creature.lastEnergy = creature.energy;
+
+		if (zoomLevel >= 0.05 && creature == selectedCreature) {
+			cropx -= (cropx - (creature.x * zoomLevel - canvas.width / 2)) / ((1 / panSpeed) / zoomLevel);
+			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / ((1 / panSpeed) / zoomLevel);
+		}
+	}
 }
 
 function wallLock(creature) {
@@ -49,104 +119,25 @@ function clampSize(creature) {
 	}
 }
 
-function update() {
-	tick++;
-
-	if (season === 0) {
-		seasonUp = true;
-		year++;
-	} else if (season == growSeasonLength + dieSeasonLength) {
-		seasonUp = false;
-	}
-
-	if (seasonUp) season++;
-	else season--;
-
-	if (season % mapUpdateDelay === 0) {
-		for (let row = 0; row < mapSize; row++) {
-			for (let column = 0; column < mapSize; column++) {
-				let tile = map[row][column];
-				if (tile.type == 1) {
-					if (season < growSeasonLength) {
-						tile.food += growSeasonGrowRate * mapUpdateDelay;
-					} else {
-						tile.food += dieSeasonGrowRate * mapUpdateDelay;
-					}
-
-					if (tile.food > tile.maxFood) tile.food = tile.maxFood;
-					else if (tile.food < 0) tile.food = 0;
-				}
-			}
-		}
-	}
-
-  
-  for (let i = creatures.length - 1; i >= 0; i--) {
-	  wallLock(creatures[i]);
-	  clampSize(creatures[i]);
-	}
-  
-	firstGen = 0;
-	population = creatures.length;
-	for (let i = 0; i < creatures.length; i++) {
-		let creature = creatures[i];
-		if (creature.age > oldest) oldest = creature.age;
-    if (creature.speciesGeneration === 0) firstGen++;
-    
-		let energy = creature.energy / creatureEnergy;
-		let rotation = creature.rotation / (2 * Math.PI);
-		let time = (tick % 15) / 15;
-		
-		let pos = creature.getPosition();
-		let tile = map[pos[0]][pos[1]];
-
-		creature.input = [time, rotation, energy];
-
-		let vision = creature.see();
-		for (let i = 0; i < vision.length; i++) {
-			creature.input.push(vision[i]);
-		}
-
-		creature.output = creature.feedForward(creature.input);
-
-		if (tile.type === 0) {
-			creature.maxSpeed = maxCreatureSpeed * swimmingSpeed;
-		} else {
-			creature.maxSpeed = maxCreatureSpeed;
-		}
-
-		creature.act();
-
-		creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
-		creature.energyGraph.gross.push(creature.energy);
-
-		creature.lastEnergy = creature.energy;
-
-		if (zoomLevel >= 0.05 && creature == selectedCreature) {
-			cropx -= (cropx - (creature.x * zoomLevel - canvas.width / 2)) / ((1 / panSpeed) / zoomLevel);
-			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / ((1 / panSpeed) / zoomLevel);
-		}
-	}
-}
+let maxTileFoodOverHundred = maxTileFood / 100;
+let multiple = tileSize * zoomLevel;
 
 function render() {
 	ctx.clearRect(0, 0, display.width, display.height);
 	ctz.clearRect(0, 0, viewport.width, viewport.height);
 
-    let maxTileFoodOverHundred = maxTileFood / 100;
-	let multiple = tileSize * zoomLevel;
-    let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
-    let huePrefix = "hsl(" + hue + ", ";
+	let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
+	let huePrefix = "hsl(" + hue + ", ";
 
 	for (let row = 0; row < mapSize; row++) {
 		for (let column = 0; column < mapSize; column++) {
 			let tile = map[row][column];
-			if (tile.type === 0) continue;
+			if (tile.type == 1) {
+				let saturation = Math.floor(tile.food / maxTileFoodOverHundred);
 
-			let saturation = Math.floor(tile.food / maxTileFoodOverHundred);
-
-			ctx.fillStyle = huePrefix + saturation + "%, 22%)";
-			ctx.fillRect(row * multiple - cropx, column * multiple - cropy, multiple, multiple);
+				ctx.fillStyle = huePrefix + saturation + "%, 22%)";
+				ctx.fillRect(row * multiple - cropx, column * multiple - cropy, multiple + 1, multiple + 1);
+			}
 		}
 	}
 
@@ -154,8 +145,7 @@ function render() {
 	ctx.lineWidth = 15 * zoomLevel;
 
 	ctx.beginPath();
-	let length = outline.length;
-	for (let i = 0; i < length; i++) {
+	for (let i = 0; i < olength; i++) {
 		ctx.moveTo(outline[i][0] * zoomLevel - cropx, outline[i][1] * zoomLevel - cropy);
 		ctx.lineTo(outline[i][2] * zoomLevel - cropx, outline[i][3] * zoomLevel - cropy);
 	}
@@ -163,34 +153,37 @@ function render() {
 
 	ctx.strokeStyle = "#ffffff";
 
-	for (let i = 0; i < creatures.length; i++) {
+	for (let i = 0; i < population; i++) {
 		let creature = creatures[i];
-		if (creature.output[3] > minAttackPower) {
+		let creaturex = creature.x;
+		let creaturey = creature.y;
+
+		if (creature.output[3] >= minAttackPower) {
 			ctx.fillStyle = "rgba(255, 0, 0, " + creature.output[3] + ")";
 
-			let pos = [Math.floor((creature.x + Math.cos(creature.rotation) * tileSize) / tileSize), Math.floor((creature.y + Math.sin(creature.rotation) * tileSize) / tileSize)];
+			let pos = [Math.floor((creaturex + Math.cos(creature.rotation) * tileSize) / tileSize), Math.floor((creaturey + Math.sin(creature.rotation) * tileSize) / tileSize)];
 			ctx.fillRect(pos[0] * zoomLevel * tileSize - cropx, pos[1] * zoomLevel * tileSize - cropy, tileSize * zoomLevel, tileSize * zoomLevel);
 		}
 
 		ctx.lineWidth = 10 * zoomLevel;
 
 		ctx.fillStyle = creature.color;
-		ctx.fillCircle(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy, creature.size * zoomLevel, true);
+		ctx.fillCircle(creaturex * zoomLevel - cropx, creaturey * zoomLevel - cropy, creature.size * zoomLevel, true);
 
 		ctx.beginPath();
-		ctx.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
-		ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * (creature.size + 75) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * (creature.size + 75) * zoomLevel);
+		ctx.moveTo(creaturex * zoomLevel - cropx, creaturey * zoomLevel - cropy);
+		ctx.lineTo(creaturex * zoomLevel - cropx + Math.cos(creature.rotation) * (creature.size + 75) * zoomLevel, creaturey * zoomLevel - cropy + Math.sin(creature.rotation) * (creature.size + 75) * zoomLevel);
 		ctx.stroke();
 
 		if (infoMode) {
 			ctx.beginPath();
-			ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
-			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation - Math.PI / 2) * ((creature.size - 3) * creature.network.output[0]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation - Math.PI / 2) * ((creature.size - 3) * creature.network.output[0]) * zoomLevel);
+			ctx.moveTo(creaturex * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creaturey * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
+			ctx.lineTo(creaturex * zoomLevel - cropx + Math.cos(creature.rotation - Math.PI / 2) * ((creature.size - 3) * creature.network.output[0]) * zoomLevel, creaturey * zoomLevel - cropy + Math.sin(creature.rotation - Math.PI / 2) * ((creature.size - 3) * creature.network.output[0]) * zoomLevel);
 			ctx.stroke();
 
 			ctx.beginPath();
-			ctx.moveTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
-			ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * ((creature.size - 3) * creature.network.output[1]) * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * ((creature.size - 3) * creature.network.output[1]) * zoomLevel);
+			ctx.moveTo(creaturex * zoomLevel - cropx + Math.cos(creature.rotation) * creature.size * zoomLevel, creaturey * zoomLevel - cropy + Math.sin(creature.rotation) * creature.size * zoomLevel);
+			ctx.lineTo(creaturex * zoomLevel - cropx + Math.cos(creature.rotation + Math.PI / 2) * ((creature.size - 3) * creature.network.output[1]) * zoomLevel, creaturey * zoomLevel - cropy + Math.sin(creature.rotation + Math.PI / 2) * ((creature.size - 3) * creature.network.output[1]) * zoomLevel);
 			ctx.stroke();
 		}
 
@@ -201,11 +194,11 @@ function render() {
 			for (let i = 0; i < eyes; i++) {
 				let eye = creature.eyes[i];
 				ctx.beginPath();
-				ctx.moveTo(creature.x * zoomLevel - cropx, creature.y * zoomLevel - cropy);
-				ctx.lineTo(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel);
+				ctx.moveTo(creaturex * zoomLevel - cropx, creaturey * zoomLevel - cropy);
+				ctx.lineTo(creaturex * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel, creaturey * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel);
 				ctx.stroke();
 
-				ctx.fillCircle(creature.x * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel, creature.y * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel, 15 * zoomLevel, true);
+				ctx.fillCircle(creaturex * zoomLevel - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel, creaturey * zoomLevel - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel, 15 * zoomLevel, true);
 			}
 		}
 	}

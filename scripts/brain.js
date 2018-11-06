@@ -12,10 +12,10 @@ Creature.prototype.createNeuralNetwork = function () {
 	// VARIABLES //
 	this.inputs = inputs + this.eyes.length * 2;
 
-	let layers = [this.inputs + outputs, Math.ceil((this.inputs + outputs * 2) / 2), outputs];
-	let forgetLayers = [this.inputs + outputs * 2, Math.ceil((this.inputs + outputs * 3) / 2), outputs];
-	let decideLayers = [this.inputs + outputs, Math.ceil((this.inputs + outputs * 2) / 2), outputs];
-	let modifyLayers = [this.inputs + outputs * 2, Math.ceil((this.inputs + outputs * 3) / 2), outputs];
+	let layers = [this.inputs + outputs, (this.inputs + outputs * 2) / 2, outputs];
+	let forgetLayers = [this.inputs + outputs * 2, (this.inputs + outputs * 3) / 2, outputs];
+	let decideLayers = [this.inputs + outputs, (this.inputs + outputs * 2) / 2, outputs];
+	let modifyLayers = [this.inputs + outputs * 2, (this.inputs + outputs * 3) / 2, outputs];
 
 	this.network = new Network(forgetLayers, decideLayers, modifyLayers, layers, this);
 

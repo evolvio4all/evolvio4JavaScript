@@ -1,30 +1,33 @@
-Creature.prototype.eat = function (p) {
-  if (this.output[2] < minEatPower) {
+Creature.prototype.eat = function (tile) {
+  let eat = this.output[2];
+  
+	if (eat < minEatPower) {
 		this.energyGraph.eat.push(0);
 		return;
 	}
-  
-	let pos = p || this.getPosition();
-	let tile = map[pos[0]][pos[1]];
 
-	let tenergy = -energy.eat * this.output[2];
 
-	this.maxSpeed = maxCreatureSpeed * eatingSpeed;
+	this.maxSpeed *= eatingSpeed;
 
-	if (tile.food - this.output[2] <= 0) {
-		tile.food = 0;
-		tenergy += (tile.food * eatEffeciency);
+	let tenergy = -energy.eat * eat;
+	let eatAmount = eat * eatPower * Math.pow(tile.food / maxTileFood, eatDiminishingRate);
+	
+	if (tile.food - eatAmount < 0) {
+	  tile.food = 0;
 	} else if (tile.food > 0) {
-		tile.food -= this.output[2] * eatPower;
-		tenergy += (this.output[2] * eatPower * eatEffeciency);
+		tile.food -= eatAmount;
 	}
-  
-  this.energy += tenergy;
+	
+	tenergy += eatAmount * eatEffeciency;
+	this.energy += tenergy;
+	
 	this.energyGraph.eat.push(tenergy);
 };
 
 Creature.prototype.metabolize = function () {
-	let scale = Math.min(Math.pow(this.age / metabolismScaleTime, 8), 1);
+  let scale = 0;
+	if (tick % scaleTickDelay === 0) scale = Math.min(Math.pow(this.age / metabolismScaleTime, metabolismScaleScale), 1);
+	
 	let tenergy = -(scale * (maxMetabolism - minMetabolism) + minMetabolism);
 	this.energy += tenergy;
 
@@ -32,15 +35,16 @@ Creature.prototype.metabolize = function () {
 };
 
 Creature.prototype.move = function () {
-	let tenergy = -energy.move * (Math.abs(this.output[1]) + Math.abs(this.output[0])) / 2;
+	let tenergy = -energy.move * Math.abs(this.output[1] / 4) - Math.abs(this.output[0]) * energy.move;
 
 	this.energy += tenergy;
 
-	this.rotation += (this.output[1] - this.output[0]) * rotationSpeed;
+	this.rotation += this.output[1] * rotationSpeed;
 	this.rotation = this.rotation % (2 * Math.PI);
-
-	this.x += Math.cos(this.rotation) * this.maxSpeed * (this.output[0] + this.output[1]) / 2;
-	this.y += Math.sin(this.rotation) * this.maxSpeed * (this.output[0] + this.output[1]) / 2;
+	
+  let speed = this.maxSpeed * this.output[0];
+	this.x += Math.cos(this.rotation) * speed;
+	this.y += Math.sin(this.rotation) * speed;
 
 	this.energyGraph.move.push(tenergy);
 };
@@ -50,46 +54,46 @@ Creature.prototype.reproduce = function () {
 		this.energyGraph.spawn.push(0);
 		return;
 	}
-	
+
 	let tenergy = 0;
 
 	if (this.age > reproduceAge && this.reproduceTime > minReproduceTime) {
 		for (let i = 0; i < this.children; i++) {
-			if (this.energy < creatureEnergy * this.childEnergy) break;
+			if (this.energy > creatureEnergy * this.childEnergy) {
+				let child = new Creature(this.x, this.y, this.species, this.speciesGeneration);
 
-			let child = new Creature(this.x, this.y, this.species, this.speciesGeneration);
+				child.eyes = [];
+				let eyes = this.eyes.length;
+				for (let i = 0; i < eyes; i++) {
+					let eye = this.eyes[i];
+					child.eyes.push(new child.eye(child, eye.angle, eye.distance));
+				}
 
-			child.eyes = [];
-			let eyes = this.eyes.length;
-			for (let i = 0; i < eyes; i++) {
-				let eye = this.eyes[i];
-				child.eyes.push(new child.eye(child, eye.angle, eye.distance));
+				child.mutability = {};
+				for (let value in this.mutability) {
+					child.mutability[value] = this.mutability[value];
+				}
+
+				child.energy = creatureEnergy * this.childEnergy * birthEffeciency;
+				child.children = this.children;
+				child.childEnergy = this.childEnergy;
+				child.color = this.color;
+				child.size = this.size;
+				child.generation = this.generation + 1;
+
+				child.mutate();
+
+				child.createNeuralNetwork();
+				child.copyNeuralNetwork(this);
+
+				child.network.mutate();
+
+				creatures.push(child);
+
+				tenergy -= this.childEnergy * creatureEnergy;
+				this.energy -= this.childEnergy * creatureEnergy;
+				this.reproduceTime = 0;
 			}
-
-			child.mutability = {};
-			for (let value in this.mutability) {
-				child.mutability[value] = this.mutability[value];
-			}
-
-			child.energy = creatureEnergy * this.childEnergy * birthEffeciency;
-			child.children = this.children;
-			child.childEnergy = this.childEnergy;
-			child.color = this.color;
-			child.size = this.size;
-			child.generation = this.generation + 1;
-
-			child.mutate();
-
-			child.createNeuralNetwork();
-			child.copyNeuralNetwork(this);
-
-			child.network.mutate();
-
-			creatures.push(child);
-
-			tenergy -= this.childEnergy * creatureEnergy;
-			this.energy -= this.childEnergy * creatureEnergy;
-			this.reproduceTime = 0;
 		}
 	}
 
@@ -97,7 +101,7 @@ Creature.prototype.reproduce = function () {
 };
 
 Creature.prototype.die = function () {
-	if (population < minCreatures || firstGen < minFirstGen) {
+	if (population <= minCreatures || firstGen < minFirstGen) {
 		try {
 			specieslist[this.species].contains.splice(specieslist[this.species].contains.indexOf(this), 1);
 
@@ -113,6 +117,7 @@ Creature.prototype.die = function () {
 		let pos = creatures.indexOf(this);
 
 		creatures.splice(pos, 1);
+		population--;
 
 		try {
 			specieslist[this.species].contains.splice(specieslist[this.species].contains.indexOf(this), 1);
@@ -149,7 +154,7 @@ Creature.prototype.attack = function () {
 			}
 		}
 	}
-	
+
 	this.energy += tenergy;
 
 	this.energyGraph.attack.push(tenergy);

@@ -4,6 +4,11 @@ function Creature(x, y, spec, specGen) {
 	this.x = x || spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
 	this.y = y || spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
 
+	this.velocity = {
+		x: 0,
+		y: 0
+	};
+
 	this.mutability = {
 		brain: seededNoise(minMutability.brain, maxMutability.brain),
 		children: seededNoise(minMutability.children, maxMutability.children),
@@ -66,6 +71,8 @@ function Creature(x, y, spec, specGen) {
 
 		return false;
 	};
+	
+	population++;
 }
 
 Creature.prototype.tick = function () {
@@ -78,6 +85,11 @@ Creature.prototype.randomize = function () {
 
 	this.x = spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
 	this.y = spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
+
+	this.velocity = {
+		x: 0,
+		y: 0
+	};
 
 	this.mutability = {
 		brain: seededNoise(minMutability.brain, maxMutability.brain),
@@ -193,15 +205,15 @@ Creature.prototype.setSpecies = function () {
 	}
 
 	if (species === undefined) {
-	  let tries = 0;
+		let tries = 0;
 		while (specieslist[species] !== undefined && tries < 100) {
-		  tries++;
+			tries++;
 			prefix = Math.floor(seededNoise(0, prefixes.length));
 			species = prefixes[prefix] + " " + suffixes[0];
 		}
-		
+
 		if (tries == 100) species = "Dud Unus";
-		
+
 		specieslist[species] = {};
 		specieslist[species].contains = [];
 	} else {
@@ -325,10 +337,26 @@ Creature.prototype.see = function () {
 }
 
 Creature.prototype.act = function () {
-  this.eat();
+  let pos = this.getPosition();
+  let tile = map[pos[0]][pos[1]];
+  
+  this.maxSpeed = maxCreatureSpeed;
+  
+	this.eat(tile);
+	
+	if (tile.type == 1) {
+    this.maxSpeed *= swimmingSpeed;
+  }
+  
 	this.attack();
 	this.reproduce();
 	this.metabolize();
 	this.tick();
 	this.move();
+}
+
+function spawnCreatures(num) {
+	for (let i = 0; i < num; i++) {
+		creatures.push(new Creature());
+	}
 }

@@ -1,7 +1,5 @@
 generateMap();
+let olength = outline.length;
 
-for (let i = 0; i < minCreatures; i++) {
-	creatures.push(new Creature());
-}
-
+spawnCreatures(minCreatures);
 setInterval(main, 1000 / 30);
