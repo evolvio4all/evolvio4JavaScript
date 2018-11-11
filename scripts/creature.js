@@ -202,7 +202,7 @@ Creature.prototype.setSpecies = function (species) {
 
 	} else {
 		let minGeneDiff = Infinity;
-		let newSpecies = "";
+		let newSpecies;
 
 		for (let specie in specieslist) {
 			let specieCreature = specieslist[specie].contains[0];
@@ -219,43 +219,28 @@ Creature.prototype.setSpecies = function (species) {
 		if (minGeneDiff < speciesDiversity) {
 			species = newSpecies.split(" ")[0];
 			this.speciesGeneration = specieslist[newSpecies].contains[0].speciesGeneration;
-		}
-
-		species = newSpecies.split(" ")[0] || species.split(" ")[0];
-
-		this.minGeneDiff = minGeneDiff;
-
-		if (this.minGeneDiff >= speciesDiversity) {
+			
+		} else {
+			species = species.split(" ")[0];
 			this.speciesGeneration++;
-
-			if (this.speciesGeneration < suffixes.length) species += " " + suffixes[this.speciesGeneration];
-			else {
-				if (this.speciesGeneration < 40) {
-					for (let i = 0; i < Math.floor(this.speciesGeneration / suffixes.length) + 1; i++) {
-						species += " " + suffixes[Math.min(this.speciesGeneration - suffixes.length * i, (suffixes.length - 1))];
-					}
-				} else {
-					species += " " + this.speciesGeneration;
-				}
-			}
-
-			if (specieslist[species] === undefined) {
-				specieslist[species] = {};
-				specieslist[species].contains = [];
-			}
 
 			let tempcolor = this.color.replace("hsl(", "").replace(")", "").split(",");
 			tempcolor[0] = Math.floor((parseInt(tempcolor[0]) + speciesColorChange * minGeneDiff / speciesDiversity * seededNoise(-1, 1)) % 360);
 			this.color = "hsl(" + tempcolor.join(",") + ")";
-		} else {
-			if (this.speciesGeneration < 40) {
-				for (let i = 0; i < Math.floor(this.speciesGeneration / suffixes.length) + 1; i++) {
-					species += " " + suffixes[Math.min(this.speciesGeneration - suffixes.length * i, (suffixes.length - 1))];
-				}
-			} else {
-				species += " " + this.speciesGeneration;
-			}
 		}
+
+		if (this.speciesGeneration < 40) {
+			for (let i = 0; i < Math.floor(this.speciesGeneration / suffixes.length) + 1; i++) {
+				species += " " + suffixes[Math.min(this.speciesGeneration - suffixes.length * i, suffixes.length - 1)];
+			}
+		} else {
+			species += " " + this.speciesGeneration;
+		}
+	}
+
+	if (specieslist[species] === undefined) {
+		specieslist[species] = {};
+		specieslist[species].contains = [];
 	}
 
 	specieslist[species].contains.push(this);
