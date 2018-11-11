@@ -76,7 +76,6 @@ Creature.prototype.reproduce = function () {
 				child.energy = creatureEnergy * this.childEnergy * birthEffeciency;
 				child.children = this.children;
 				child.childEnergy = this.childEnergy;
-				child.color = this.color;
 				child.size = this.size;
 				child.generation = this.generation + 1;
 
