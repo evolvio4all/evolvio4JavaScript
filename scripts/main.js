@@ -16,7 +16,7 @@ function main() {
 			}
 		}
 		let ndate = new Date();
-		if (ndate - odate > maxUpdateTime && !fastforward && autoMode) {
+		if (ndate - odate > maxUpdateTime && !fastforward && autoMode && timescale > 1) {
 			timescale--;
 		} else if (ndate - odate < minUpdateTime && !fastforward && autoMode) {
 			timescale++;
@@ -41,12 +41,14 @@ function update() {
 		for (let row = 0; row < mapSize; row++) {
 			for (let column = 0; column < mapSize; column++) {
 				let tile = map[row][column];
-				if (tile.type == 1 && tile.food < tile.maxFood) {
+				if (tile.type == 1) {
 					if (season < growSeasonLength) {
 						tile.food += growSeasonGrowRate * mapUpdateDelay; // * (tile.food / tile.maxFood + Number.EPSILON);
 					} else {
 						tile.food += dieSeasonGrowRate * mapUpdateDelay; // * (tile.food / tile.maxFood + Number.EPSILON);
 					}
+					
+					if (tile.food > tile.maxFood) tile.food = tile.maxFood;
 				}
 			}
 		}

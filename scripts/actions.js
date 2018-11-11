@@ -55,7 +55,7 @@ Creature.prototype.reproduce = function () {
 	}
 
 	let tenergy = 0;
-
+  
 	if (this.age > reproduceAge && this.reproduceTime > minReproduceTime) {
 		for (let i = 0; i < this.children; i++) {
 			if (this.energy > creatureEnergy * this.childEnergy) {
