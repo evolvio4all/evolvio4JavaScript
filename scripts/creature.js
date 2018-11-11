@@ -1,4 +1,4 @@
-function Creature(x, y, spec, specGen) {
+function Creature(x, y, spec, specGen, color) {
 	let tile = Math.floor(seededNoise(0, spawnTiles.length));
 
 	this.x = x || spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
@@ -10,16 +10,16 @@ function Creature(x, y, spec, specGen) {
 	};
 
 	this.mutability = {
-		brain: seededNoise(minMutability.brain, maxMutability.brain),
-		children: seededNoise(minMutability.children, maxMutability.children),
-		childEnergy: seededNoise(minMutability.childEnergy, maxMutability.childEnergy),
-		size: seededNoise(minMutability.size, maxMutability.size),
+		brain: 0,
+		children: 0,
+		childEnergy: 0,
+		size: 0,
 		eyes: {
-			number: seededNoise(minMutability.eyes.number, maxMutability.eyes.number),
-			angle: seededNoise(minMutability.eyes.angle, maxMutability.eyes.angle),
-			distance: seededNoise(minMutability.eyes.distance, maxMutability.eyes.distance)
+			number: 0,
+			angle: 0,
+			distance: 0
 		},
-		mutability: seededNoise(minMutability.mutability, maxMutability.mutability)
+		mutability: 0
 	};
 
 	this.energyGraph = {
@@ -34,17 +34,17 @@ function Creature(x, y, spec, specGen) {
 		gross: []
 	};
 
-	this.size = seededNoise(minCreatureSize, maxCreatureSize);
+	this.size = 0;
 
-	this.energy = creatureEnergy / 2;
-	this.lastEnergy = creatureEnergy / 2;
+	this.energy = 0;
+	this.lastEnergy = 0;
 
 	this.age = 0;
 	this.reproduceTime = 0;
-	this.childEnergy = seededNoise(minChildEnergy, maxChildEnergy);
-	this.children = Math.floor(seededNoise(minChildren, maxChildren));
+	this.childEnergy = 0;
+	this.children = 0;
 
-	this.color = newColor();
+	this.color = color || newColor();
 
 	this.genes = [this.color, this.children, this.childEnergy];
 
@@ -71,7 +71,7 @@ function Creature(x, y, spec, specGen) {
 
 		return false;
 	};
-	
+
 	population++;
 }
 
@@ -140,7 +140,7 @@ Creature.prototype.randomize = function () {
 
 	this.geneticID = "";
 	this.generation = 0;
-	this.species = undefined;
+	this.species = "undefined";
 	this.speciesGeneration = 0;
 	this.species = this.setSpecies();
 
@@ -163,7 +163,7 @@ Creature.prototype.setSpecies = function () {
 	this.spIn = species;
 
 	let network = this.network;
-	for (let i = 0; i < 3; i++) {
+	for (let i = 0; i < 1; i++) {
 		this.feedForward(testInput);
 
 		let forgetOutputs = network.forget.neurons[network.forget.neurons.length - 1];
@@ -189,35 +189,44 @@ Creature.prototype.setSpecies = function () {
 
 	this.geneticID = geneticID;
 
-	let minGeneDiff = Infinity;
-	for (let specie in specieslist) {
-		let speciesL = specieslist[specie];
-		var geneDiff = arrayDifference(this.geneticID, speciesL.contains[0].geneticID);
-
-		if (geneDiff < minGeneDiff) {
-			minGeneDiff = geneDiff;
-
-			if (minGeneDiff < speciesDiversity) {
-				species = specie.split(" ")[0];
-				this.speciesGeneration = speciesL.contains[0].speciesGeneration;
-			}
-		}
-	}
-
-	if (species === undefined) {
+	if (species == "undefined" || species === undefined) {
 		let tries = 0;
-		while (specieslist[species] !== undefined && tries < 100) {
+		while (specieslist[species] !== undefined && tries < 10 || species == "undefined" || species === undefined) {
 			tries++;
 			prefix = Math.floor(seededNoise(0, prefixes.length));
 			species = prefixes[prefix] + " " + suffixes[0];
 		}
 
-		if (tries == 100) species = "Dud Unus";
+		if (tries == 100) species = "Dud " + suffixes[0];
 
 		specieslist[species] = {};
 		specieslist[species].contains = [];
 	} else {
-		species = species.split(" ")[0];
+		let minGeneDiff = Infinity;
+		let newSpecies = "";
+
+		for (let specie in specieslist) {
+			if (species != specie) {
+				let specieCreature = specieslist[specie].contains[0];
+				if (specieCreature) {
+					let geneDiff = arrayDifference(this.geneticID, specieCreature.geneticID);
+
+					if (geneDiff < minGeneDiff) {
+						minGeneDiff = geneDiff;
+
+						newSpecies = specie;
+					}
+				}
+			}
+		}
+
+		if (minGeneDiff < speciesDiversity) {
+		  console.log(newSpecies);
+			species = newSpecies.split(" ")[0];
+			this.speciesGeneration = newSpecies.contains[0].speciesGeneration;
+		}
+
+		species = newSpecies.split(" ")[0] || species.split(" ")[0];
 
 		this.minGeneDiff = minGeneDiff;
 
@@ -240,10 +249,10 @@ Creature.prototype.setSpecies = function () {
 				specieslist[species].contains = [];
 			}
 
-			let tempcolor = this.color.replace(" ", "").replace("hsl", "").replace("(", "").replace(")", "").split(",");
+			let tempcolor = this.color.replace("hsl(", "").replace(")", "").split(",");
 
 			let rand = Math.floor(seededNoise(0, 2));
-			tempcolor[0] = Math.floor(((tempcolor[0] - 0) + Math.floor(speciesColorChange * minGeneDiff / speciesDiversity * seededNoise(0.5, 1))) % 360).toString();
+			tempcolor[0] = Math.floor(((tempcolor[0] - 0) + speciesColorChange * minGeneDiff / speciesDiversity * seededNoise(-1, 1)) % 360);
 			this.color = "hsl(" + tempcolor.join(",") + ")";
 		} else {
 			if (this.speciesGeneration < 40) {
@@ -284,11 +293,10 @@ Creature.prototype.eye = function (parent, angle, distance) {
 			if (tile == undefined) return [0, "oob"];
 		} else return [0, "oob"];
 
-		let length = creatures.length;
-		for (let i = 0; i < length; i++) {
+		for (let i = 0; i < population; i++) {
 			let creature = creatures[i];
-
 			if (creature == this.parent) continue;
+
 			if (Math.floor(creature.x / tileSize) == pos[0] && Math.floor(creature.y / tileSize) == pos[1]) {
 				return [creature, "creature"];
 			}
@@ -337,17 +345,17 @@ Creature.prototype.see = function () {
 }
 
 Creature.prototype.act = function () {
-  let pos = this.getPosition();
-  let tile = map[pos[0]][pos[1]];
-  
-  this.maxSpeed = maxCreatureSpeed;
-  
+	let pos = this.getPosition();
+	let tile = map[pos[0]][pos[1]];
+
+	this.maxSpeed = maxCreatureSpeed;
+
 	this.eat(tile);
-	
-	if (tile.type == 1) {
-    this.maxSpeed *= swimmingSpeed;
-  }
-  
+
+	if (tile.type == 0) {
+		this.maxSpeed *= swimmingSpeed;
+	}
+
 	this.attack();
 	this.reproduce();
 	this.metabolize();
@@ -358,5 +366,6 @@ Creature.prototype.act = function () {
 function spawnCreatures(num) {
 	for (let i = 0; i < num; i++) {
 		creatures.push(new Creature());
+		creatures[i].die(); // to randomize the creature
 	}
 }

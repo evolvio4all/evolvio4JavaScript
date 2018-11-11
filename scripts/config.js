@@ -24,35 +24,35 @@ const distanceSmoothing = 0.5; // less land further away from center
 const continentSize = 50; // How large the islands are (maintains water ratio)
 
 const growSeasonLength = 1200; // Grow season length (growSeasonLength * 2 / 30 = growSeasonLength in seconds)
-const dieSeasonLength = 400; // Die season length (dieSeasonLength * 2 / 30 = dieSeasonLength in seconds)
+const dieSeasonLength = 300; // Die season length (dieSeasonLength * 2 / 30 = dieSeasonLength in seconds)
 
 const mapUpdateDelay = 15; // How many ticks before the map tiles update
 
 // CREATURES //
 const minCreatures = 50; // Minimum number of creatures
-const minFirstGen = 30; // Minimum number of first generation creatures
+const minFirstGen = 50; // Minimum number of first generation creatures
 const creatureLimit = 5000; // Maximum number of creatures (when population = creatureLimit, the game pauses)
+const foodImposedCreatureLimit = 300; // Maximum number of creatures before food stops growing (when population = foodBasedCreatureLimit, food stops growing)
 
 const creatureEnergy = 50; // Maximum creature energy
 
 const metabolismScaleTime = 600; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
-const metabolismScaleScale = 10; // Determines how uniformly metabolism increases. Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
-const scaleTickDelay = 30; // Ticks between reevaluating the metabolism scale (it's a little expensive)
+const metabolismScaleScale = 8; // Determines how uniformly metabolism increases. Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
 
-const minMetabolism = 0.0; // Initial metabolism
+const minMetabolism = 0; // Initial metabolism
 const maxMetabolism = 0.1; // End metabolism (metabolism when age == metabolismScaleTime)
 
-const speciesDiversity = 10; // Diversity of each species
-const speciesColorChange = 20; // Color change between species
+const speciesDiversity = 2; // Diversity of each species
+const speciesColorChange = 30; // Color change between species
 
 const maxCreatureSize = 100; // Maximum creature size (radius)
 const minCreatureSize = 30; // Minimum creature size (radius)
 
 const maxCreatureSpeed = 150; // Maximum creature speed
 const maxAcceleration = 1; // Maximum creature acceleration
-const swimmingSpeed = 0.2; // Movement speed % in water
+const swimmingSpeed = 0.1; // Movement speed % in water
 
-const eatingSpeed = 0.005; // Movement speed % while eating
+const eatingSpeed = 0.0; // Movement speed % while eating
 const eatDiminishingRate = 2; // Determines how uniformly diminishing returns are applied on eating; 0 is none; (based on food on the tile / maxTileFood). Math.pow(tile.food / maxTileFood, eatDiminishingReturns)
 
 const rotationSpeed = 0.5; // Speed % how fast creatures rotate
@@ -60,13 +60,13 @@ const rotationSpeed = 0.5; // Speed % how fast creatures rotate
 let oldest = 0; // Oldest creature's age
 
 const minInitEyes = 1; // Minimum "eyes" a first generation creature can have
-const maxInitEyes = 4; // Maximum "eyes" a first generation creature can have
+const maxInitEyes = 3; // Maximum "eyes" a first generation creature can have
 
 const minEyes = 1; // Minimum number of "eyes" a creature can have
 const maxEyes = 12; // Maximum number of "eyes" a creature can have
 
 const minEyeDistance = 0; // Minimum eye distance in general (creatures will mutate the angle and distance)
-const maxEyeDistance = tileSize * 3; // Maximum eye distance in general (creatures will mutate the angle and distance)
+const maxEyeDistance = tileSize * 5; // Maximum eye distance in general (creatures will mutate the angle and distance)
 
 const initEyeDistanceH = 3; // Maximum distance an "eye" can be from a creature in tiles forward and backward initially
 const initEyeDistanceV = 1; // Maximum distance an "eye" can be from a creature in tiles to either side initially
@@ -77,22 +77,22 @@ const maxEyeDistanceChange = 30;
 const minChildren = 1; // Minimum children a creature is allowed to produce
 const maxChildren = 10; // Maximum children a creature is allowed to produce
 
-const minChildEnergy = 0.05; // Min % of creatures energy to be given to a single child
-const maxChildEnergy = 0.95; // Max % of creatures energy to be given to a single child
+const minChildEnergy = 0.1; // Min % of creatures energy to be given to a single child
+const maxChildEnergy = 0.7; // Max % of creatures energy to be given to a single child
 
 const energy = { // Energy cost per tick
     eat: 0.02, // Energy cost to eat
     move: 0.01, // Energy cost to move
-    attack: 0.06 // Energy cost to attack
+    attack: 0.1 // Energy cost to attack
 };
 
 const eatEffeciency = 0.9; // Eat effeciency %
-const eatPower = 1;
+const eatPower = 0.8;
 
-const birthEffeciency = 0.8; // Birth effeciency %
+const birthEffeciency = 0.85; // Birth effeciency %
 
-const attackEffeciency = 0.95; // Attack effeciency %
-const attackPower = 2; // Attack power % (damage)
+const attackEffeciency = 0.5; // Attack effeciency %
+const attackPower = 10; // Attack power % (damage)
 
 const minEatPower = 0.1; // Minimum eating strength (anything lower will be 0)
 const minSpawnPower = 0.1; // Minimum output to reproduce (anything lower will be 0)
