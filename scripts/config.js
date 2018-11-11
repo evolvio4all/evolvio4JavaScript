@@ -17,7 +17,7 @@ const selectSizeAddition = 100; // How far around creatures can you click to sel
 
 let maxTileFood = 5; // Maximum food in a tile
 const growSeasonGrowRate = 0.003; // How fast food regrows during grow season %
-const dieSeasonGrowRate = 0.001; // How fast food regrows during die season %
+const dieSeasonGrowRate = 0.002; // How fast food regrows during die season %
 
 const waterBias = 0.23; // Land vs. Water % (Becomes unstable above about 0.75)
 const distanceSmoothing = 0.5; // less land further away from center
@@ -42,7 +42,7 @@ const metabolismScaleScale = 8; // Determines how uniformly metabolism increases
 const minMetabolism = 0; // Initial metabolism
 const maxMetabolism = 0.1; // End metabolism (metabolism when age == metabolismScaleTime)
 
-const speciesDiversity = 2; // Diversity of each species
+const speciesDiversity = 10; // Diversity of each species
 const speciesColorChange = 30; // Color change between species
 
 const maxCreatureSize = 100; // Maximum creature size (radius)

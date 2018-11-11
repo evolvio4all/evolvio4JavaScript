@@ -58,9 +58,8 @@ function Creature(x, y, spec, specGen, color) {
 
 	this.geneticID = "";
 	this.generation = 0;
-	this.species = spec;
 	this.speciesGeneration = specGen || 0;
-	this.species = this.setSpecies();
+	this.species = this.setSpecies(spec);
 
 	this.rotation = 0;
 
@@ -154,9 +153,8 @@ Creature.prototype.getPosition = function () {
 	return [x, y];
 };
 
-Creature.prototype.setSpecies = function () {
+Creature.prototype.setSpecies = function (species) {
 	let geneticID = [];
-	let species = this.species;
 	let prefix = "";
 	let spGen = this.speciesGeneration;
 
@@ -201,29 +199,26 @@ Creature.prototype.setSpecies = function () {
 
 		specieslist[species] = {};
 		specieslist[species].contains = [];
+
 	} else {
 		let minGeneDiff = Infinity;
 		let newSpecies = "";
 
 		for (let specie in specieslist) {
-			if (species != specie) {
-				let specieCreature = specieslist[specie].contains[0];
-				if (specieCreature) {
-					let geneDiff = arrayDifference(this.geneticID, specieCreature.geneticID);
+			let specieCreature = specieslist[specie].contains[0];
 
-					if (geneDiff < minGeneDiff) {
-						minGeneDiff = geneDiff;
+			let geneDiff = arrayDifference(this.geneticID, specieCreature.geneticID);
 
-						newSpecies = specie;
-					}
-				}
+			if (geneDiff < minGeneDiff) {
+				minGeneDiff = geneDiff;
+
+				newSpecies = specie;
 			}
 		}
 
 		if (minGeneDiff < speciesDiversity) {
-		  console.log(newSpecies);
 			species = newSpecies.split(" ")[0];
-			this.speciesGeneration = newSpecies.contains[0].speciesGeneration;
+			this.speciesGeneration = specieslist[newSpecies].contains[0].speciesGeneration;
 		}
 
 		species = newSpecies.split(" ")[0] || species.split(" ")[0];
@@ -250,9 +245,7 @@ Creature.prototype.setSpecies = function () {
 			}
 
 			let tempcolor = this.color.replace("hsl(", "").replace(")", "").split(",");
-
-			let rand = Math.floor(seededNoise(0, 2));
-			tempcolor[0] = Math.floor(((tempcolor[0] - 0) + speciesColorChange * minGeneDiff / speciesDiversity * seededNoise(-1, 1)) % 360);
+			tempcolor[0] = Math.floor((parseInt(tempcolor[0]) + speciesColorChange * minGeneDiff / speciesDiversity * seededNoise(-1, 1)) % 360);
 			this.color = "hsl(" + tempcolor.join(",") + ")";
 		} else {
 			if (this.speciesGeneration < 40) {
@@ -310,7 +303,7 @@ Creature.prototype.eye = function (parent, angle, distance) {
 
 Creature.prototype.makeEyes = function () {
 	let eyes = [];
-	let numEyes = Math.floor(seededNoise(minInitEyes, maxInitEyes));
+	let numEyes = Math.floor(seededNoise(minInitEyes, maxInitEyes + 1));
 
 	for (let i = 0; i < numEyes; i++) {
 		eyes.push(new this.eye(this));

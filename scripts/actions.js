@@ -100,25 +100,21 @@ Creature.prototype.reproduce = function () {
 
 Creature.prototype.die = function () {
 	if (specieslist[this.species]) {
+	  let con = specieslist[this.species].contains.indexOf(this);
+		specieslist[this.species].contains.splice(con, 1);
+	  
+	  if (specieslist[this.species].contains.length === 0) {
+			delete specieslist[this.species];
+		}
+	  
 		if (population <= minCreatures || firstGen <= minFirstGen) {
-			let pos = specieslist[this.species].contains.indexOf(this);
-			specieslist[this.species].contains.splice(pos, 1);
-
 			this.randomize();
 		} else {
 			let pos = creatures.indexOf(this);
-			let con = specieslist[this.species].contains.indexOf(this);
 			creatures.splice(pos, 1);
 
-			specieslist[this.species].contains.splice(con, 1);
 			population--;
 		}
-		
-		if (specieslist[this.species].contains.length === 0) {
-			delete specieslist[this.species];
-		}
-	} else {
-	  delete specieslist[this.species];
 	}
 };
 
