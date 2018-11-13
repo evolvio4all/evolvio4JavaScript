@@ -126,9 +126,18 @@ let maxTileFoodOverHundred = maxTileFood / 100;
 let multiple = tileSize * zoomLevel;
 
 function render() {
+    renderClear();
+    renderTiles();
+    renderOutline();
+    renderCreatures();
+    renderUI();
+    renderSelectedCreature();
+}
+function renderClear() {
 	ctx.clearRect(0, 0, display.width, display.height);
 	ctz.clearRect(0, 0, viewport.width, viewport.height);
-
+}
+function renderTiles() {
 	let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
 	let huePrefix = "hsl(" + hue + ", ";
 
@@ -143,7 +152,8 @@ function render() {
 			}
 		}
 	}
-
+}
+function renderOutline() {
 	ctx.strokeStyle = "#ffffff";
 	ctx.lineWidth = 15 * zoomLevel;
 
@@ -153,9 +163,10 @@ function render() {
 		ctx.moveTo(outline[i][0] * zoomLevel - cropx, outline[i][1] * zoomLevel - cropy);
 		ctx.lineTo(outline[i][2] * zoomLevel - cropx, outline[i][3] * zoomLevel - cropy);
 	}
-	
-	ctx.stroke();
 
+	ctx.stroke();
+}
+function renderCreatures() {
 	ctx.strokeStyle = "#ffffff";
 
 	for (let i = 0; i < population; i++) {
@@ -202,7 +213,8 @@ function render() {
 			}
 		}
 	}
-
+}
+function renderUI() {
 	ctz.textAlign = "center";
 	ctz.fillStyle = "#ffffff";
 	ctz.strokeStyle = "#000000";
@@ -239,7 +251,8 @@ function render() {
 			ctz.stroke();
 		}
 	}
-
+}
+function renderSelectedCreature() {
 	if (selectedCreature !== null) {
 		ctz.font = "32px Calibri";
 		ctz.lineWidth = 10 * zoomLevel;
