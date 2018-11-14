@@ -18,7 +18,7 @@ function generateMap() {
 function generateOutline() {
 	for (let i = 0; i < mapSize; i++) {
 		for (let j = 0; j < mapSize; j++) {
-			if (map[i][j].type == 1) {
+			if (map[i][j].type > 0) {
 				if (i < mapSize - 1 && map[i + 1][j].type === 0) {
 					outline.push([(i + 1) * tileSize, j * tileSize, (i + 1) * tileSize, (j + 1) * tileSize]);
 				}
@@ -43,7 +43,15 @@ function Tile(x, y) {
 	var tile = noise.simplex2(x / continentSize, y / continentSize) - (waterBias * 2 - 1);
 	// We increase odds of tile being water if it is further away from center (affected by distanceSmoothing)
 	tile -= Math.sqrt(Math.pow(x - mapSize / 2, 2) + Math.pow(y - mapSize / 2, 2)) / (mapSize / 2) * distanceSmoothing;
-	this.type = tile < 0 ? 0 : 1;
+	
+	if (tile < 0) {
+	  this.type = 0;
+	} else if (tile > 1 - everGreenCentralization && seededNoise() < everGreenPercentage) {
+	  this.type = 2;
+	} else {
+	  this.type = 1;
+	}
+	
 	this.maxFood = seededNoise(0.9 * maxTileFood, maxTileFood);
 	this.food = this.maxFood;
 

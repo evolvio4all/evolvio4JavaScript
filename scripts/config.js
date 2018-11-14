@@ -15,9 +15,12 @@ const mapSize = 150; // Size of the map (height and width) in tiles
 const tileSize = 400; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
-let maxTileFood = 15; // Maximum food in a tile
-const growSeasonGrowRate = 0.02; // How fast food regrows during grow season %
-const dieSeasonGrowRate = -0.005; // How fast food regrows during die season %
+let maxTileFood = 15; // Maximum food on a tile
+const growSeasonGrowRate = 0.03; // How fast food regrows during grow season %
+const dieSeasonGrowRate = -0.001; // How fast food regrows during die season %
+
+const everGreenCentralization = 0.4; // % How far from the center evergreen tiles are allowed to be
+const everGreenPercentage = 0.2; // % of food tiles (within the central area) that are evergreen (always in grow season)
 
 const waterBias = 0.2; // Land vs. Water % (Becomes unstable above about 0.75; inexact)
 const distanceSmoothing = 1.3; // Higher = Less land further away from center
@@ -29,18 +32,18 @@ const dieSeasonLength = 600; // Die season length (dieSeasonLength * 2 / 30 = di
 const mapUpdateDelay = 15; // How many ticks before the map tiles update
 
 // CREATURES //
-const minCreatures = 100; // Minimum number of creatures
+const minCreatures = 50; // Minimum number of creatures
 const minFirstGen = 50; // Minimum number of first generation creatures
 const creatureLimit = 5000; // Maximum number of creatures (when population = creatureLimit, the game pauses)
-const foodImposedCreatureLimit = 500; // Maximum number of creatures before food stops growing (when population = foodBasedCreatureLimit, food stops growing)
+const foodImposedCreatureLimit = 400; // Maximum number of creatures before food stops growing (when population = foodBasedCreatureLimit, food stops growing)
 
 const creatureEnergy = 50; // Maximum creature energy
 
 const metabolismScaleTime = 900; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
-const metabolismScaleScale = 4; // Determines how uniformly metabolism increases. Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
+const metabolismScaleScale = 8; // Determines how uniformly metabolism increases. Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
 
 const minMetabolism = 0; // Initial metabolism
-const maxMetabolism = 0.2; // End metabolism (metabolism when age == metabolismScaleTime)
+const maxMetabolism = 0.15; // End metabolism (metabolism when age == metabolismScaleTime)
 
 const speciesDiversity = 4; // Diversity of each species
 const speciesColorChange = 10; // Color change between species
@@ -59,10 +62,10 @@ const rotationSpeed = 0.5; // Maximum rotation speed in radians per tick
 
 let oldest = 0; // Oldest creature's age
 
-const minInitEyes = 1; // Minimum "eyes" a first generation creature can have
-const maxInitEyes = 3; // Maximum "eyes" a first generation creature can have
+const minInitEyes = 2; // Minimum "eyes" a first generation creature can have
+const maxInitEyes = 4; // Maximum "eyes" a first generation creature can have
 
-const minEyes = 1; // Minimum number of "eyes" a creature can have
+const minEyes = 2; // Minimum number of "eyes" a creature can have
 const maxEyes = 12; // Maximum number of "eyes" a creature can have
 
 const minEyeDistance = 0; // Minimum eye distance in general (creatures will mutate the angle and distance)
@@ -71,8 +74,8 @@ const maxEyeDistance = tileSize * 5; // Maximum eye distance in general (creatur
 const initEyeDistanceH = 3; // Maximum distance an "eye" can be from a creature in tiles forward and backward initially
 const initEyeDistanceV = 1; // Maximum distance an "eye" can be from a creature in tiles to either side initially
 
-const maxEyeAngleChange = 1;
-const maxEyeDistanceChange = 30;
+const maxEyeAngleChange = Math.PI;
+const maxEyeDistanceChange = 300;
 
 const minChildren = 1; // Minimum children a creature is allowed to produce
 const maxChildren = 10; // Maximum children a creature is allowed to produce
@@ -82,12 +85,13 @@ const maxChildEnergy = 0.7; // Max % of creatures energy to be given to a single
 
 const energy = { // Energy cost per tick
     eat: 0.02, // Energy cost to eat
-    move: 0.01, // Energy cost to move
+    move: 0.02, // Energy cost to move
+    rotate: 0.05,
     attack: 0.2 // Energy cost to attack
 };
 
 const eatEffeciency = 0.9; // Eat effeciency %
-const eatPower = 1;
+const eatPower = 0.4;
 
 const birthEffeciency = 0.85; // Birth effeciency %
 
@@ -142,7 +146,7 @@ const maxInitialAxonValue = 20; // Maximum power of an axon intially
 
 // ZOOM //
 const zoomSpeed = 0.1; // How fast the zoom happens
-const minZoomLevel = 0.028; // Furthest zoom
+const minZoomLevel = 1080 / (mapSize * tileSize); // Furthest zoom
 const maxZoomLevel = 0.3;  // Nearest zoom
 let zoomLevel = 1080 / (mapSize * tileSize); // Default zoom
 

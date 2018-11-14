@@ -216,10 +216,9 @@ Creature.prototype.setSpecies = function (species) {
 			}
 		}
 
-		if (minGeneDiff < speciesDiversity) {
+		if (minGeneDiff < speciesDiversity && species != newSpecies) {
 			species = newSpecies.split(" ")[0];
 			this.speciesGeneration = specieslist[newSpecies].contains[0].speciesGeneration;
-			
 		} else {
 			species = species.split(" ")[0];
 			this.speciesGeneration++;
@@ -280,7 +279,7 @@ Creature.prototype.eye = function (parent, angle, distance) {
 			}
 		}
 
-		if (tile.type == 1) return [tile, "tile"];
+		if (tile.type > 0) return [tile, "tile"];
 
 		return [tile, "water"];
 	}
@@ -306,7 +305,8 @@ Creature.prototype.see = function () {
 
 		if (sight[1] == "tile") {
 			output.push(sight[0].food / maxTileFood);
-			output.push(Math.max(60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40, 50) / 360);
+			if (sight[0].type == 1) output.push(Math.max(60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40, 50) / 360);
+			else output.push(145 / 360);
 		} else if (sight[1] == "water") {
 			output.push(0);
 			output.push(220 / 360);

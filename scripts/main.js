@@ -15,6 +15,7 @@ function main() {
 				tc = 0;
 			}
 		}
+		
 		let ndate = new Date();
 		if (ndate - odate > maxUpdateTime && !fastforward && autoMode && timescale > 1) {
 			timescale--;
@@ -41,14 +42,15 @@ function update() {
 		for (let row = 0; row < mapSize; row++) {
 			for (let column = 0; column < mapSize; column++) {
 				let tile = map[row][column];
-				if (tile.type == 1) {
+				if (tile.type > 0) {
 					if (season < growSeasonLength) {
 						tile.food += growSeasonGrowRate * mapUpdateDelay; // * (tile.food / tile.maxFood + Number.EPSILON);
-					} else {
+					} else if (tile.type == 1) {
 						tile.food += dieSeasonGrowRate * mapUpdateDelay; // * (tile.food / tile.maxFood + Number.EPSILON);
 					}
-					
+
 					if (tile.food > tile.maxFood) tile.food = tile.maxFood;
+					else if (tile.food < 0) tile.food = 0;
 				}
 			}
 		}
@@ -64,16 +66,18 @@ function update() {
 		if (creature.age > oldest) oldest = creature.age;
 		if (creature.speciesGeneration === 0) firstGen++;
 
-		let energy = creature.energy / creatureEnergy;
-		let rotation = creature.rotation / (2 * Math.PI);
 		let time = (tick % 15) / 15;
-
+		let rotation = creature.rotation / (2 * Math.PI);
+		let energy = creature.energy / creatureEnergy;
+    let age = creature.age / metabolismScaleTime;
+    
 		let pos = creature.getPosition();
 		let tile = map[pos[0]][pos[1]];
-		let velx = creature.velocity.x;
-		let vely = creature.velocity.y;
-
-		creature.input = [time, rotation, energy];
+		
+		let x = pos[0] / mapSize;
+    let y = pos[1] / mapSize;
+    
+		creature.input = [time, rotation, energy, age, x, y];
 
 		let vision = creature.see();
 		for (let i = 0; i < vision.length; i++) {
@@ -94,9 +98,9 @@ function update() {
 			cropy -= (cropy - (creature.y * zoomLevel - canvas.height / 2)) / ((1 / panSpeed) / zoomLevel);
 		}
 	}
-	
+
 	for (let i = population - 1; i >= 0; i--) {
-	  clampSize(creatures[i]);
+		clampSize(creatures[i]);
 	}
 }
 
@@ -126,47 +130,37 @@ let maxTileFoodOverHundred = maxTileFood / 100;
 let multiple = tileSize * zoomLevel;
 
 function render() {
-    renderClear();
-    renderTiles();
-    renderOutline();
-    renderCreatures();
-    renderUI();
-    renderSelectedCreature();
-}
-function renderClear() {
 	ctx.clearRect(0, 0, display.width, display.height);
 	ctz.clearRect(0, 0, viewport.width, viewport.height);
-}
-function renderTiles() {
+
 	let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
 	let huePrefix = "hsl(" + hue + ", ";
 
 	for (let row = 0; row < mapSize; row++) {
 		for (let column = 0; column < mapSize; column++) {
 			let tile = map[row][column];
-			if (tile.type == 1) {
+			if (tile.type > 0) {
 				let saturation = Math.floor(tile.food / maxTileFoodOverHundred);
 
-				ctx.fillStyle = huePrefix + saturation + "%, 22%)";
+				if (tile.type == 1) ctx.fillStyle = huePrefix + saturation + "%, 20%)";
+				else ctx.fillStyle = "hsl(145, " + saturation + "%, 18%)";
 				ctx.fillRect(row * multiple - cropx, column * multiple - cropy, multiple + 1, multiple + 1);
 			}
 		}
 	}
-}
-function renderOutline() {
+
 	ctx.strokeStyle = "#ffffff";
 	ctx.lineWidth = 15 * zoomLevel;
 
 	ctx.beginPath();
-	
+
 	for (let i = 0; i < olength; i++) {
 		ctx.moveTo(outline[i][0] * zoomLevel - cropx, outline[i][1] * zoomLevel - cropy);
 		ctx.lineTo(outline[i][2] * zoomLevel - cropx, outline[i][3] * zoomLevel - cropy);
 	}
 
 	ctx.stroke();
-}
-function renderCreatures() {
+
 	ctx.strokeStyle = "#ffffff";
 
 	for (let i = 0; i < population; i++) {
@@ -213,8 +207,7 @@ function renderCreatures() {
 			}
 		}
 	}
-}
-function renderUI() {
+
 	ctz.textAlign = "center";
 	ctz.fillStyle = "#ffffff";
 	ctz.strokeStyle = "#000000";
@@ -251,12 +244,11 @@ function renderUI() {
 			ctz.stroke();
 		}
 	}
-}
-function renderSelectedCreature() {
+
 	if (selectedCreature !== null) {
 		ctz.font = "32px Calibri";
 		ctz.lineWidth = 10 * zoomLevel;
-		
+
 		ctz.strokeStyle = "#ffffff"
 		ctz.beginPath();
 		ctz.moveTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation) * selectedCreature.size * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation) * selectedCreature.size * zoomLevel);
@@ -274,7 +266,7 @@ function renderSelectedCreature() {
 
 		ctx.lineWidth = 2 * zoomLevel;
 		ctx.fillStyle = selectedCreature.color;
-		
+
 		for (let eye of selectedCreature.eyes) {
 			ctx.beginPath();
 			ctx.moveTo(selectedCreature.x * zoomLevel - cropx, selectedCreature.y * zoomLevel - cropy);
@@ -389,8 +381,8 @@ function renderSelectedCreature() {
 
 			ctz.strokeText("Cell State", 1920 - 60, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
 
-			ctz.strokeText("Left", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
-			ctz.strokeText("Right", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
+			ctz.strokeText("Move", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+			ctz.strokeText("Turn", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
 			ctz.strokeText("Eat", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
 			ctz.strokeText("Attack", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
 			ctz.strokeText("Reproduce", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);
@@ -401,8 +393,8 @@ function renderSelectedCreature() {
 
 			ctz.fillText("Cell State", 1920 - 60, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
 
-			ctz.fillText("Left", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
-			ctz.fillText("Right", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
+			ctz.fillText("Move", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 0 - nnui.size - 12);
+			ctz.fillText("Turn", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 1 - nnui.size - 12);
 			ctz.fillText("Eat", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 2 - nnui.size - 12);
 			ctz.fillText("Attack", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 3 - nnui.size - 12);
 			ctz.fillText("Reproduce", nnui.xoffset - nnui.size * 10, nnui.yoffset + (nnui.size * 2 + nnui.yspacing) * 4 - nnui.size - 12);

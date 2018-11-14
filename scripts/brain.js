@@ -1,5 +1,5 @@
 // BRAIN INFO //
-const inputs = 3;
+const inputs = 6;
 const outputs = 5 + memories;
 
 const brains = 4;

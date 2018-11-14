@@ -34,7 +34,7 @@ Creature.prototype.metabolize = function () {
 };
 
 Creature.prototype.move = function () {
-	let tenergy = -energy.move * Math.abs(this.output[1]) - Math.abs(this.output[0] / 4) * energy.move;
+	let tenergy = -energy.rotate * Math.abs(this.output[1]) - Math.abs(this.output[0]) * energy.move;
 
 	this.energy += tenergy;
 
