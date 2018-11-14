@@ -94,7 +94,7 @@ Creature.prototype.initAxons = function () {
 
 					if (seededNoise() < connectionDensity) {
 						weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue);
-					}
+					} else weight = 0;
 
 					neuronWeights.push(weight);
 				}
@@ -110,7 +110,7 @@ Creature.prototype.initAxons = function () {
 
 				if (seededNoise() < connectionDensity) {
 					weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue);
-				}
+				} else weight = 0;
 
 				layerWeights.push(weight);
 			}
@@ -336,6 +336,7 @@ Creature.prototype.mutate = function () {
 	let eyes = this.eyes.length;
 	for (let i = eyes - 1; i >= 0; i--) {
 		rand = seededNoise(0, 100);
+		
 		if (rand < mutability.eyes.angle) {
 			let eye = this.eyes[i];
 

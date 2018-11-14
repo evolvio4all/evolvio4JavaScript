@@ -21,6 +21,7 @@ let fastforward = false;
 let debugToggle = false;
 
 let population = 0;
+let oldest = 0;
 
 let creatures = [];
 let selectedCreature = null;

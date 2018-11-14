@@ -15,7 +15,7 @@ function main() {
 				tc = 0;
 			}
 		}
-		
+
 		let ndate = new Date();
 		if (ndate - odate > maxUpdateTime && !fastforward && autoMode && timescale > 1) {
 			timescale--;
@@ -66,17 +66,17 @@ function update() {
 		if (creature.age > oldest) oldest = creature.age;
 		if (creature.speciesGeneration === 0) firstGen++;
 
-		let time = (tick % 15) / 15;
-		let rotation = creature.rotation / (2 * Math.PI);
+		let time = (tick % 10) / 10;
+		let rotation = creature.rotation / 6.28318; // 2 * 3.14159 (PI)
 		let energy = creature.energy / creatureEnergy;
-    let age = creature.age / metabolismScaleTime;
-    
+		let age = creature.age / metabolismScaleTime;
+
 		let pos = creature.getPosition();
 		let tile = map[pos[0]][pos[1]];
-		
+
 		let x = pos[0] / mapSize;
-    let y = pos[1] / mapSize;
-    
+		let y = pos[1] / mapSize;
+
 		creature.input = [time, rotation, energy, age, x, y];
 
 		let vision = creature.see();
@@ -130,9 +130,20 @@ let maxTileFoodOverHundred = maxTileFood / 100;
 let multiple = tileSize * zoomLevel;
 
 function render() {
+	renderClear();
+	renderTiles();
+	renderOutline();
+	renderCreatures();
+	renderUI();
+	renderSelectedCreature();
+}
+
+function renderClear() {
 	ctx.clearRect(0, 0, display.width, display.height);
 	ctz.clearRect(0, 0, viewport.width, viewport.height);
+}
 
+function renderTiles() {
 	let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
 	let huePrefix = "hsl(" + hue + ", ";
 
@@ -148,7 +159,9 @@ function render() {
 			}
 		}
 	}
+}
 
+function renderOutline() {
 	ctx.strokeStyle = "#ffffff";
 	ctx.lineWidth = 15 * zoomLevel;
 
@@ -160,9 +173,9 @@ function render() {
 	}
 
 	ctx.stroke();
+}
 
-	ctx.strokeStyle = "#ffffff";
-
+function renderCreatures() {
 	for (let i = 0; i < population; i++) {
 		let creature = creatures[i];
 		let creaturex = creature.x * zoomLevel;
@@ -207,7 +220,9 @@ function render() {
 			}
 		}
 	}
+}
 
+function renderUI() {
 	ctz.textAlign = "center";
 	ctz.fillStyle = "#ffffff";
 	ctz.strokeStyle = "#000000";
@@ -244,7 +259,9 @@ function render() {
 			ctz.stroke();
 		}
 	}
+}
 
+function renderSelectedCreature() {
 	if (selectedCreature !== null) {
 		ctz.font = "32px Calibri";
 		ctz.lineWidth = 10 * zoomLevel;
