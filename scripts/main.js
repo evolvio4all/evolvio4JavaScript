@@ -56,20 +56,22 @@ function update() {
 		}
 	}
 
-	for (let i = 0; i < population; i++) {
-		wallLock(creatures[i]);
-	}
-
 	firstGen = 0;
+	let time = (tick % 10) / 10 * 2 - 1;
+
 	for (let i = 0; i < population; i++) {
 		let creature = creatures[i];
+		wallLock(creature);
+
 		if (creature.age > oldest) oldest = creature.age;
 		if (creature.speciesGeneration === 0) firstGen++;
 
-		let time = (tick % 10) / 10;
 		let rotation = creature.rotation / 6.28318; // 2 * 3.14159 (PI)
 		let energy = creature.energy / creatureEnergy;
 		let age = creature.age / metabolismScaleTime;
+
+		let velx = creature.velocity.x / maxCreatureSpeed;
+		let vely = creature.velocity.y / maxCreatureSpeed;
 
 		let pos = creature.getPosition();
 		let tile = map[pos[0]][pos[1]];
@@ -77,7 +79,7 @@ function update() {
 		let x = pos[0] / mapSize;
 		let y = pos[1] / mapSize;
 
-		creature.input = [time, rotation, energy, age, x, y];
+		creature.input = [time, rotation, energy, age, velx, vely];
 
 		let vision = creature.see();
 		for (let i = 0; i < vision.length; i++) {
@@ -190,7 +192,10 @@ function renderCreatures() {
 
 		ctx.lineWidth = 10 * zoomLevel;
 
-		ctx.fillStyle = creature.color;
+		let color = creature.color.split(",");
+		color[1] = Math.floor(creature.energy / creatureEnergy * 100) + "%";
+
+		ctx.fillStyle = color.join(",");
 		ctx.fillCircle(creaturex - cropx, creaturey - cropy, creature.size * zoomLevel, true);
 
 		ctx.beginPath();
@@ -216,7 +221,8 @@ function renderCreatures() {
 				ctx.lineTo(creaturex - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel, creaturey - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel);
 				ctx.stroke();
 
-				ctx.fillCircle(creaturex - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * zoomLevel, creaturey - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * zoomLevel, 15 * zoomLevel, true);
+				let tween = Math.min(Math.max(0, eye.tween), 1);
+				ctx.fillCircle(creaturex - cropx + Math.cos(creature.rotation + eye.angle) * eye.distance * tween * zoomLevel, creaturey - cropy + Math.sin(creature.rotation + eye.angle) * eye.distance * tween * zoomLevel, 15 * zoomLevel, true);
 			}
 		}
 	}
@@ -284,20 +290,24 @@ function renderSelectedCreature() {
 		ctx.lineWidth = 2 * zoomLevel;
 		ctx.fillStyle = selectedCreature.color;
 
-		for (let eye of selectedCreature.eyes) {
+		for (let i = 0; i < selectedCreature.eyes.length; i++) {
+		  let eye = selectedCreature.eyes[i];
 			ctx.beginPath();
 			ctx.moveTo(selectedCreature.x * zoomLevel - cropx, selectedCreature.y * zoomLevel - cropy);
 			ctx.lineTo(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel);
 			ctx.stroke();
 
-			ctx.fillCircle(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation + eye.angle) * eye.distance * zoomLevel, 15 * zoomLevel, true);
+			let tween = Math.min(Math.max(0, eye.tween), 1);
+			ctx.fillCircle(selectedCreature.x * zoomLevel - cropx + Math.cos(selectedCreature.rotation + eye.angle) * eye.distance * tween * zoomLevel, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation + eye.angle) * eye.distance * tween * zoomLevel, 15 * zoomLevel, true);
 		}
 
 		ctz.lineWidth = 3;
 
 		if (infoMode) {
+			let col = 0;
 			for (let j = 0; j < selectedCreature.network.forget.neurons[0].length; j++) {
-				ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 14, j * (nnui.size * 2 + 5) + nnui.yoffset, nnui.size, nnui.stroke);
+				if (j % 20 == 0) col++;
+				ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 18 + (nnui.size + 5) * col * 2, j % 20 * (nnui.size * 2 + 5) + nnui.yoffset, nnui.size, nnui.stroke);
 			}
 
 			for (let j = 0; j < selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1].length; j++) {
@@ -422,8 +432,10 @@ function renderSelectedCreature() {
 
 			ctz.font = "bold 21px Calibri";
 
+			col = 0;
 			for (let j = 0; j < selectedCreature.network.forget.neurons[0].length; j++) {
-				ctz.fillText(selectedCreature.network.forget.neurons[0][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 14, j * (nnui.size * 2 + 5) + nnui.yoffset + 6);
+				if (j % 20 == 0) col++;
+				ctz.fillText(selectedCreature.network.forget.neurons[0][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 18 + (nnui.size + 5) * col * 2, j % 20 * (nnui.size * 2 + 5) + nnui.yoffset + 6);
 			}
 
 			for (let j = 0; j < selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1].length; j++) {

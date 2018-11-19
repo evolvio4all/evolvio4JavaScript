@@ -258,24 +258,29 @@ Creature.prototype.eye = function (parent, angle, distance) {
 
 	this.angle = angle || Math.atan2(this.y, this.x);
 	this.distance = distance || Math.sqrt(this.x * this.x + this.y * this.y);
-
+  
+  this.tween = 1;
+  
 	this.see = function () {
 		let out;
 		let tile;
-
-		let pos = [Math.floor((this.parent.x + Math.cos(this.parent.rotation + this.angle) * this.distance) / tileSize), Math.floor((this.parent.y + Math.sin(this.parent.rotation + this.angle) * this.distance) / tileSize)];
+    
+    let tween = Math.min(Math.max(0, this.tween), 1);
+    
+		let pos = [Math.floor((this.parent.x + Math.cos(this.parent.rotation + this.angle) * this.distance * tween) / tileSize), Math.floor((this.parent.y + Math.sin(this.parent.rotation + this.angle) * this.distance * tween) / tileSize)];
 		let row = map[pos[0]];
 		if (row) {
 			tile = row[pos[1]];
-			if (tile == undefined) return [0, "oob"];
-		} else return [0, "oob"];
+			if (tile == undefined) return [-1, "oob"];
+		} else return [-1, "oob"];
 
 		for (let i = 0; i < population; i++) {
 			let creature = creatures[i];
-			if (creature == this.parent) continue;
 
-			if (Math.floor(creature.x / tileSize) == pos[0] && Math.floor(creature.y / tileSize) == pos[1]) {
-				return [creature, "creature"];
+			if (creature != this.parent) {
+				if (Math.floor(creature.x / tileSize) == pos[0] && Math.floor(creature.y / tileSize) == pos[1]) {
+					return [creature, "creature"];
+				}
 			}
 		}
 
@@ -308,11 +313,11 @@ Creature.prototype.see = function () {
 			if (sight[0].type == 1) output.push(Math.max(60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40, 50) / 360);
 			else output.push(145 / 360);
 		} else if (sight[1] == "water") {
-			output.push(0);
+			output.push(-1);
 			output.push(220 / 360);
 		} else if (sight[1] == "creature") {
 			output.push(sight[0].energy / creatureEnergy);
-			output.push(((sight[0].color.split(",")[0].replace("hsl(", "") - 0) % 360) / 360);
+			output.push((sight[0].color.split(",")[0].replace("hsl(", "") % 360) / 360);
 		} else if (sight[1] == "oob") {
 			output.push(sight[0]);
 			output.push(sight[0]);
@@ -326,19 +331,23 @@ Creature.prototype.act = function () {
 	let pos = this.getPosition();
 	let tile = map[pos[0]][pos[1]];
 
-	this.maxSpeed = maxCreatureSpeed;
+	this.tick();
+	
+	this.adjustEyes();
+	this.attack();
+	this.reproduce();
+	this.metabolize();
+	this.move();
 
 	this.eat(tile);
 
 	if (tile.type == 0) {
-		this.maxSpeed *= swimmingSpeed;
+		this.velocity.x *= swimmingSpeed;
+		this.velocity.y *= swimmingSpeed;
 	}
 
-	this.attack();
-	this.reproduce();
-	this.metabolize();
-	this.tick();
-	this.move();
+	this.x += this.velocity.x;
+	this.y += this.velocity.y;
 }
 
 function spawnCreatures(num) {

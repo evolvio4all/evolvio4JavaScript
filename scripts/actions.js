@@ -1,12 +1,10 @@
 Creature.prototype.eat = function (tile) {
 	let eat = this.output[2];
-
+  
 	if (eat < minEatPower) {
 		this.energyGraph.eat.push(0);
 		return;
 	}
-
-	this.maxSpeed *= eatingSpeed;
 
 	let tenergy = -energy.eat * eat;
 	let eatAmount = eat * eatPower * Math.pow(tile.food / maxTileFood, eatDiminishingRate);
@@ -19,6 +17,9 @@ Creature.prototype.eat = function (tile) {
 
 	tenergy += eatAmount * eatEffeciency;
 	this.energy += tenergy;
+	
+	this.velocity.x *= eatingSpeed;
+	this.velocity.y *= eatingSpeed;
 
 	this.energyGraph.eat.push(tenergy);
 };
@@ -40,10 +41,15 @@ Creature.prototype.move = function () {
 
 	this.rotation += this.output[1] * rotationSpeed;
 	this.rotation = this.rotation % (2 * Math.PI);
-
-	let speed = this.maxSpeed * this.output[0];
-	this.x += Math.cos(this.rotation) * speed;
-	this.y += Math.sin(this.rotation) * speed;
+  
+  let acceleration = maxAcceleration * this.output[0];
+	
+	this.velocity.x += Math.cos(this.rotation) * acceleration;
+	this.velocity.y += Math.sin(this.rotation) * acceleration;
+	
+	let f = (1 - friction);
+	this.velocity.x *= f;
+	this.velocity.y *= f;
 
 	this.energyGraph.move.push(tenergy);
 };
@@ -146,3 +152,12 @@ Creature.prototype.attack = function () {
 
 	this.energyGraph.attack.push(tenergy);
 };
+
+Creature.prototype.adjustEyes = function () {
+  let eyes = this.eyes;
+  for (let i = 0; i < eyes.length; i++) {
+    let eye = eyes[i];
+    
+    eye.tween = this.output[outputs + i];
+  }
+}
