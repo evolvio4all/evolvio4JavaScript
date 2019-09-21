@@ -1,46 +1,55 @@
 const display = document.getElementById("canvas");
 const ctx = display.getContext("2d", {
-	alpha: true
+  alpha: true
 });
 
 const viewport = document.getElementById("neuralnet");
 const ctz = viewport.getContext("2d", {
-	alpha: true
+  alpha: true
 });
 
 ctz.lineCap = "round";
 
 let tick = 0;
 let tc = 0;
+let timescale = 1;
+let population = 0;
+let oldest = 0;
 
 let pause = false;
 
-let timescale = 1;
 let fastforward = false;
 
 let debugToggle = false;
 
-let population = 0;
-let oldest = 0;
+var lastTick = -1;
+
+let maxNewSpeciesTries = 50;
 
 let creatures = [];
 let selectedCreature = null;
 
 let energyGraph = {
-	eat: [],
-	move: [],
-	metabolism: [],
-	attack: [],
-	birth: [],
-	net: [],
-	gain: [],
-	loss: [],
-	total: []
+  eat: [],
+  move: [],
+  metabolism: [],
+  attack: [],
+  birth: [],
+  net: [],
+  gain: [],
+  loss: [],
+  total: []
 };
 
 let season = 0;
 let seasonUp = true;
 let year = 0;
+
+let highestSimulatedTick = 0;
+
+const tickList = [];
+
+let replacer = ['x', 'y', 'output', 'network', 'color', 'rotation', 'eyes', 'energy', 'size', 'main', 'forget', 'decide', 'modify', 'cellState', 'neurons', 'energyGraph', 'gross', 'net', 'attack', 'eat', 'move', 'metabolism', 'age'];
 
 let firstGen = 0;
 
@@ -51,48 +60,65 @@ let suffixes = ["Unus", "Duo", "Tribus", "Quattuor", "Quinque", "Sex", "Septem",
 let lastKey = NaN;
 let toggle = false;
 
+let creatureLocations = [];
+
+let speciesGraph = [];
+let speciesColors = [];
+let speciesCountList = [];
+let currentSpeciesGraphIndex = 0;
+
+let waterTexture = new Image();
+waterTexture.src = "./topwater.jpg";
+
+let waterScrollX = -1000;
+let waterScrollY = -1000;
+
+let waterDirection = true;
+
 // FUNCTIONS //
 
 function newColor() {
-	let h = Math.floor(seededNoise(0, 360));
-	let s = Math.floor(seededNoise(20, 80));
-	let l = 50;
+  let h = Math.floor(seededNoise(0, 360));
+  let s = Math.floor(seededNoise(20, 80));
+  let l = 50;
 
-	return "hsl(" + h + ", " + s + "%, " + l + "%)";
+  return "hsl(" + h + ", " + s + "%, " + l + "%)";
 }
 
 let grv = 1;
 
 function seededNoise(a, b) {
-	let r1 = a || 0;
-	let r2 = b || 1;
+  let r1 = a || 0;
+  let r2 = b || 1;
 
-	grv += (Math.abs(seed * Math.tan(grv / Math.sin(grv * seed))) % 1) * (r2 - r1) + r1;
+  grv += (Math.abs(seed * Math.tan(grv / Math.sin(grv * seed))) % 1) * (r2 - r1) + r1;
 
-	return (Math.abs(seed * Math.tan(grv / Math.sin(grv * seed))) % 1) * (r2 - r1) + r1;
+  return (Math.abs(seed * Math.tan(grv / Math.sin(grv * seed))) % 1) * (r2 - r1) + r1;
 }
 
 function strDifference(str1, str2) {
-	let value = 0;
-	for (let i = 2; i < str1.length; i++) {
-		value += Math.abs(str1[i] - str2[i]);
-	}
-	return value;
+  let value = 0;
+  for (let i = 2; i < str1.length; i++) {
+    value += Math.abs(str1[i] - str2[i]);
+  }
+  return value;
 }
 
 function arrayDifference(arr1, arr2) {
-	let value = 0;
-	for (let i = 0; i < arr1.length; i++) {
-		value += Math.abs(arr1[i] - arr2[i]);
-	}
-	return value;
+  let value = 0;
+
+  for (let i = 0; i < arr1.length; i++) {
+    value += Math.abs(arr1[i] - arr2[i]);
+  }
+
+  return value;
 }
 
-CanvasRenderingContext2D.prototype.fillCircle = function (x, y, r, s) {
-	this.beginPath();
-	this.arc(x, y, r, 0, 2 * Math.PI);
-	this.closePath();
+CanvasRenderingContext2D.prototype.fillCircle = function(x, y, r, s) {
+  this.beginPath();
+  this.arc(x, y, r, 0, 2 * Math.PI);
+  this.closePath();
 
-	this.fill();
-	if (s) this.stroke();
+  this.fill();
+  if (s) this.stroke();
 };

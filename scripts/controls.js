@@ -1,50 +1,63 @@
 let background = document.body.style.background;
 
 function checkKey(key) {
-	// checks an incoming key
-	lastKey = key;
-	
-	if (keyDown(controls.play)) {
-		timescale = 1;
-		autoMode = false;
-	} else if (keyDown(controls.fastForward) && !fastforward) {
-		timescale *= 3;
-		fastforward = true;
-	} else if (keyDown(controls.stop)) {
-		timescale = 0;
-		autoMode = false;
-	} if (keyDown(controls.auto)) {
-	  autoMode = true;
-	}
-	
-	if (keyDown(controls.debug)) {
-	  debugMode = !debugMode;
-	}
-	
-	if (keyDown(controls.info)) {
-	  infoMode = !infoMode;
-	}
+  // checks an incoming key
+  lastKey = key;
 
-	if (keyDown(controls.gif)) {
-	  gifMode = !gifMode;
-	  
-	  if (gifMode) document.body.style.background = "rgb(10, 90, 180)";
-	  else document.body.style.background = "url('./water.gif') center center repeat fixed";
-	}
+  if (keyDown(controls.play)) {
+    timescale = 1;
+    autoMode = false;
+  } else if (keyDown(controls.fastForward)) {
+    if (timescale >= 0) {
+      if (timescale == 0) timescale = 0.0625;
+      timescale *= 2;
+    } else if (timescale < -0.125) {
+      timescale /= 2;
+    } else timescale = 0;
+  } else if (keyDown(controls.stop)) {
+    autoMode = false;
+
+    if (timescale <= 0) {
+      if (timescale == 0) timescale = -0.0625;
+      timescale *= 2;
+    } else if (timescale > 0.125) {
+      timescale /= 2;
+    } else timescale = 0;
+  }
+  if (keyDown(controls.auto)) {
+    autoMode = true;
+  }
+
+  if (keyDown(controls.debug)) {
+    debugMode = !debugMode;
+  }
+
+  if (keyDown(controls.info)) {
+    infoMode = !infoMode;
+  }
 }
 
 let mouse = {
-	up: {x: 0, y: 0},
-	down: {x: 0, y: 0},
-	current: {x: 0, y: 0},
-	isdown: false
+  up: {
+    x: 0,
+    y: 0
+  },
+  down: {
+    x: 0,
+    y: 0
+  },
+  current: {
+    x: 0,
+    y: 0
+  },
+  isdown: false
 };
 
 function getMousePos(e) {
-	return [
-		(e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.clientWidth),
-		(e.clientY - canvas.getBoundingClientRect().top) * (canvas.height / canvas.clientHeight)
-	];
+  return [
+    (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.clientWidth),
+    (e.clientY - canvas.getBoundingClientRect().top) * (canvas.height / canvas.clientHeight)
+  ];
 }
 
 function keyDown(key) {
@@ -52,80 +65,79 @@ function keyDown(key) {
   return false;
 }
 
-window.onmousedown = function (e) {
-	mouse.down.x = getMousePos(e)[0];
-	mouse.down.y = getMousePos(e)[1];
+window.onmousedown = function(e) {
+  mouse.down.x = getMousePos(e)[0];
+  mouse.down.y = getMousePos(e)[1];
 
-	mouse.isdown = true;
+  mouse.isdown = true;
 
-	selectedCreature = null;
+  selectedCreature = null;
 
-	for (let creature of creatures) {
-		if (creature.select()) {
-			selectedCreature = creature;
-		}
-	}
+  for (let creature of creatures) {
+    if (select(creature)) {
+      selectedCreature = creature;
+    }
+  }
 };
 
-window.onmouseup = function (e) {
-	mouse.up.x = getMousePos(e)[0];
-	mouse.up.y = getMousePos(e)[1];
+window.onmouseup = function(e) {
+  mouse.up.x = getMousePos(e)[0];
+  mouse.up.y = getMousePos(e)[1];
 
-	mouse.isdown = false;
+  mouse.isdown = false;
 };
 
-window.onmousemove = function (e) {
-	mouse.current.x = getMousePos(e)[0];
-	mouse.current.y = getMousePos(e)[1];
+window.onmousemove = function(e) {
+  mouse.current.x = getMousePos(e)[0];
+  mouse.current.y = getMousePos(e)[1];
 
-	if (mouse.isdown) {
-		cropx += (lcx - mouse.current.x);
-		cropy += (lcy - mouse.current.y);
-	}
+  if (mouse.isdown) {
+    cropx += (lcx - mouse.current.x);
+    cropy += (lcy - mouse.current.y);
+  }
 
-	lcx = mouse.current.x;
-	lcy = mouse.current.y;
+  lcx = mouse.current.x;
+  lcy = mouse.current.y;
 };
 
-window.onmousewheel = function (e) {
-	e.preventDefault();
+window.onmousewheel = function(e) {
   zoomCache = zoomLevel;
-	zoomAmount = Math.max(Math.min(e.wheelDelta, 1), -1) * zoomSpeed * zoomCache;
-	zoomLevel += zoomAmount;
-	
-	if (zoomLevel < minZoomLevel) {
-		zoomLevel = minZoomLevel;
-	} else
-	if (zoomLevel > maxZoomLevel) {
-		zoomLevel = maxZoomLevel;
-	} else {
-		mouse.current.x = getMousePos(e)[0];
-		mouse.current.y = getMousePos(e)[1];
+  zoomAmount = Math.max(Math.min(e.wheelDelta, 1), -1) * zoomSpeed * zoomCache;
+  zoomLevel += zoomAmount;
 
-		let bzoom = {};
-		zoomLevel -= zoomAmount;
-		bzoom.x = (cropx + mouse.current.x) / zoomLevel;
-		bzoom.y = (cropy + mouse.current.y) / zoomLevel;
+  if (zoomLevel < minZoomLevel) {
+    zoomLevel = minZoomLevel;
+  } else
+  if (zoomLevel > maxZoomLevel) {
+    zoomLevel = maxZoomLevel;
+  } else {
+    mouse.current.x = getMousePos(e)[0];
+    mouse.current.y = getMousePos(e)[1];
 
-		let azoom = {};
-		zoomLevel += zoomAmount;
-		azoom.x = (cropx + mouse.current.x) / zoomLevel;
-		azoom.y = (cropy + mouse.current.y) / zoomLevel;
+    let bzoom = {};
+    zoomLevel -= zoomAmount;
+    bzoom.x = (cropx + mouse.current.x) / zoomLevel;
+    bzoom.y = (cropy + mouse.current.y) / zoomLevel;
 
-		cropx += (bzoom.x - azoom.x) * zoomLevel;
-		cropy += (bzoom.y - azoom.y) * zoomLevel;
-	}
-	
-	multiple = tileSize * zoomLevel;
+    let azoom = {};
+    zoomLevel += zoomAmount;
+    azoom.x = (cropx + mouse.current.x) / zoomLevel;
+    azoom.y = (cropy + mouse.current.y) / zoomLevel;
+
+    cropx += (bzoom.x - azoom.x) * zoomLevel;
+    cropy += (bzoom.y - azoom.y) * zoomLevel;
+  }
+
+  multiple = tileSize * zoomLevel;
 };
 
-window.onkeydown = function (e) {
-	checkKey(e.keyCode);
+window.onkeydown = function(e) {
+  checkKey(e.keyCode);
 };
 
-window.onkeyup = function (e) {
-	if (e.keyCode == keys[controls.fastForward] && fastforward) {
-		fastforward = false;
-		timescale /= 3;
-	}
+window.onkeyup = function(e) {
+  if (e.keyCode == keys[controls.fastForward] && fastforward) {
+    fastforward = false;
+    timescale /= 3;
+  }
 };
