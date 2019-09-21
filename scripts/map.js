@@ -5,62 +5,70 @@ let spawnTiles = [];
 noise.seed(seededNoise()); // We seed our noise generator
 
 function generateMap() {
-	for (let x = 0; x < mapSize; x++) {
-		map.push([]);
-		for (let y = 0; y < mapSize; y++) {
-			map[x].push(new Tile(x, y));
-		}
-	}
+  for (let x = 0; x < mapSize; x++) {
+    map.push([]);
+    creatureLocations.push([]);
 
-	generateOutline();
+    for (let y = 0; y < mapSize; y++) {
+      let tile = new Tile(x, y);
+      if (tile.type == 0) {
+        tile = null;
+      }
+
+      map[x].push(tile);
+    }
+  }
+
+  generateOutline();
 }
 
 function generateOutline() {
-	for (let i = 0; i < mapSize; i++) {
-		for (let j = 0; j < mapSize; j++) {
-			if (map[i][j].type > 0) {
-				if (i < mapSize - 1 && map[i + 1][j].type === 0) {
-					outline.push([(i + 1) * tileSize, j * tileSize, (i + 1) * tileSize, (j + 1) * tileSize]);
-				}
+  for (let i = 0; i < mapSize; i++) {
+    for (let j = 0; j < mapSize; j++) {
+      if (map[i][j] != null) {
+        if (i < mapSize - 1 && map[i + 1][j] == null) {
+          outline.push([(i + 1) * tileSize, j * tileSize, (i + 1) * tileSize, (j + 1) * tileSize]);
+        }
 
-				if (i > 0 && map[i - 1][j].type === 0) {
-					outline.push([i * tileSize, j * tileSize, i * tileSize, (j + 1) * tileSize]);
-				}
+        if (i > 0 && map[i - 1][j] == null) {
+          outline.push([i * tileSize, j * tileSize, i * tileSize, (j + 1) * tileSize]);
+        }
 
-				if (j < mapSize - 1 && map[i][j + 1].type === 0) {
-					outline.push([i * tileSize, (j + 1) * tileSize, (i + 1) * tileSize, (j + 1) * tileSize]);
-				}
+        if (j < mapSize - 1 && map[i][j + 1] == null) {
+          outline.push([i * tileSize, (j + 1) * tileSize, (i + 1) * tileSize, (j + 1) * tileSize]);
+        }
 
-				if (j > 0 && map[i][j - 1].type === 0) {
-					outline.push([i * tileSize, j * tileSize, (i + 1) * tileSize, j * tileSize]);
-				}
-			}
-		}
-	}
+        if (j > 0 && map[i][j - 1] == null) {
+          outline.push([i * tileSize, j * tileSize, (i + 1) * tileSize, j * tileSize]);
+        }
+      }
+    }
+  }
 }
 
 function Tile(x, y) {
-	var tile = noise.simplex2(x / continentSize, y / continentSize) - (waterBias * 2 - 1);
-	// We increase odds of tile being water if it is further away from center (affected by distanceSmoothing)
-	tile -= Math.sqrt(Math.pow(x - mapSize / 2, 2) + Math.pow(y - mapSize / 2, 2)) / (mapSize / 2) * distanceSmoothing;
-	
-	if (tile < 0) {
-	  this.type = 0;
-	} else if (tile > 1 - everGreenCentralization && seededNoise() < everGreenPercentage) {
-	  this.type = 2;
-	} else {
-	  this.type = 1;
-	}
-	
-	this.maxFood = seededNoise(0.9 * maxTileFood, maxTileFood);
-	this.food = this.maxFood;
+  var tile = noise.simplex2(x / mapSize * mapComplexity, y / mapSize * mapComplexity) - maxWaterPercentage * 2 + 1;
+  tile = Math.min(tile, 1);
+  tile += noise.simplex2(x / mapSize * mapComplexity, y / mapSize * mapComplexity) * edgeSmoothness - maxWaterPercentage * 2 + 1;
 
-	this.x = x;
-	this.y = y;
+  // We increase odds of tile being water if it is further away from center (affected by distanceSmoothing)
+  tile -= (Math.sqrt(Math.pow(x - mapSize / 2, 2) + Math.pow(y - mapSize / 2, 2)) / (mapSize / 2)) / edgeDistance;
 
-	if (this.type) {
-		spawnTiles.push(this);
-	} else {
-		this.food = 0;
-	}
+  if (tile < 0) {
+    this.type = 0;
+  } else if (tile > 1 - everGreenCentralization && seededNoise() < everGreenPercentage) {
+    this.type = 2;
+  } else {
+    this.type = 1;
+  }
+
+  this.maxFood = parseFloat((seededNoise(0.9 * maxTileFood, maxTileFood) * this.type).toFixed(2));
+  this.food = this.maxFood;
+
+  this.x = x;
+  this.y = y;
+
+  if (this.type) {
+    spawnTiles.push(this);
+  }
 }
