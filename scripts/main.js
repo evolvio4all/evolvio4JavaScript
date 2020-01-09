@@ -4,11 +4,38 @@ function main() {
 
   if (cropx / zoomLevel > 140000) cropx = -100000 * zoomLevel;
   else if (cropx / zoomLevel < -140000) cropx = 100000 * zoomLevel;
+
+  if (speciesGraphAutoSmooth) {
+    speciesGraphSmooth = Math.ceil(1 + tick / 20000);
+  }
+
+  if (speciesGraphAutoMult) {
+    speciesGraphMult = 10800 / tick * speciesGraphDetail;
+  }
+
+  if (speciesGraphAutoDial && speciesGraph.length > 0) {
+    speciesGraphDial = 1920 - tick / speciesGraphDetail;
+  }
+
+  checkKey();
+
   render();
 
-  localStorage.setItem("ticksBeforeCrash", tickList.length);
+  let odate = new Date();
+
+  simulateUpdates();
+
+  let ndate = new Date();
+
+  if (ndate - odate > maxUpdateTime && !fastforward && autoMode && timescale > 1) {
+    timescale--;
+  } else if (ndate - odate < minUpdateTime && !fastforward && autoMode) {
+    timescale++;
+  }
+}
+
+function simulateUpdates() {
   if (population < creatureLimit) {
-    let odate = new Date();
     if (Math.abs(timescale) >= 1) { // Can timescale ever go below 1?
       if (timescale > 0) {
         if (tick >= tickList.length * ticksPerCapture) {
@@ -37,14 +64,6 @@ function main() {
 
         tc = 0;
       }
-    }
-
-    let ndate = new Date();
-
-    if (ndate - odate > maxUpdateTime && !fastforward && autoMode && timescale > 1) {
-      timescale--;
-    } else if (ndate - odate < minUpdateTime && !fastforward && autoMode) {
-      timescale++;
     }
   }
 }
@@ -82,7 +101,7 @@ function saveTick() {
 }
 
 function update() {
-  if (tick % ticksPerCapture == (ticksPerCapture - 1) && tick != (ticksPerCapture - 1) && reverseEnabled) replaceTick();
+  if (reverseEnabled && tick % ticksPerCapture == (ticksPerCapture - 1) && tick != (ticksPerCapture - 1)) replaceTick();
 
   tick++;
 
@@ -97,42 +116,12 @@ function update() {
       if (speciesCountList[j].length == 0) continue;
 
       if (speciesGraph[j].length == 0) speciesGraph[j].push(tick);
-      speciesGraph[j].push(speciesCountList[j].length);
-      stackedThisTick = speciesCountList[j].length;
+      speciesGraph[j].push(stackedThisTick + speciesCountList[j].length);
+      stackedThisTick += speciesCountList[j].length;
     }
   }
 
-  if (season === 0) {
-    seasonUp = true;
-    year++;
-  } else if (season == growSeasonLength + dieSeasonLength) {
-    seasonUp = false;
-    if (dieSeasonGrowRate > minDieRate) dieSeasonGrowRate -= dieRateReduction;
-    if (growSeasonGrowRate > minGrowRate) growSeasonGrowRate -= growRateReduction;
-  }
-
-  if (seasonUp) season++;
-  else season--;
-
-  if (season % mapUpdateDelay === 0 && population < foodImposedCreatureLimit) {
-    for (let row = 0; row < mapSize; row++) {
-      for (let column = 0; column < mapSize; column++) {
-        let tile = map[row][column];
-        if (tile != null && tile.type > 0) {
-          if (season < growSeasonLength) {
-            tile.food += growSeasonGrowRate * mapUpdateDelay * (tile.food / tile.maxFood * (1 - minGrowPercentage) + minGrowPercentage);
-          } else if (tile.type == 1) {
-            tile.food += dieSeasonGrowRate * mapUpdateDelay * (tile.food / tile.maxFood * (1 - minGrowPercentage) + minGrowPercentage);
-          } else if (tile.type == 2) {
-            tile.food += growSeasonGrowRate * mapUpdateDelay * (tile.food / tile.maxFood * (1 - minGrowPercentage) + minGrowPercentage);
-          }
-
-          if (tile.food > tile.maxFood) tile.food = tile.maxFood;
-          else if (tile.food < 0) tile.food = 0;
-        }
-      }
-    }
-  }
+  updateMap();
 
   creatureLocations = [];
   for (let f = 0; f < mapSize; f++) {
@@ -146,6 +135,62 @@ function update() {
     creatureLocations[Math.floor(creature.x / tileSize)][Math.floor(creature.y / tileSize)] = creature;
   }
 
+  updateCreatures();
+
+  if (tick % ticksPerCapture == 0 && reverseEnabled) saveTick();
+}
+
+function updateMap() {
+  // Cycle through tiles //
+  if (tick % mapUpdateDelay === 0 && population < foodImposedCreatureLimit) {
+    for (let row = 0; row < mapSize; row++) {
+      for (let column = 0; column < mapSize; column++) {
+        let tile = map[row][column];
+
+        // If tile isn't water //
+        if (tile != null && tile.type > 0) {
+          // If tile is grass //
+          if (tile.type == 1) {
+            // Add grass to tile //
+            tile.food += (winterGrowRate + (Math.sin((tick / yearLength) * 3.14) + 1) / 2 * (springGrowRate - winterGrowRate)) * mapUpdateDelay;
+            // If tile is evergreen //
+          } else if (tile.type == 2) {
+            // Add food to tile //
+            tile.food += springGrowRate * everGreenGrowModifier * mapUpdateDelay;
+          }
+
+          // Spread grass to all touching tiles //
+          // Left and right //
+          if (map[row - 1] && map[row - 1][column]) map[row - 1][column].food += Math.max(tile.food - map[row - 1][column].food, 0) * grassSpreadRate * mapUpdateDelay;
+          if (map[row + 1] && map[row + 1][column]) map[row + 1][column].food += Math.max(tile.food - map[row + 1][column].food, 0) * grassSpreadRate * mapUpdateDelay;
+          // Up and down //
+          if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * grassSpreadRate * mapUpdateDelay;
+          if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * grassSpreadRate * mapUpdateDelay;
+        }
+      }
+    }
+
+
+    // Loop through map again //
+    for (let row = 0; row < mapSize; row++) {
+      for (let column = 0; column < mapSize; column++) {
+        let tile = map[row][column];
+        if (tile != null && tile.type > 0) {
+          // Limit amount of food in a tile //
+          if (tile.food > tile.maxFood) tile.food = tile.maxFood;
+          else if (tile.food < 0) tile.food = 0;
+        }
+      }
+    }
+  }
+}
+
+function updateCreatures() {
+  updateCreaturesBrain();
+  updateCreaturesFinal();
+}
+
+function updateCreaturesBrain() {
   for (let i = population - 1; i >= 0; i--) {
     let creature = creatures[i];
     if (creature.age > oldest) oldest = creature.age;
@@ -153,7 +198,7 @@ function update() {
     let time = (creature.age % internalClockSpeed) / internalClockSpeed * 2 - 1;
 
     let rotation = creature.rotation / 6.28318; // 2 * 3.14159 (PI)
-    let energy = creature.energy / creatureEnergy;
+    let energy = creature.energy / maxCreatureEnergy;
     let age = creature.age / metabolismScaleTime;
 
     let velx = creature.velocity.x / maxCreatureSpeed;
@@ -168,7 +213,9 @@ function update() {
 
     creature.output = feedForward(creature, creature.input);
   }
+}
 
+function updateCreaturesFinal() {
   for (let i = population - 1; i >= 0; i--) {
     let creature = creatures[i];
 
@@ -183,9 +230,11 @@ function update() {
     for (let i = 0; i < creature.output.length; i++) {
       creature.output[i] = parseFloat(creature.output[i].toFixed(2));
     }
-  }
 
-  if (tick % ticksPerCapture == 0 && reverseEnabled) saveTick();
+    if (creature.energy > maxCreatureEnergy) {
+    	creature.energy = maxCreatureEnergy;
+    }
+  }
 }
 
 function wallLock(creature) {
@@ -203,7 +252,7 @@ function wallLock(creature) {
 }
 
 function clampSize(creature) {
-  if (creature.energy > creatureEnergy) creature.energy = creatureEnergy;
+  //if (creature.energy > maxCreatureEnergy) creature.energy = maxCreatureEnergy;
   if (creature.energy <= 0) {
     if (creature == selectedCreature) selectedCreature = null;
     die(creature);
@@ -220,7 +269,7 @@ function render() {
   renderCreatures();
   renderUI();
   renderSelectedCreature();
-  if (debugMode && infoMode) renderSpeciesGraph();
+  if (speciesGraphOn) renderSpeciesGraph();
 }
 
 function renderClear() {
@@ -237,17 +286,18 @@ function renderTiles() {
   ctx.drawImage(waterTexture, -cropx - middleX + 1920 / 2 * 100 * zoomLevel, -cropy - middleY - 1080 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
   ctx.drawImage(waterTexture, -cropx - middleX + 1920 / 2 * 100 * zoomLevel, -cropy - middleY + 1080 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
 
-  let hue = (60 - (season - growSeasonLength) / (growSeasonLength + dieSeasonLength) * 40);
-  let huePrefix = "hsl(" + hue + ", ";
+  //let hue = 50 + 50 * (Math.sin(tick / yearLength) + 1) / 2;
+  //let huePrefix = "hsl(" + hue + ", ";
 
   for (let row = 0; row < mapSize; row++) {
     for (let column = 0; column < mapSize; column++) {
       let tile = map[row][column];
       if (tile != null) {
-        let saturation = Math.floor(tile.food / maxTileFoodOverHundred);
+        let hue = Math.floor(45 + 50 * (tile.food / maxTileFood));
 
-        if (tile.type == 1) ctx.fillStyle = huePrefix + saturation + "%, 20%)";
-        else ctx.fillStyle = "hsl(145, " + saturation + "%, 18%)";
+        //if (tile.type == 1) ctx.fillStyle = huePrefix + saturation + "%, 25%)";
+        //else
+        ctx.fillStyle = "hsl(" + hue + ", 80%, 20%)";
         ctx.fillRect(row * multiple - cropx, column * multiple - cropy, multiple + 1, multiple + 1);
       }
     }
@@ -284,7 +334,7 @@ function renderCreatures() {
     ctx.lineWidth = 10 * zoomLevel;
 
     let color = creature.color.split(",");
-    color[1] = Math.floor(creature.energy / creatureEnergy * 100) + "%";
+    color[1] = Math.floor(creature.energy / maxCreatureEnergy * 100) + "%";
 
     ctx.fillStyle = color.join(",");
     ctx.fillCircle(creaturex - cropx, creaturey - cropy, creature.size * zoomLevel, true);
@@ -325,10 +375,9 @@ function renderUI() {
     ctz.font = "48px Calibri";
     ctz.lineWidth = 5;
 
-    let yearProgress = seasonUp ? season / (growSeasonLength + dieSeasonLength) / 2 : 1 - (season / (growSeasonLength + dieSeasonLength) / 2);
     ctz.textAlign = "left";
-    ctz.strokeText("Year " + (year + yearProgress).toFixed(1), 40, 980);
-    ctz.fillText("Year " + (year + yearProgress).toFixed(1), 40, 980);
+    ctz.strokeText("Year " + (tick / yearLength).toFixed(1), 40, 980);
+    ctz.fillText("Year " + (tick / yearLength).toFixed(1), 40, 980);
 
     ctz.strokeText(population + " Evos", 40, 1040);
     ctz.fillText(population + " Evos", 40, 1040);
@@ -436,48 +485,48 @@ function renderSelectedCreature() {
       ctz.strokeStyle = "#ffffff";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.gross.length - 1; i >= 0; i--) {
-        if (i > 140) selectedCreature.energyGraph.gross.splice(0, 1);
-        ctz.lineTo(i * 10, 900 - selectedCreature.energyGraph.gross[i] * energyGraphMult / 10);
+        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.gross.splice(0, 1);
+        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.gross[i] * energyGraphMult / 10);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#aaffff";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.net.length - 1; i >= 0; i--) {
-        if (i > 140) selectedCreature.energyGraph.net.splice(0, 1);
-        ctz.lineTo(i * 10, 900 - selectedCreature.energyGraph.net[i] * energyGraphMult);
+        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.net.splice(0, 1);
+        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.net[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#ffaa00";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.metabolism.length - 1; i >= 0; i--) {
-        if (i > 140) selectedCreature.energyGraph.metabolism.splice(0, 1);
-        ctz.lineTo(i * 10, 900 - selectedCreature.energyGraph.metabolism[i] * energyGraphMult);
+        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.metabolism.splice(0, 1);
+        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.metabolism[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#ff2233";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.attack.length - 1; i >= 0; i--) {
-        if (i > 140) selectedCreature.energyGraph.attack.splice(0, 1);
-        ctz.lineTo(i * 10, 900 - selectedCreature.energyGraph.attack[i] * energyGraphMult);
+        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.attack.splice(0, 1);
+        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.attack[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#aa88ff";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.move.length - 1; i >= 0; i--) {
-        if (i > 140) selectedCreature.energyGraph.move.splice(0, 1);
-        ctz.lineTo(i * 10, 900 - selectedCreature.energyGraph.move[i] * energyGraphMult);
+        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.move.splice(0, 1);
+        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.move[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#00ff00";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.eat.length - 1; i >= 0; i--) {
-        if (i > 140) selectedCreature.energyGraph.eat.splice(0, 1);
-        ctz.lineTo(i * 10, 900 - selectedCreature.energyGraph.eat[i] * energyGraphMult);
+        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.eat.splice(0, 1);
+        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.eat[i] * energyGraphMult);
       }
       ctz.stroke();
 
@@ -558,25 +607,36 @@ function renderSelectedCreature() {
   }
 }
 
-let width = 960;
-
 function renderSpeciesGraph() {
   if (speciesGraph.length == 0) return;
 
   ctz.lineWidth = 1;
   ctz.strokeStyle = "black";
-  ctz.lineCap = "round";
-  ctz.lineJoint = "round";
-  for (let i = speciesGraph.length - 1; i >= 0; i--) {
-    let width = 1920 / tick * speciesGraphDetail;
-    ctz.fillStyle = speciesColors[i].replace(")", "," + (0.6 + i / speciesGraph.length) / 2);
-    ctz.beginPath();
-    for (let j = 1; j < speciesGraph[i].length; j++) {
-      ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * width + (j - 1) * width, 980 - speciesGraph[i][j] * speciesGraphMult);
-    }
-    ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * width + (speciesGraph[i].length - 2) * width, 980);
+  ctz.lineCap = "bevel";
+  ctz.lineJoin = "round"
 
-    ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * width, 980);
+  let width = 1920 / tick * speciesGraphDetail;
+  for (let i = speciesGraph.length - 1; i >= 0; i--) {
+    let alpha = 1;
+    if (i > 0) {
+      alpha = 1; //(0.6 + 1 / (speciesGraph[i][0] - speciesGraph[i - 1][0])) / 2;
+    }
+
+    ctz.fillStyle = speciesColors[i].replace(")", ", " + alpha + ")");
+    ctz.beginPath();
+    for (let j = speciesGraphSmooth; j < speciesGraph[i].length; j += speciesGraphSmooth) {
+      let average = 0;
+      for (let k = 0; k < speciesGraphSmooth; k++) {
+        average += speciesGraph[i][j - k];
+      }
+      average /= speciesGraphSmooth;
+
+      ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + j * speciesGraphStretch + speciesGraphDial, 980 - average * speciesGraphMult);
+    }
+
+    ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + speciesGraph[i].length * speciesGraphStretch + speciesGraphDial, 980);
+
+    ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + speciesGraphDial, 980);
     ctz.stroke();
     ctz.fill();
   }

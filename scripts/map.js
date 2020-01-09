@@ -2,7 +2,7 @@ let map = [];
 let outline = [];
 let spawnTiles = [];
 
-noise.seed(seededNoise()); // We seed our noise generator
+noise.seed(seededNoiseA()); // We seed our noise generator
 
 function generateMap() {
   for (let x = 0; x < mapSize; x++) {
@@ -56,13 +56,16 @@ function Tile(x, y) {
 
   if (tile < 0) {
     this.type = 0;
-  } else if (tile > 1 - everGreenCentralization && seededNoise() < everGreenPercentage) {
+  } else if ((1 - everGreenCentralization) + (seededNoiseA() * everGreenCentralization) < tile && seededNoiseA() < everGreenPercentage) {
     this.type = 2;
   } else {
     this.type = 1;
   }
 
-  this.maxFood = parseFloat((seededNoise(0.9 * maxTileFood, maxTileFood) * this.type).toFixed(2));
+  if (this.type == 1) this.maxFood = parseFloat((seededNoiseA(0.9 * maxTileFood, maxTileFood)).toFixed(2));
+  else if (this.type == 2) this.maxFood = parseFloat((seededNoiseA(0.9 * maxTileFood, maxTileFood) * everGreenMaxFoodModifier).toFixed(2));
+  else if (this.type == 0) this.maxFood = 0;
+
   this.food = this.maxFood;
 
   this.x = x;

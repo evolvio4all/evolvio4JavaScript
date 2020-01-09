@@ -67,6 +67,9 @@ let speciesColors = [];
 let speciesCountList = [];
 let currentSpeciesGraphIndex = 0;
 
+let speciesGraphDial = 0;
+let speciesGraphAutoDial = true;
+
 let waterTexture = new Image();
 waterTexture.src = "./topwater.jpg";
 
@@ -75,25 +78,64 @@ let waterScrollY = -1000;
 
 let waterDirection = true;
 
+let speciesGraphOn = false;
+
+
+let noiseChain = [];
+
+let keyToggle = true;
 // FUNCTIONS //
 
-function newColor() {
-  let h = Math.floor(seededNoise(0, 360));
-  let s = Math.floor(seededNoise(20, 80));
+function newColor(noiseGroup) {
+  if (noiseGroup) {
+    var h = Math.floor(seededNoiseB(0, 360));
+  } else {
+    var h = Math.floor(seededNoiseA(0, 360));
+  }
+
   let l = 50;
 
-  return "hsl(" + h + ", " + s + "%, " + l + "%)";
+  return "hsl(" + h + ", " + 100 + "%, " + l + "%)";
 }
 
-let grv = 1;
+let grva = 1;
+let grvb = 1;
 
-function seededNoise(a, b) {
+function seededNoiseA(a, b) {
   let r1 = a || 0;
   let r2 = b || 1;
 
-  grv += (Math.abs(seed * Math.tan(grv / Math.sin(grv * seed))) % 1) * (r2 - r1) + r1;
+  grva += (Math.abs(seed * Math.tan(grva / Math.sin(grva * seed))) % 1) + 0.1;
 
-  return (Math.abs(seed * Math.tan(grv / Math.sin(grv * seed))) % 1) * (r2 - r1) + r1;
+  return (Math.abs(seed * Math.tan(grva / Math.sin(grva * seed))) % 1) * (r2 - r1) + r1;
+}
+
+function seededNoiseB(a, b) {
+  let r1 = a || 0;
+  let r2 = b || 1;
+
+  grvb++;
+  if (grvb >= 2147483647) grvb = 1;
+
+  return (Math.abs(seed * Math.tan(grvb / Math.sin(grvb * seed))) % 1) * (r2 - r1) + r1;
+}
+
+function sortByHighestValue(a, b) {
+  let aMax = 0;
+  let bMax = 0;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] > aMax) {
+      aMax = a[i];
+    }
+  }
+
+  for (let i = 0; i < b.length; i++) {
+    if (b[i] > bMax) {
+      bMax = b[i];
+    }
+  }
+
+  return aMax - bMax;
 }
 
 function strDifference(str1, str2) {

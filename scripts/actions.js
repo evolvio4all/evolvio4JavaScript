@@ -16,7 +16,7 @@ eat = function(creature, tile) {
     return;
   }
 
-  let eatAmount = eatp * eatPower * Math.pow(tile.food / maxTileFood, eatDiminishingRate);
+  let eatAmount = eatp * eatPower * (1 - Math.pow(1 - Math.min(tile.food / maxTileFood, 1), eatDiminishingRate));
   tenergy += eatAmount * eatEffeciency;
   creature.energy += tenergy;
 
@@ -30,11 +30,11 @@ eat = function(creature, tile) {
 };
 
 metabolize = function(creature) {
-  let scale = 0;
-  scale = Math.min(Math.pow(creature.age / metabolismScaleTime, metabolismScaleScale), 1);
-  let sizeScalar = (maxCreatureSize - minCreatureSize + creature.size) / maxCreatureSize;
+  let timeScalar = Math.min(Math.pow(creature.age / metabolismScaleTime, metabolismScaleScale), 1);
+  let sizeScalar = (1 - sizeMetabolismFactor) + ((creature.size - minCreatureSize) / maxCreatureSize) * sizeMetabolismFactor;
+  let weightScalar = (1 - weightMetabolismFactor) + (creature.energy / maxCreatureEnergy) * weightMetabolismFactor;
 
-  let tenergy = -((maxMetabolism - minMetabolism) + minMetabolism) * sizeScalar * scale;
+  let tenergy = -(maxMetabolism - minMetabolism) * timeScalar * sizeScalar * weightScalar - minMetabolism;
   creature.energy += tenergy;
 
   creature.energyGraph.metabolism.push(parseFloat(tenergy.toFixed(2)));
@@ -81,18 +81,19 @@ reproduce = function(creature) {
   }
 
   let tenergy = 0;
-  let randomNum = seededNoise();
-
-  if (creature.age > reproduceAge && creature.reproduceTime > minReproduceTime && randomNum > 0.48 && randomNum < 0.481) {
+  let randomNum = seededNoiseA();
+	
+  // Random number added to desynchronize births (theoretically this would happen over time naturally, but it would take a long time and synchronized birth has an undesired impacts on user-experience)
+  if (creature.age > reproduceAge && creature.reproduceTime > minReproduceTime && randomNum < 0.001) {
     for (let i = 0; i < creature.children; i++) {
-      if (creature.energy > creatureEnergy * creature.childEnergy) {
-        let child = new Creature(creature.x + (seededNoise() * 2 - 1) * 10, creature.y + (seededNoise() * 2 - 1) * 10, creature.species, creature.speciesGeneration, creature.color);
+      if (creature.energy > maxCreatureEnergy * creature.childEnergy) {
+        let child = new Creature(creature.x + (seededNoiseA() * 2 - 1) * 10, creature.y + (seededNoiseA() * 2 - 1) * 10, creature.species, creature.speciesGeneration, creature.color);
 
         child.eyes = [];
         let eyes = creature.eyes.length;
         for (let i = 0; i < eyes; i++) {
           let eyeCopy = creature.eyes[i];
-          child.eyes.push(new eye(eyeCopy.angle, eyeCopy.distance));
+          child.eyes.push(new eye(eyeCopy.angle, eyeCopy.distance, false));
         }
 
         child.mutability = {};
@@ -100,7 +101,7 @@ reproduce = function(creature) {
           child.mutability[value] = creature.mutability[value];
         }
 
-        child.energy = creatureEnergy * creature.childEnergy * birthEffeciency;
+        child.energy = maxCreatureEnergy * creature.childEnergy * birthEffeciency;
         child.children = creature.children;
         child.childEnergy = creature.childEnergy;
         child.size = creature.size;
@@ -108,16 +109,16 @@ reproduce = function(creature) {
 
         mutate(child);
 
-        createNeuralNetwork(child);
+        createNeuralNetwork(child, false);
         copyNeuralNetwork(child, creature);
 
         mutateNet(child.network);
-        child.rotation = seededNoise() * 2 * Math.PI;
+        child.rotation = seededNoiseA() * 2 * Math.PI;
 
         creatures.push(child);
 
-        tenergy -= creature.childEnergy * creatureEnergy;
-        creature.energy -= creature.childEnergy * creatureEnergy;
+        tenergy -= creature.childEnergy * maxCreatureEnergy;
+        creature.energy -= creature.childEnergy * maxCreatureEnergy;
         creature.reproduceTime = 0;
       } else break;
     }
@@ -165,7 +166,7 @@ attack = function(creature) {
 
   if (creatureLocations[attackPositionX]) {
     let targetCreature = creatureLocations[attackPositionX][attackPositionY] || null;
-    if (targetCreature) {
+    if (targetCreature && targetCreature != creature) {
       let sizeDiff = Math.max(creature.size - targetCreature.size, 0) / maxCreatureSize + 0.2;
       targetCreature.energy -= att * attackPower * sizeDiff;
 

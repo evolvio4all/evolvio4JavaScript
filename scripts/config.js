@@ -1,6 +1,5 @@
-// GLOBAL //
+﻿// GLOBAL //
 let seed = prompt("Seed?");
-
 
 if (seed == "" || seed == null) seed = Math.floor(Math.random() * 99999);
 
@@ -23,27 +22,24 @@ const tileSize = 400; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
 const maxTileFood = 100; // Maximum food on a tile
-let growSeasonGrowRate = 0.005; // How fast food regrows during grow season %
-let dieSeasonGrowRate = 0.005; // How fast food regrows during die season %
 
-const growRateReduction = 0.0001; // The amount grow season growing is reduced by each year
-const dieRateReduction = 0.0001; // The amount die season growing is reduced by each year
+const springGrowRate = 0.02; // Grow amount in spring season (applies to all tiles)
+const winterGrowRate = -0.01; // Grow amount in winter season (applies to all tiles)
 
-const minGrowRate = 0.005; // Minimum grow amount in grow season
-const minDieRate = 0.004; // Minimum grow amount in die season
+const grassSpreadRate = 0.00025; // % difference between tiles grass spread rate
 
-const minGrowPercentage = 0.1; // Minimum amount growing can be reduced to on an empty tile (growing is based on food left)
-
-const everGreenCentralization = 0.00; // % How far from the center evergreen tiles are allowed to be
-const everGreenPercentage = 0.13; // % of food tiles (within the central area) that are evergreen (always in grow season)
+// evergreen tiles are always grow at the same rate //
+const everGreenCentralization = 0.3; // % How far from the center evergreen tiles are allowed to be
+const everGreenPercentage = 0.8; // % of food tiles (within the central area) that are evergreen (always in grow season)
+const everGreenGrowModifier = 0.7; // % speed evergreen tiles grow compared to normal tiles
+const everGreenMaxFoodModifier = 1.2; // % maximum food is modified by on evergreen tiles
 
 const mapComplexity = 2.2; // How complex the map is. Breaks below 1
 const maxWaterPercentage = 0.3; // Water % past edge
 const edgeDistance = 0.8; // How far from the center does water start forming
 const edgeSmoothness = 0.0; // How smooth the transition from edge to water is. Reduces the appearance of a circular island.
 
-const growSeasonLength = 5000; // Grow season length (growSeasonLength * 2 / 30 = growSeasonLength in seconds)
-const dieSeasonLength = 800; // Die season length (dieSeasonLength * 2 / 30 = dieSeasonLength in seconds)
+const yearLength = 1800; // Length of the year (in ticks)
 
 const mapUpdateDelay = 15; // How many ticks before the map tiles update
 
@@ -75,21 +71,33 @@ const initEyeDistanceH = 6; // Maximum distance an "eye" can be from a creature 
 const initEyeDistanceV = 3; // Maximum distance an "eye" can be from a creature in tiles to either side initially
 
 // Energy //
-const creatureEnergy = 50; // Maximum creature energy
+const maxCreatureEnergy = 80; // Maximum creature energy
 const energyGraphMult = 100; // Energy graph height multiplier
+const energyGraphWidth = 2; // Width of the energy graph
 
 const energy = {
   eat: 0.25, // Energy cost to eat at eatPower
-  move: 0.015, // Energy cost to move at maxCreatureSpeed
-  rotate: 0.02, // Energy cost to rotate at rotationSpeed
-  attack: 0.35 // Energy cost to attack at attackPower
+  move: 0.03, // Energy cost to move at maxCreatureSpeed
+  rotate: 0.03, // Energy cost to rotate at rotationSpeed
+  attack: 0.25 // Energy cost to attack at attackPower
 };
 
-const metabolismScaleTime = 3600; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
-const metabolismScaleScale = 3; // Determines how uniformly metabolism increases. Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
+// Eating //
+const minEatPower = 0.25; // Minimum eating strength (anything lower will be considered 0)
 
-const minMetabolism = 0.01; // Initial metabolism
-const maxMetabolism = 0.3; // End metabolism (metabolism when age == metabolismScaleTime)
+const eatEffeciency = 0.8; // Eat effeciency %
+const eatPower = 1; // Eating speed %
+
+const eatDiminishingRate = 3; // Determines how uniformly diminishing returns are applied on eating; Higher is less diminishing; 0 is none; 1 is linear; (based on food on the tile / maxTileFood). Math.pow(tile.food / maxTileFood, eatDiminishingReturns)
+
+// Metabolism //
+const metabolismScaleTime = 3600; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
+const metabolismScaleScale = 10; // Determines how uniformly metabolism increases. 1 is linear; Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
+const sizeMetabolismFactor = 0; // % how much size affects metabolism (creature size / maxCreatureSize)
+const weightMetabolismFactor = 0; // % how much energy affects metabolism (creature energy / maxCreatureEnergy)
+
+const minMetabolism = 0.05; // Initial metabolism
+const maxMetabolism = 0.8; // End metabolism (metabolism when age == metabolismScaleTime)
 
 // Movement //
 const maxCreatureSpeed = 300; // Maximum creature speed (maxCreatureSpeed = maxAcceleration / friction)
@@ -104,43 +112,41 @@ const eatingSpeed = 0.2; // Movement speed % while eating
 const rotationSpeed = 0.255; // Maximum rotation speed in radians per tick
 const minRotation = 0.1; // Minimum rotation amount as a percentage of rotation speed
 
+
 // Species //
-const speciesDiversity = 100; // Diversity of each species
+const speciesDiversity = 80; // Diversity of each species
 const speciesColorChange = 20; // Color change between species
 
 const speciesGraphDetail = 50; // Higher = less detail (in ticks). Down to 1. High detail takes up a lot of memory after a while
-const speciesGraphMult = 1.5; // Height of species graph
+let speciesGraphMult = 1; // Height of species graph
+let speciesGraphAutoMult = false; // Is the graph height adjusted automatically (default: true)
+let speciesGraphSmooth = 1; // Smoothness of the species graph, averages the the graph points
+let speciesGraphAutoSmooth = false; // Does the smoothness scale over time (makes the species graph less spikey over time) (default: false)
+let speciesGraphStretch = 1; // How stretched the graph is
+let speciesGraphScrollSpeed = 20;
+
 const minCreaturesForTracking = 5; // Minimum number of population needed for a species to be tracked on the species graph (saves memory)
 const speciesAccuracy = 5; // How many times to run a feedforward and detect a species (increases geneticID length by about 25)
 
-// Birth //
+// Reproduction //
 const birthEffeciency = 0.95; // Birth effeciency %
 
 const minChildren = 1; // Minimum children a creature is allowed to produce
 const maxChildren = 6; // Maximum children a creature is allowed to produce
 
-const minChildEnergy = 0.1; // Min % of creatures energy to be given to a single child
+const minChildEnergy = 0.3; // Min % of creatures energy to be given to a single child
 const maxChildEnergy = 0.7; // Max % of creatures energy to be given to a single child
 
-// Reproduction //
 const minSpawnPower = -0.8; // Minimum output to reproduce (anything lower will be considered 0)
 
 const reproduceAge = 1800; // Minimum number of ticks before a creature can spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
 const minReproduceTime = 900; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
-// Eating //
-const minEatPower = 0.25; // Minimum eating strength (anything lower will be considered 0)
-
-const eatEffeciency = 0.8; // Eat effeciency %
-const eatPower = 1; // Eating speed %
-
-const eatDiminishingRate = 2; // Determines how uniformly diminishing returns are applied on eating; 0 is none; (based on food on the tile / maxTileFood). Math.pow(tile.food / maxTileFood, eatDiminishingReturns)
-
 // Attacking //
 const minAttackPower = 0.35; // Minimum attack strength (anything lower will be considered 0)
 
 const attackEffeciency = 0.95; // Attack effeciency %
-const attackPower = 3; // Attack power % (damage)
+const attackPower = 2; // Attack power % (damage)
 
 
 // Mutation //
@@ -208,7 +214,11 @@ const controls = {
   debug: "d",
   gif: "g",
   auto: "up",
-  info: "i"
+  info: "i",
+  speciesGraphMode: "s",
+  speciesGraphLeft: "a",
+  speciesGraphRight: "d",
+  speciesGraphDial: "q"
 };
 
 const nnui = { // Neural network UI config

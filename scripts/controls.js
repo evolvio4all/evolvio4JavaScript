@@ -4,17 +4,21 @@ function checkKey(key) {
   // checks an incoming key
   lastKey = key;
 
-  if (keyDown(controls.play)) {
+  if (keyDown(controls.play) && keyToggle) {
     timescale = 1;
     autoMode = false;
-  } else if (keyDown(controls.fastForward)) {
+
+    keyToggle = false;
+  } else if (keyDown(controls.fastForward) && keyToggle) {
     if (timescale >= 0) {
       if (timescale == 0) timescale = 0.0625;
       timescale *= 2;
     } else if (timescale < -0.125) {
       timescale /= 2;
     } else timescale = 0;
-  } else if (keyDown(controls.stop)) {
+
+    keyToggle = false;
+  } else if (keyDown(controls.stop) && keyToggle) {
     autoMode = false;
 
     if (timescale <= 0) {
@@ -23,17 +27,47 @@ function checkKey(key) {
     } else if (timescale > 0.125) {
       timescale /= 2;
     } else timescale = 0;
+
+    keyToggle = false;
   }
-  if (keyDown(controls.auto)) {
+  if (keyDown(controls.auto) && keyToggle) {
     autoMode = true;
+
+    keyToggle = false;
   }
 
-  if (keyDown(controls.debug)) {
+  if (keyDown(controls.debug) && keyToggle) {
     debugMode = !debugMode;
+
+    keyToggle = false;
   }
 
-  if (keyDown(controls.info)) {
+  if (keyDown(controls.info) && keyToggle) {
     infoMode = !infoMode;
+
+    keyToggle = false;
+  }
+
+  if (keyDown(controls.speciesGraphMode) && keyToggle) {
+    speciesGraphOn = !speciesGraphOn;
+
+    keyToggle = false;
+  }
+
+  if (keyDown(controls.speciesGraphLeft)) {
+    speciesGraphDial += speciesGraphScrollSpeed;
+    speciesGraphAutoDial = false;
+  }
+
+  if (keyDown(controls.speciesGraphRight)) {
+    speciesGraphDial -= speciesGraphScrollSpeed;
+    speciesGraphAutoDial = false;
+  }
+
+  if (keyDown(controls.speciesGraphDial) && keyToggle) {
+    speciesGraphAutoDial = true;
+
+    keyToggle = false;
   }
 }
 
@@ -60,10 +94,9 @@ function getMousePos(e) {
   ];
 }
 
-function keyDown(key) {
-  if (lastKey == keys[key]) return true;
-  return false;
-}
+window.onkeydown = function(e) {
+  activeKeys.push(e.keyCode);
+};
 
 window.onmousedown = function(e) {
   mouse.down.x = getMousePos(e)[0];
@@ -100,9 +133,9 @@ window.onmousemove = function(e) {
   lcy = mouse.current.y;
 };
 
-window.onmousewheel = function(e) {
+window.onwheel = function(e) {
   zoomCache = zoomLevel;
-  zoomAmount = Math.max(Math.min(e.wheelDelta, 1), -1) * zoomSpeed * zoomCache;
+  zoomAmount = Math.max(Math.min(-e.deltaY, 1), -1) * zoomSpeed * zoomCache;
   zoomLevel += zoomAmount;
 
   if (zoomLevel < minZoomLevel) {
@@ -131,13 +164,26 @@ window.onmousewheel = function(e) {
   multiple = tileSize * zoomLevel;
 };
 
-window.onkeydown = function(e) {
-  checkKey(e.keyCode);
-};
+function keyDown(key) {
+  if (activeKeys.indexOf(keys[key.toLowerCase()]) > -1) return true;
+  return false;
+}
 
 window.onkeyup = function(e) {
   if (e.keyCode == keys[controls.fastForward] && fastforward) {
     fastforward = false;
     timescale /= 3;
   }
+
+  var z = activeKeys.indexOf(e.keyCode);
+  toggle = true;
+
+  for (i = activeKeys.length - 1; i >= 0; i--) {
+    activeKeys.splice(z, 1);
+
+    activeKeys.indexOf(e.keyCode);
+    if (z == -1) break;
+  }
+
+  keyToggle = true;
 };

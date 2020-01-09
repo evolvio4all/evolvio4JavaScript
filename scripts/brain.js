@@ -8,7 +8,7 @@ const testInput = [];
 for (let i = 0; i < speciesAccuracy; i++) {
   testInput.push([]);
   for (let j = 0; j < inputs; j++) {
-    let inputRandom = seededNoise(-0.6, 0.6);
+    let inputRandom = seededNoiseA(-0.6, 0.6);
     if (inputRandom < 0) inputRandom -= 0.4;
     else inputRandom += 0.4;
 
@@ -17,9 +17,9 @@ for (let i = 0; i < speciesAccuracy; i++) {
 }
 
 // Creature.prototype creates a neural network composed of layers and axons
-function createNeuralNetwork(creature) {
+function createNeuralNetwork(creature, noiseGroup) {
   // VARIABLES //
-  creature.inputs = inputs + creature.eyes.length * 2;
+  creature.inputs = inputs + creature.eyes.length;
   creature.outputs = outputs;
 
   let forgetLayers = [creature.inputs, (creature.inputs + creature.outputs) / 2, creature.outputs];
@@ -30,7 +30,7 @@ function createNeuralNetwork(creature) {
   creature.network = new Network(forgetLayers, decideLayers, modifyLayers, layers, creature.outputs, creature.inputs);
 
   initNeurons(creature); // Creature.prototype initializes the neurons, creating them, Neurons contain a value and are the connection point for axons
-  initAxons(creature); // Axons are basically lines that connect Neurons, each one has a weight, and each neuron has a value, the axon takes the value and multiplies it by the weight
+  initAxons(creature, noiseGroup); // Axons are basically lines that connect Neurons, each one has a weight, and each neuron has a value, the axon takes the value and multiplies it by the weight
 };
 
 function Network(forget, decide, modify, main, out, inp) {
@@ -79,7 +79,7 @@ initNeurons = function(creature) {
   }
 };
 
-initAxons = function(creature) {
+initAxons = function(creature, noiseGroup) {
   for (let brain in creature.network) {
     if (brain == "cellState") break;
     let nbrain = creature.network[brain];
@@ -98,8 +98,10 @@ initAxons = function(creature) {
         for (let axon = 0; axon < neuronsInNextLayer; axon++) {
           let weight = 0;
 
-          if (seededNoise() < connectionDensity) {
-            weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue);
+          if (noiseGroup && seededNoiseB() < connectionDensity) {
+            weight = seededNoiseB(-maxInitialAxonValue, maxInitialAxonValue);
+          } else if (!noiseGroup && seededNoiseA() < connectionDensity) {
+            weight = seededNoiseA(-maxInitialAxonValue, maxInitialAxonValue);
           } else weight = 0;
 
           neuronWeights.push(weight);
@@ -114,8 +116,10 @@ initAxons = function(creature) {
       for (let axon = 0; axon < neuronsInNextLayer; axon++) {
         let weight = 0;
 
-        if (seededNoise() < connectionDensity) {
-          weight = seededNoise(-maxInitialAxonValue, maxInitialAxonValue);
+        if (noiseGroup && seededNoiseB() < connectionDensity) {
+          weight = seededNoiseB(-maxInitialAxonValue, maxInitialAxonValue);
+        } else if (!noiseGroup && seededNoiseA() < connectionDensity) {
+          weight = seededNoiseA(-maxInitialAxonValue, maxInitialAxonValue);
         } else weight = 0;
 
         layerWeights.push(weight);
@@ -302,7 +306,7 @@ calculateCellState = function(creature, network, cellStateLength) {
 mutate = function(creature) {
   let mutability = creature.mutability;
 
-  let rand = seededNoise(0, 100);
+  let rand = seededNoiseA(0, 100);
 
   if (rand < mutability.children / 2) {
     creature.children += 1;
@@ -312,7 +316,7 @@ mutate = function(creature) {
     if (creature.children > maxChildren) creature.children = maxChildren;
   }
 
-  rand = seededNoise(0, 100);
+  rand = seededNoiseA(0, 100);
 
   if (rand < mutability.size / 2) {
     creature.size /= 1.03;
@@ -322,7 +326,7 @@ mutate = function(creature) {
     if (creature.size > maxCreatureSize) creature.size = maxCreatureSize;
   }
 
-  rand = seededNoise(0, 100);
+  rand = seededNoiseA(0, 100);
 
   if (rand < mutability.size / 10) {
     creature.size /= 1.1;
@@ -332,7 +336,7 @@ mutate = function(creature) {
     if (creature.size > maxCreatureSize) creature.size = maxCreatureSize;
   }
 
-  rand = seededNoise(0, 100);
+  rand = seededNoiseA(0, 100);
 
   if (rand < mutability.childEnergy / 2) {
     creature.childEnergy /= 1.03;
@@ -344,51 +348,51 @@ mutate = function(creature) {
 
   let eyes = creature.eyes.length;
   for (let i = eyes - 1; i >= 0; i--) {
-    rand = seededNoise(0, 100);
+    rand = seededNoiseA(0, 100);
 
     if (rand < mutability.eyes.angle) {
       let eye = creature.eyes[i];
 
-      eye.angle += seededNoise(-maxEyeAngleChange, maxEyeAngleChange);
+      eye.angle += seededNoiseA(-maxEyeAngleChange, maxEyeAngleChange);
       eye.angle = eye.angle % (2 * Math.PI);
       if (eye.angle < 0) eye.angle += 2 * Math.PI;
     }
 
-    rand = seededNoise(0, 100);
+    rand = seededNoiseA(0, 100);
 
     if (rand < mutability.eyes.distance) {
       let eye = creature.eyes[i];
 
-      eye.distance += seededNoise(-maxEyeDistanceChange, maxEyeDistanceChange);
+      eye.distance += seededNoiseA(-maxEyeDistanceChange, maxEyeDistanceChange);
       if (eye.distance < minEyeDistance) eye.distance = minEyeDistance;
       else if (eye.distance > maxEyeDistance) eye.angle = maxEyeDistance;
     }
 
-    rand = seededNoise(0, 100);
+    rand = seededNoiseA(0, 100);
 
     if (rand < mutability.eyes.number / 2 && creature.eyes.length < maxEyes) {
-      creature.eyes.push(new eye());
+      creature.eyes.push(new eye(undefined, undefined, false));
     } else if (rand < mutability.eyes.number && creature.eyes.length > minEyes) {
       creature.eyes.splice(i, 1);
     }
   }
 
   for (let property in mutability) {
-    rand = seededNoise(0, 100);
+    rand = seededNoiseA(0, 100);
 
     if (property == "eyes") {
       for (let sec in mutability[property]) {
-        rand = seededNoise(0, 100);
+        rand = seededNoiseA(0, 100);
 
         if (rand < mutability.mutability) {
-          mutability[property][sec] += seededNoise(-maxMutabilityChange, maxMutabilityChange);
+          mutability[property][sec] += seededNoiseA(-maxMutabilityChange, maxMutabilityChange);
 
           if (mutability[property][sec] < minMutability[property][sec]) mutability[property][sec] = minMutability[property][sec];
           else if (mutability[property][sec] > maxMutability[property][sec]) mutability[property][sec] = maxMutability[property][sec];
         }
       }
     } else if (rand < mutability.mutability) {
-      mutability[property] += seededNoise(-maxMutabilityChange, maxMutabilityChange);
+      mutability[property] += seededNoiseA(-maxMutabilityChange, maxMutabilityChange);
 
       if (mutability[property] < minMutability[property]) mutability[property] = minMutability[property];
       else if (mutability[property] > maxMutability[property]) mutability[property] = maxMutability[property];
@@ -408,17 +412,17 @@ mutateNet = function(creature, network) {
 
       for (let axon = 0; axon < neuronsInNextLayer; axon++) {
         for (let neuron = 0; neuron <= neurons; neuron++) {
-          let randomNumber = seededNoise(0, 100);
+          let randomNumber = seededNoiseA(0, 100);
 
           if (neuron == neurons) {
             if (randomNumber < creature.mutability.brain / 2) {
-              nbrain.biasAxons[layer][axon] += seededNoise(-stepAmount, stepAmount);
+              nbrain.biasAxons[layer][axon] += seededNoiseA(-stepAmount, stepAmount);
             } else if (randomNumber < creature.mutability.brain) {
               nbrain.biasAxons[layer][axon] = 0;
             }
           } else {
             if (randomNumber < creature.mutability.brain / 2) {
-              nbrain.axons[layer][neuron][axon] += seededNoise(-stepAmount, stepAmount);
+              nbrain.axons[layer][neuron][axon] += seededNoiseA(-stepAmount, stepAmount);
             } else if (randomNumber < creature.mutability.brain) {
               nbrain.axons[layer][neuron][axon] = 0;
             }
