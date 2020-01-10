@@ -158,7 +158,7 @@ function updateMap() {
           // If tile is grass //
           if (tile.type == 1) {
             // Add grass to tile //
-            tile.food += (winterGrowRate + (Math.sin((tick / yearLength) * 3.14) + 1) / 2 * (springGrowRate - winterGrowRate)) * mapUpdateDelay;
+            tile.food += (winterGrowRate + (Math.sin((tick / dayLength) * 3.14) + 1) / 2 * (springGrowRate - winterGrowRate)) * mapUpdateDelay;
             // If tile is evergreen //
           } else if (tile.type == 2) {
             // Add food to tile //
@@ -296,7 +296,7 @@ function renderTiles() {
   ctx.drawImage(waterTexture, -cropx - middleX + 1920 / 2 * 100 * zoomLevel, -cropy - middleY - 1079 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
   ctx.drawImage(waterTexture, -cropx - middleX + 1920 / 2 * 100 * zoomLevel, -cropy - middleY + 1080 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
 
-  //let hue = 50 + 50 * (Math.sin(tick / yearLength) + 1) / 2;
+  //let hue = 50 + 50 * (Math.sin(tick / dayLength) + 1) / 2;
   //let huePrefix = "hsl(" + hue + ", ";
 
   for (let row = 0; row < mapSize; row++) {
@@ -391,8 +391,8 @@ function renderUI() {
     ctx.lineWidth = 5;
 
     ctx.textAlign = "left";
-    ctx.strokeText("Year " + (tick / yearLength).toFixed(1), 40, 980);
-    ctx.fillText("Year " + (tick / yearLength).toFixed(1), 40, 980);
+    ctx.strokeText("Day " + (tick / dayLength).toFixed(1), 40, 980);
+    ctx.fillText("Day " + (tick / dayLength).toFixed(1), 40, 980);
 
     ctx.strokeText(population + " Evos", 40, 1040);
     ctx.fillText(population + " Evos", 40, 1040);
@@ -501,7 +501,7 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.gross.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.gross.splice(0, 1);
-        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.gross[i] * energyGraphMult * energyGraphEnergyTotalMult);
+        ctz.lineTo(energyGraphX + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.gross[i] * energyGraphMult * energyGraphEnergyTotalMult);
       }
       ctz.stroke();
 
@@ -509,7 +509,7 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.net.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.net.splice(0, 1);
-        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.net[i] * energyGraphMult);
+        ctz.lineTo(energyGraphX + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.net[i] * energyGraphMult);
       }
       ctz.stroke();
 
@@ -517,7 +517,7 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.metabolism.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.metabolism.splice(0, 1);
-        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.metabolism[i] * energyGraphMult);
+        ctz.lineTo(energyGraphX + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.metabolism[i] * energyGraphMult);
       }
       ctz.stroke();
 
@@ -525,7 +525,7 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.attack.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.attack.splice(0, 1);
-        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.attack[i] * energyGraphMult);
+        ctz.lineTo(energyGraphX + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.attack[i] * energyGraphMult);
       }
       ctz.stroke();
 
@@ -533,7 +533,7 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.move.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.move.splice(0, 1);
-        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.move[i] * energyGraphMult);
+        ctz.lineTo(energyGraphX + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.move[i] * energyGraphMult);
       }
       ctz.stroke();
 
@@ -541,14 +541,14 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.eat.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.eat.splice(0, 1);
-        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.eat[i] * energyGraphMult);
+        ctz.lineTo(energyGraphX + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.eat[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#000000";
       ctz.beginPath();
-      ctz.moveTo(1920 - energyGraphWidth, energyGraphY);
-      ctz.lineTo(1920, energyGraphY);
+      ctz.moveTo(energyGraphX, energyGraphY);
+      ctz.lineTo(energyGraphX + energyGraphWidth, energyGraphY);
       ctz.stroke();
 
       ctz.strokeStyle = "#000000";

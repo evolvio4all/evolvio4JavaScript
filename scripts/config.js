@@ -12,7 +12,7 @@ const maxUpdateTime = 45; // Time between updates before the timescale is decrea
 
 // [DANGER] EXPERIMENTAL //
 const reverseEnabled = false; // My current time reversing solution is very naiive and so it takes up a lot of storage;
-//Will crash by year 300 at most
+//Will crash by day 300 at most
 const ticksPerCapture = 1000; // Number of ticks between frame captures. Only with reverseEnabled.
 //(higher = WAY more CPU intensive, browser will crash above a certain amount); ONLY IF reverseEnabled = true
 
@@ -39,7 +39,7 @@ const maxWaterPercentage = 0.3; // Water % past edge
 const edgeDistance = 0.8; // How far from the center does water start forming
 const edgeSmoothness = 0.0; // How smooth the transition from edge to water is. Reduces the appearance of a circular island.
 
-const yearLength = 400; // Length of the year (in ticks)
+const dayLength = 400; // Length of the day (in ticks)
 
 const mapUpdateDelay = 15; // How many ticks before the map tiles update
 
@@ -75,8 +75,8 @@ const maxCreatureEnergy = 250; // Maximum creature energy
 const energyGraphMult = 50; // Energy graph height multiplier
 const energyGraphEnergyTotalMult = 0.01; // Energy total height on energy graph relative other lines
 const energyGraphSpacing = 2; // Spacing beween points on the energy graph
-const energyGraphWidth = 1920 - 350 * 2; // Width of the energy graph (in pixels, from the rightmost point)
-const energyGraphRightX = 1920 - 350; // X of the RIGHT SIDE of the energyGraph
+const energyGraphWidth = 1920 - 350 - 150; // Width of the energy graph (in pixels, from the rightmost point)
+const energyGraphX = 350; // X of the RIGHT SIDE of the energyGraph
 const energyGraphY = 1080 - 50; // Y of the energyGraph
 
 const energy = {
@@ -129,7 +129,7 @@ let speciesGraphAutoSmooth = false; // Does the smoothness scale over time (make
 let speciesGraphStretch = 1; // How stretched the graph is
 let speciesGraphScrollSpeed = 20; // How fast the species graph dial moves per tick (z / x)
 const speciesGraphX = 350; // Does nothing. I'll do it later // TODO
-const speciesGraphY = 1080 - 250; // Y position of speciesGraph
+const speciesGraphY = 1080 - 125; // Y position of speciesGraph
 const speciesGraphWidth = 1920 - 350 * 2; // Does nothing. I'll do it later // TODO
 
 const minCreaturesForTracking = 5; // Minimum number of population needed for a species to be tracked on the species graph (saves memory)
