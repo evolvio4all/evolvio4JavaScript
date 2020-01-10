@@ -181,7 +181,8 @@ const minMutability = { // Minimum mutability in various categories
     angle: 3,
     distance: 3
   },
-  mutability: 5
+  mutability: 5,
+  biases: 10
 };
 
 const maxMutability = { // Maximum mutability in various categories
@@ -194,7 +195,8 @@ const maxMutability = { // Maximum mutability in various categories
     angle: 5,
     distance: 5
   },
-  mutability: 20
+  mutability: 20,
+  biases: 30
 };
 
 const maxMutabilityChange = 3; // Maximum amount any mutability can change by in a single mutation

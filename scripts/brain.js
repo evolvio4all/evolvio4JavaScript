@@ -367,6 +367,12 @@ function mutate(creature) {
 };
 
 function mutateNet(creature, network) {
+  for (let i = 0; i < creature.biases.length; i++) {
+    if (seededNoiseA() < creature.mutability.biases) {
+      creature.biases[i] += seededNoiseA(-2, 2);
+    }
+  }
+
   for (let brain in network) {
     if (brain == "cellState") break;
     let nbrain = network[brain];

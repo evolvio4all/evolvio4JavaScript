@@ -89,6 +89,7 @@ function reproduce(creature) {
         let child = new Creature(creature.x + (seededNoiseA() * 2 - 1) * 10, creature.y + (seededNoiseA() * 2 - 1) * 10, creature.species, creature.speciesGeneration, creature.color);
 
         child.eyes = [];
+
         let eyes = creature.eyes.length;
         for (let i = 0; i < eyes; i++) {
           let eyeCopy = creature.eyes[i];
@@ -111,7 +112,7 @@ function reproduce(creature) {
         createNeuralNetwork(child, false);
         copyNeuralNetwork(child, creature);
 
-        mutateNet(child.network);
+        mutateNet(child, child.network);
         child.rotation = seededNoiseA() * 2 * Math.PI;
 
         creatures.push(child);
