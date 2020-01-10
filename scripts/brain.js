@@ -21,11 +21,12 @@ function createNeuralNetwork(creature, noiseGroup) {
   // VARIABLES //
   creature.inputs = inputs + creature.eyes.length;
   creature.outputs = outputs;
+  creature.cellStates = outputs;
 
-  let forgetLayers = [creature.inputs, (creature.inputs + creature.outputs) / 2, creature.outputs];
-  let decideLayers = [creature.inputs, (creature.inputs + creature.outputs) / 2, creature.outputs];
-  let modifyLayers = [creature.inputs, (creature.inputs + creature.outputs) / 2, creature.outputs];
-  let layers = [creature.outputs + creature.inputs, (creature.inputs + creature.outputs * 2) / 2, creature.outputs];
+  let forgetLayers = [creature.outputs + creature.cellStates + creature.inputs, 8, creature.outputs];
+  let decideLayers = [creature.outputs + creature.cellStates + creature.inputs, 8, creature.outputs];
+  let modifyLayers = [creature.outputs + creature.inputs, 8, creature.outputs];
+  let layers = [creature.outputs + creature.inputs, 8, creature.outputs];
 
   creature.network = new Network(forgetLayers, decideLayers, modifyLayers, layers, creature.outputs, creature.inputs);
 
@@ -61,7 +62,7 @@ function Network(forget, decide, modify, main, out, inp) {
   for (let i = 0; i < out; i++) this.output.push(0);
 }
 
-initNeurons = function(creature) {
+function initNeurons(creature) {
   for (let brain in creature.network) {
     if (brain == "cellState") break;
     let nbrain = creature.network[brain];
@@ -79,7 +80,7 @@ initNeurons = function(creature) {
   }
 };
 
-initAxons = function(creature, noiseGroup) {
+function initAxons(creature, noiseGroup) {
   for (let brain in creature.network) {
     if (brain == "cellState") break;
     let nbrain = creature.network[brain];
@@ -110,22 +111,6 @@ initAxons = function(creature, noiseGroup) {
       }
 
       nbrain.axons.push(layerWeights);
-
-      layerWeights = [];
-
-      for (let axon = 0; axon < neuronsInNextLayer; axon++) {
-        let weight = 0;
-
-        if (noiseGroup && seededNoiseB() < connectionDensity) {
-          weight = seededNoiseB(-maxInitialAxonValue, maxInitialAxonValue);
-        } else if (!noiseGroup && seededNoiseA() < connectionDensity) {
-          weight = seededNoiseA(-maxInitialAxonValue, maxInitialAxonValue);
-        } else weight = 0;
-
-        layerWeights.push(weight);
-      }
-
-      nbrain.biasAxons.push(layerWeights);
     }
   }
 };
@@ -138,9 +123,9 @@ function feedForward(creature, input) {
   let cellStateLength = network.cellState.length;
 
   feedForget(creature, network, input, inputCount, outputCount, cellStateLength);
-  feedDecide(creature, network, input, inputCount, outputCount);
+  feedDecide(creature, network, input, inputCount, outputCount, cellStateLength);
   feedModify(creature, network, input, inputCount, outputCount, cellStateLength);
-  feedMain(creature, network, input, inputCount, outputCount);
+  feedMain(creature, network, input, inputCount, outputCount, cellStateLength);
 
   return calculateCellState(creature, network, cellStateLength);
 };
@@ -149,7 +134,6 @@ function feedForget(creature, network, input, inputCount, outputCount, cellState
   let nbrain = network.forget;
   let layers = nbrain.layerCount;
 
-  /*
   for (let op = 0; op < outputCount; op++) {
     nbrain.neurons[0][op] = network.output[op] || 0;
   }
@@ -157,10 +141,9 @@ function feedForget(creature, network, input, inputCount, outputCount, cellState
   for (let cs = 0; cs < cellStateLength; cs++) {
     nbrain.neurons[0][outputCount + cs] = network.cellState[cs] || 0;
   }
-  */
 
   for (let i = 0; i < inputCount; i++) {
-    nbrain.neurons[0][ /*outputCount + cellStateLength + */ i] = input[i] || 0;
+    nbrain.neurons[0][outputCount + cellStateLength + i] = input[i] || 0;
   }
 
   let neuronsInNextLayer;
@@ -170,13 +153,8 @@ function feedForget(creature, network, input, inputCount, outputCount, cellState
 
     for (let axon = 0; axon < neuronsInNextLayer; axon++) { // Loops through each axon
       let value = 0;
-
-      for (let neuron = 0; neuron <= neuronsInLayer; neuron++) { // For each axon position (neuron in next layer) loop through all of the neurons in this layer
-        if (neuron == neuronsInLayer) {
-          value += nbrain.biasAxons[layer][axon] * bias; // add bias neuron (independent)
-        } else {
-          value += nbrain.axons[layer][neuron][axon] * nbrain.neurons[layer][neuron]; // add all neuron values times weight of their respective axon
-        }
+      for (let neuron = 0; neuron < neuronsInLayer; neuron++) { // For each axon position (neuron in next layer) loop through all of the neurons in this layer
+        value += nbrain.axons[layer][neuron][axon] * nbrain.neurons[layer][neuron]; // add all neuron values times weight of their respective axon
       }
 
       nbrain.neurons[layer + 1][axon] = 1 / (1 + Math.exp(-value)); // set neuron in next layer value to sigmoid
@@ -184,16 +162,20 @@ function feedForget(creature, network, input, inputCount, outputCount, cellState
   }
 }
 
-feedDecide = function(creature, network, input, inputCount, outputCount) {
+function feedDecide(creature, network, input, inputCount, outputCount, cellStateLength) {
   let nbrain = network.decide;
   let layers = nbrain.layerCount;
 
-  /*for (let op = 0; op < outputCount; op++) {
+  for (let op = 0; op < outputCount; op++) {
     nbrain.neurons[0][op] = network.output[op] || 0;
-  }*/
+  }
+
+  for (let cs = 0; cs < cellStateLength; cs++) {
+    nbrain.neurons[0][outputCount + cs] = network.cellState[cs] || 0;
+  }
 
   for (let i = 0; i < inputCount; i++) {
-    nbrain.neurons[0][ /*outputCount + */ i] = input[i] || 0;
+    nbrain.neurons[0][outputCount + cellStateLength + i] = input[i] || 0;
   }
 
   let neuronsInNextLayer;
@@ -204,12 +186,8 @@ feedDecide = function(creature, network, input, inputCount, outputCount) {
     for (let axon = 0; axon < neuronsInNextLayer; axon++) { // Loops through each axon
       let value = 0;
 
-      for (let neuron = 0; neuron <= neuronsInLayer; neuron++) { // For each axon position (neuron in next layer) loop through all of the neurons in this layer
-        if (neuron == neuronsInLayer) {
-          value += nbrain.biasAxons[layer][axon] * bias; // add bias neuron (independent)
-        } else {
-          value += nbrain.axons[layer][neuron][axon] * nbrain.neurons[layer][neuron]; // add all neuron values times weight of their respective axon
-        }
+      for (let neuron = 0; neuron < neuronsInLayer; neuron++) { // For each axon position (neuron in next layer) loop through all of the neurons in this layer
+        value += nbrain.axons[layer][neuron][axon] * nbrain.neurons[layer][neuron]; // add all neuron values times weight of their respective axon
       }
 
       nbrain.neurons[layer + 1][axon] = approximate_tanh(value);
@@ -217,20 +195,16 @@ feedDecide = function(creature, network, input, inputCount, outputCount) {
   }
 }
 
-feedModify = function(creature, network, input, inputCount, outputCount, cellStateLength) {
+function feedModify(creature, network, input, inputCount, outputCount, cellStateLength) {
   let nbrain = network.modify;
   let layers = nbrain.layerCount;
 
-  /*for (let op = 0; op < outputCount; op++) {
+  for (let op = 0; op < outputCount; op++) {
     nbrain.neurons[0][op] = network.output[op] || 0;
   }
 
-  for (let cs = 0; cs < cellStateLength; cs++) {
-    nbrain.neurons[0][outputCount + cs] = network.cellState[cs] || 0;
-  }*/
-
   for (let i = 0; i < inputCount; i++) {
-    nbrain.neurons[0][ /*outputCount + cellStateLength +*/ i] = input[i] || 0;
+    nbrain.neurons[0][outputCount + i] = input[i] || 0;
   }
 
   let neuronsInNextLayer;
@@ -241,12 +215,8 @@ feedModify = function(creature, network, input, inputCount, outputCount, cellSta
     for (let axon = 0; axon < neuronsInNextLayer; axon++) { // Loops through each axon
       let value = 0;
 
-      for (let neuron = 0; neuron <= neuronsInLayer; neuron++) { // For each axon position (neuron in next layer) loop through all of the neurons in this layer
-        if (neuron == neuronsInLayer) {
-          value += nbrain.biasAxons[layer][axon] * bias; // add bias neuron (independent)
-        } else {
-          value += nbrain.axons[layer][neuron][axon] * nbrain.neurons[layer][neuron]; // add all neuron values times weight of their respective axon
-        }
+      for (let neuron = 0; neuron < neuronsInLayer; neuron++) { // For each axon position (neuron in next layer) loop through all of the neurons in this layer
+        value += nbrain.axons[layer][neuron][axon] * nbrain.neurons[layer][neuron]; // add all neuron values times weight of their respective axon
       }
 
       nbrain.neurons[layer + 1][axon] = 1 / (1 + Math.exp(-value)); // set neuron in next layer value to sigmoid
@@ -254,7 +224,7 @@ feedModify = function(creature, network, input, inputCount, outputCount, cellSta
   }
 }
 
-feedMain = function(creature, network, input, inputCount, outputCount) {
+function feedMain(creature, network, input, inputCount, outputCount, cellStateLength) {
   let nbrain = network.main;
   let layers = nbrain.layerCount;
 
@@ -274,12 +244,8 @@ feedMain = function(creature, network, input, inputCount, outputCount) {
     for (let axon = 0; axon < neuronsInNextLayer; axon++) { // Loops through each axon
       let value = 0;
 
-      for (let neuron = 0; neuron <= neuronsInLayer; neuron++) { // For each axon position (neuron in next layer) loop through all of the neurons in this layer
-        if (neuron == neuronsInLayer) {
-          value += nbrain.biasAxons[layer][axon] * bias; // add bias neuron (independent)
-        } else {
-          value += nbrain.axons[layer][neuron][axon] * nbrain.neurons[layer][neuron]; // add all neuron values times weight of their respective axon
-        }
+      for (let neuron = 0; neuron < neuronsInLayer; neuron++) { // For each axon position (neuron in next layer) loop through all of the neurons in this layer
+        value += nbrain.axons[layer][neuron][axon] * nbrain.neurons[layer][neuron]; // add all neuron values times weight of their respective axon
       }
 
       nbrain.neurons[layer + 1][axon] = 1 / (1 + Math.exp(-value)); // set neuron in next layer value to sigmoid
@@ -287,7 +253,7 @@ feedMain = function(creature, network, input, inputCount, outputCount) {
   }
 }
 
-calculateCellState = function(creature, network, cellStateLength) {
+function calculateCellState(creature, network, cellStateLength) {
   let forgetOutput = network.forget.neurons[network.forget.layerCount - 1];
   let decideOutput = network.decide.neurons[network.decide.layerCount - 1];
   let modifyOutput = network.modify.neurons[network.modify.layerCount - 1];
@@ -303,7 +269,7 @@ calculateCellState = function(creature, network, cellStateLength) {
 }
 
 // Modifies weights of the axons
-mutate = function(creature) {
+function mutate(creature) {
   let mutability = creature.mutability;
 
   let rand = seededNoiseA(0, 100);
@@ -400,7 +366,13 @@ mutate = function(creature) {
   }
 };
 
-mutateNet = function(creature, network) {
+function mutateNet(creature, network) {
+  for (let i = 0; i < creature.biases.length; i++) {
+    if (seededNoiseA() < creature.mutability.biases) {
+      creature.biases[i] += seededNoiseA(-2, 2);
+    }
+  }
+
   for (let brain in network) {
     if (brain == "cellState") break;
     let nbrain = network[brain];
@@ -411,21 +383,12 @@ mutateNet = function(creature, network) {
       let neuronsInNextLayer = nbrain.layers[layer + 1];
 
       for (let axon = 0; axon < neuronsInNextLayer; axon++) {
-        for (let neuron = 0; neuron <= neurons; neuron++) {
+        for (let neuron = 0; neuron < neurons; neuron++) {
           let randomNumber = seededNoiseA(0, 100);
-
-          if (neuron == neurons) {
-            if (randomNumber < creature.mutability.brain / 2) {
-              nbrain.biasAxons[layer][axon] += seededNoiseA(-stepAmount, stepAmount);
-            } else if (randomNumber < creature.mutability.brain) {
-              nbrain.biasAxons[layer][axon] = 0;
-            }
-          } else {
-            if (randomNumber < creature.mutability.brain / 2) {
-              nbrain.axons[layer][neuron][axon] += seededNoiseA(-stepAmount, stepAmount);
-            } else if (randomNumber < creature.mutability.brain) {
-              nbrain.axons[layer][neuron][axon] = 0;
-            }
+          if (randomNumber < creature.mutability.brain / 1.2) {
+            nbrain.axons[layer][neuron][axon] += seededNoiseA(-stepAmount, stepAmount);
+          } else if (randomNumber < creature.mutability.brain) {
+            nbrain.axons[layer][neuron][axon] = 0;
           }
         }
       }
@@ -433,7 +396,7 @@ mutateNet = function(creature, network) {
   }
 }
 
-copyNeuralNetwork = function(creature, copy) {
+function copyNeuralNetwork(creature, copy) {
   for (let brain in creature.network) {
     if (brain == "cellState") break;
     let netw = copy.network[brain].layers[0] < creature.network[brain].layers[0] ? copy.network[brain] : creature.network[brain];

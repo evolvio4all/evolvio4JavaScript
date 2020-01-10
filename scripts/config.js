@@ -1,4 +1,4 @@
-﻿// GLOBAL //
+// GLOBAL //
 let seed = prompt("Seed?");
 
 if (seed == "" || seed == null) seed = Math.floor(Math.random() * 99999);
@@ -12,7 +12,7 @@ const maxUpdateTime = 45; // Time between updates before the timescale is decrea
 
 // [DANGER] EXPERIMENTAL //
 const reverseEnabled = false; // My current time reversing solution is very naiive and so it takes up a lot of storage;
-//Will crash by year 300 at most
+//Will crash by day 300 at most
 const ticksPerCapture = 1000; // Number of ticks between frame captures. Only with reverseEnabled.
 //(higher = WAY more CPU intensive, browser will crash above a certain amount); ONLY IF reverseEnabled = true
 
@@ -21,10 +21,10 @@ const mapSize = 120; // Size of the map (height and width) in tiles
 const tileSize = 400; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
-const maxTileFood = 100; // Maximum food on a tile
+const maxTileFood = 20; // Maximum food on a tile
 
 const springGrowRate = 0.02; // Grow amount in spring season (applies to all tiles)
-const winterGrowRate = -0.01; // Grow amount in winter season (applies to all tiles)
+const winterGrowRate = -0.005; // Grow amount in winter season (applies to all tiles)
 
 const grassSpreadRate = 0.00025; // % difference between tiles grass spread rate
 
@@ -34,20 +34,26 @@ const everGreenPercentage = 0.8; // % of food tiles (within the central area) th
 const everGreenGrowModifier = 0.7; // % speed evergreen tiles grow compared to normal tiles
 const everGreenMaxFoodModifier = 1.2; // % maximum food is modified by on evergreen tiles
 
-const mapComplexity = 2.2; // How complex the map is. Breaks below 1
-const maxWaterPercentage = 0.3; // Water % past edge
-const edgeDistance = 0.8; // How far from the center does water start forming
-const edgeSmoothness = 0.0; // How smooth the transition from edge to water is. Reduces the appearance of a circular island.
+const firstMapFrequency = 3;
+const firstMapImpact = 1 / 2;
 
-const yearLength = 1800; // Length of the year (in ticks)
+const secondMapFrequency = 2;
+const secondMapImpact = 1 / 4;
+
+const thirdMapFrequency = 9;
+const thirdMapImpact = 1 / 8;
+
+const edgeDistanceImpact = 0.5; // How far from the center does water start forming
+
+const dayLength = 400; // Length of the day (in ticks)
 
 const mapUpdateDelay = 15; // How many ticks before the map tiles update
 
 // CREATURES //
 
 // Global //
-const minCreatures = 50; // Minimum number of creatures
-const minFirstGen = 50; // Minimum number of first generation creatures
+const minCreatures = 25; // Minimum number of creatures
+const minFirstGen = 25; // Minimum number of first generation creatures
 
 const creatureLimit = 5000; // Maximum number of creatures (when population = creatureLimit, the game pauses)
 const foodImposedCreatureLimit = 800; // Maximum number of creatures before food stops growing (when population = foodBasedCreatureLimit, food stops growing)
@@ -71,9 +77,13 @@ const initEyeDistanceH = 6; // Maximum distance an "eye" can be from a creature 
 const initEyeDistanceV = 3; // Maximum distance an "eye" can be from a creature in tiles to either side initially
 
 // Energy //
-const maxCreatureEnergy = 80; // Maximum creature energy
-const energyGraphMult = 100; // Energy graph height multiplier
-const energyGraphWidth = 2; // Width of the energy graph
+const maxCreatureEnergy = 250; // Maximum creature energy
+const energyGraphMult = 50; // Energy graph height multiplier
+const energyGraphEnergyTotalMult = 0.01; // Energy total height on energy graph relative other lines
+const energyGraphSpacing = 2; // Spacing beween points on the energy graph
+const energyGraphWidth = 1920 - 350 - 150; // Width of the energy graph (in pixels, from the rightmost point)
+const energyGraphX = 350; // X of the RIGHT SIDE of the energyGraph
+const energyGraphY = 1080 - 50; // Y of the energyGraph
 
 const energy = {
   eat: 0.25, // Energy cost to eat at eatPower
@@ -91,13 +101,13 @@ const eatPower = 1; // Eating speed %
 const eatDiminishingRate = 3; // Determines how uniformly diminishing returns are applied on eating; Higher is less diminishing; 0 is none; 1 is linear; (based on food on the tile / maxTileFood). Math.pow(tile.food / maxTileFood, eatDiminishingReturns)
 
 // Metabolism //
-const metabolismScaleTime = 3600; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
+const metabolismScaleTime = 1800; // How long it takes for metabolism to scale to maxMetabolism; Effectively lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
 const metabolismScaleScale = 10; // Determines how uniformly metabolism increases. 1 is linear; Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
 const sizeMetabolismFactor = 0; // % how much size affects metabolism (creature size / maxCreatureSize)
 const weightMetabolismFactor = 0; // % how much energy affects metabolism (creature energy / maxCreatureEnergy)
 
-const minMetabolism = 0.05; // Initial metabolism
-const maxMetabolism = 0.8; // End metabolism (metabolism when age == metabolismScaleTime)
+const minMetabolism = 0.1; // Initial metabolism
+const maxMetabolism = 0.25; // End metabolism (metabolism when age == metabolismScaleTime)
 
 // Movement //
 const maxCreatureSpeed = 300; // Maximum creature speed (maxCreatureSpeed = maxAcceleration / friction)
@@ -119,11 +129,14 @@ const speciesColorChange = 20; // Color change between species
 
 const speciesGraphDetail = 50; // Higher = less detail (in ticks). Down to 1. High detail takes up a lot of memory after a while
 let speciesGraphMult = 1; // Height of species graph
-let speciesGraphAutoMult = false; // Is the graph height adjusted automatically (default: true)
+let speciesGraphAutoMult = false; // Is the graph height adjusted automatically (default: false)
 let speciesGraphSmooth = 1; // Smoothness of the species graph, averages the the graph points
 let speciesGraphAutoSmooth = false; // Does the smoothness scale over time (makes the species graph less spikey over time) (default: false)
 let speciesGraphStretch = 1; // How stretched the graph is
-let speciesGraphScrollSpeed = 20;
+let speciesGraphScrollSpeed = 20; // How fast the species graph dial moves per tick (z / x)
+const speciesGraphX = 350; // Does nothing. I'll do it later // TODO
+const speciesGraphY = 1080 - 175; // Y position of speciesGraph
+const speciesGraphWidth = 1920 - 350 * 2; // Does nothing. I'll do it later // TODO
 
 const minCreaturesForTracking = 5; // Minimum number of population needed for a species to be tracked on the species graph (saves memory)
 const speciesAccuracy = 5; // How many times to run a feedforward and detect a species (increases geneticID length by about 25)
@@ -139,8 +152,8 @@ const maxChildEnergy = 0.7; // Max % of creatures energy to be given to a single
 
 const minSpawnPower = -0.8; // Minimum output to reproduce (anything lower will be considered 0)
 
-const reproduceAge = 1800; // Minimum number of ticks before a creature can spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
-const minReproduceTime = 900; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
+const reproduceAge = 500; // Minimum number of ticks before a creature can spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+const minReproduceTime = 400; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Attacking //
 const minAttackPower = 0.35; // Minimum attack strength (anything lower will be considered 0)
@@ -156,7 +169,7 @@ const maxEyeDistanceChange = 300; // Maxmimum distance an eye can change distanc
 // ADVANCED //
 
 // Neural Network //
-const bias = 1.648; // Multiplied by the weight of a bias axon
+const biases = 3;
 
 const minMutability = { // Minimum mutability in various categories
   brain: 3,
@@ -168,7 +181,8 @@ const minMutability = { // Minimum mutability in various categories
     angle: 3,
     distance: 3
   },
-  mutability: 5
+  mutability: 5,
+  biases: 10
 };
 
 const maxMutability = { // Maximum mutability in various categories
@@ -181,7 +195,8 @@ const maxMutability = { // Maximum mutability in various categories
     angle: 5,
     distance: 5
   },
-  mutability: 20
+  mutability: 20,
+  biases: 30
 };
 
 const maxMutabilityChange = 3; // Maximum amount any mutability can change by in a single mutation
@@ -216,16 +231,16 @@ const controls = {
   auto: "up",
   info: "i",
   speciesGraphMode: "s",
-  speciesGraphLeft: "a",
-  speciesGraphRight: "d",
-  speciesGraphDial: "q"
+  speciesGraphLeft: "z",
+  speciesGraphRight: "x",
+  speciesGraphDial: "c"
 };
 
 const nnui = { // Neural network UI config
   xoffset: 1920 - 100,
   yoffset: 70,
   xspacing: 10,
-  yspacing: 100,
+  yspacing: 70,
   size: 18,
   stroke: true,
   maxLineSize: 10,

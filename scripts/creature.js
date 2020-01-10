@@ -19,7 +19,8 @@ function Creature(x, y, spec, specGen, color) {
       angle: 0,
       distance: 0
     },
-    mutability: 0
+    mutability: 0,
+    biases: 0
   };
 
   this.energyGraph = {
@@ -64,6 +65,13 @@ function Creature(x, y, spec, specGen, color) {
   population++;
 
   this.eyes = makeEyes(false);
+
+  this.biases = [];
+
+  for (let b = 0; b < biases; b++) {
+    this.biases.push(Math.random() * 2 - 1);
+  }
+
   createNeuralNetwork(this, false);
 
   this.rotation = 0;
@@ -162,7 +170,8 @@ function randomize(creature) {
       angle: seededNoiseB(minMutability.eyes.angle, maxMutability.eyes.angle),
       distance: seededNoiseB(minMutability.eyes.distance, maxMutability.eyes.distance)
     },
-    mutability: seededNoiseB(minMutability.mutability, maxMutability.mutability)
+    mutability: seededNoiseB(minMutability.mutability, maxMutability.mutability),
+    biases: seededNoiseB(minMutability.biases, maxMutability.biases)
   };
 
   creature.energyGraph = {
@@ -196,6 +205,12 @@ function randomize(creature) {
 
   creature.eyes = makeEyes(true);
 
+  creature.biases = [];
+
+  for (let b = 0; b < biases; b++) {
+    creature.biases.push(Math.random() * 2 - 1);
+  }
+
   createNeuralNetwork(creature, true);
 
   creature.geneticID = "";
@@ -212,8 +227,6 @@ function randomize(creature) {
   creature.rotation = seededNoiseB() * 2 * Math.PI;
 
   firstGen++;
-
-  //console.log(creature.species + " " + grvb);
 };
 
 function getPosition(creature) {

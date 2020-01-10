@@ -43,7 +43,7 @@ let energyGraph = {
 
 let season = 0;
 let seasonUp = true;
-let year = 0;
+let day = 0;
 
 let highestSimulatedTick = 0;
 
