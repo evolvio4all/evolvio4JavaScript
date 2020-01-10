@@ -1,4 +1,4 @@
-eat = function(creature, tile) {
+function eat(creature, tile) {
   let eatp = creature.output[2];
 
   if (eatp < minEatPower) {
@@ -29,7 +29,7 @@ eat = function(creature, tile) {
   }
 };
 
-metabolize = function(creature) {
+function metabolize(creature) {
   let timeScalar = Math.min(Math.pow(creature.age / metabolismScaleTime, metabolismScaleScale), 1);
   let sizeScalar = (1 - sizeMetabolismFactor) + ((creature.size - minCreatureSize) / maxCreatureSize) * sizeMetabolismFactor;
   let weightScalar = (1 - weightMetabolismFactor) + (creature.energy / maxCreatureEnergy) * weightMetabolismFactor;
@@ -40,7 +40,7 @@ metabolize = function(creature) {
   creature.energyGraph.metabolism.push(parseFloat(tenergy.toFixed(2)));
 };
 
-move = function(creature) {
+function move(creature) {
   if (!creature.rotateTime) creature.rotateTime = 1;
 
   let tenergy = 0;
@@ -66,7 +66,6 @@ move = function(creature) {
 
     creature.velocity.x += Math.cos(creature.rotation) * acceleration;
     creature.velocity.y += Math.sin(creature.rotation) * acceleration;
-
   }
 
   creature.energy += tenergy;
@@ -74,7 +73,7 @@ move = function(creature) {
   creature.energyGraph.move.push(parseFloat(tenergy.toFixed(2)));
 };
 
-reproduce = function(creature) {
+function reproduce(creature) {
   if (creature.output[4] < minSpawnPower) {
     //creature.energyGraph.spawn.push(0);
     return;
@@ -82,9 +81,9 @@ reproduce = function(creature) {
 
   let tenergy = 0;
   let randomNum = seededNoiseA();
-	
+
   // Random number added to desynchronize births (theoretically this would happen over time naturally, but it would take a long time and synchronized birth has an undesired impacts on user-experience)
-  if (creature.age > reproduceAge && creature.reproduceTime > minReproduceTime && randomNum < 0.001) {
+  if (creature.age > reproduceAge && creature.reproduceTime > minReproduceTime && randomNum < 0.5) {
     for (let i = 0; i < creature.children; i++) {
       if (creature.energy > maxCreatureEnergy * creature.childEnergy) {
         let child = new Creature(creature.x + (seededNoiseA() * 2 - 1) * 10, creature.y + (seededNoiseA() * 2 - 1) * 10, creature.species, creature.speciesGeneration, creature.color);
@@ -127,7 +126,7 @@ reproduce = function(creature) {
   //creature.energyGraph.spawn.push(parseFloat(tenergy.toFixed(2)));
 };
 
-die = function(creature) {
+function die(creature) {
   if (specieslist[creature.species]) {
     let con = specieslist[creature.species].contains.indexOf(creature);
     specieslist[creature.species].contains.splice(con, 1);
@@ -151,7 +150,7 @@ die = function(creature) {
   }
 };
 
-attack = function(creature) {
+function attack(creature) {
   let att = creature.output[3];
 
   if (att < minAttackPower) {
@@ -179,7 +178,7 @@ attack = function(creature) {
   creature.energyGraph.attack.push(parseFloat(tenergy.toFixed(2)));
 };
 
-adjustEyes = function(creature) {
+function adjustEyes(creature) {
   let eyes = creature.eyes;
   for (let i = 0; i < eyes.length; i++) {
     let eye = eyes[i];

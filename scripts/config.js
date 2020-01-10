@@ -1,4 +1,4 @@
-﻿// GLOBAL //
+// GLOBAL //
 let seed = prompt("Seed?");
 
 if (seed == "" || seed == null) seed = Math.floor(Math.random() * 99999);
@@ -21,10 +21,10 @@ const mapSize = 120; // Size of the map (height and width) in tiles
 const tileSize = 400; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
-const maxTileFood = 100; // Maximum food on a tile
+const maxTileFood = 20; // Maximum food on a tile
 
 const springGrowRate = 0.02; // Grow amount in spring season (applies to all tiles)
-const winterGrowRate = -0.01; // Grow amount in winter season (applies to all tiles)
+const winterGrowRate = -0.005; // Grow amount in winter season (applies to all tiles)
 
 const grassSpreadRate = 0.00025; // % difference between tiles grass spread rate
 
@@ -34,20 +34,20 @@ const everGreenPercentage = 0.8; // % of food tiles (within the central area) th
 const everGreenGrowModifier = 0.7; // % speed evergreen tiles grow compared to normal tiles
 const everGreenMaxFoodModifier = 1.2; // % maximum food is modified by on evergreen tiles
 
-const mapComplexity = 2.2; // How complex the map is. Breaks below 1
+const mapComplexity = 1.7; // How complex the map is. Breaks below 1
 const maxWaterPercentage = 0.3; // Water % past edge
 const edgeDistance = 0.8; // How far from the center does water start forming
 const edgeSmoothness = 0.0; // How smooth the transition from edge to water is. Reduces the appearance of a circular island.
 
-const yearLength = 1800; // Length of the year (in ticks)
+const yearLength = 400; // Length of the year (in ticks)
 
 const mapUpdateDelay = 15; // How many ticks before the map tiles update
 
 // CREATURES //
 
 // Global //
-const minCreatures = 50; // Minimum number of creatures
-const minFirstGen = 50; // Minimum number of first generation creatures
+const minCreatures = 25; // Minimum number of creatures
+const minFirstGen = 25; // Minimum number of first generation creatures
 
 const creatureLimit = 5000; // Maximum number of creatures (when population = creatureLimit, the game pauses)
 const foodImposedCreatureLimit = 800; // Maximum number of creatures before food stops growing (when population = foodBasedCreatureLimit, food stops growing)
@@ -71,9 +71,11 @@ const initEyeDistanceH = 6; // Maximum distance an "eye" can be from a creature 
 const initEyeDistanceV = 3; // Maximum distance an "eye" can be from a creature in tiles to either side initially
 
 // Energy //
-const maxCreatureEnergy = 80; // Maximum creature energy
-const energyGraphMult = 100; // Energy graph height multiplier
-const energyGraphWidth = 2; // Width of the energy graph
+const maxCreatureEnergy = 250; // Maximum creature energy
+const energyGraphMult = 50; // Energy graph height multiplier
+const energyGraphEnergyTotalMult = 0.01; // Energy total height on energy graph relative other lines
+const energyGraphSpacing = 2; // Spacing beween points on the energy graph
+const energyGraphWidth = 1700; // Width of the energy graph (in pixels, from the rightmost point)
 
 const energy = {
   eat: 0.25, // Energy cost to eat at eatPower
@@ -91,13 +93,13 @@ const eatPower = 1; // Eating speed %
 const eatDiminishingRate = 3; // Determines how uniformly diminishing returns are applied on eating; Higher is less diminishing; 0 is none; 1 is linear; (based on food on the tile / maxTileFood). Math.pow(tile.food / maxTileFood, eatDiminishingReturns)
 
 // Metabolism //
-const metabolismScaleTime = 3600; // Max lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
+const metabolismScaleTime = 1800; // How long it takes for metabolism to scale to maxMetabolism; Effectively lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
 const metabolismScaleScale = 10; // Determines how uniformly metabolism increases. 1 is linear; Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
 const sizeMetabolismFactor = 0; // % how much size affects metabolism (creature size / maxCreatureSize)
 const weightMetabolismFactor = 0; // % how much energy affects metabolism (creature energy / maxCreatureEnergy)
 
-const minMetabolism = 0.05; // Initial metabolism
-const maxMetabolism = 0.8; // End metabolism (metabolism when age == metabolismScaleTime)
+const minMetabolism = 0.1; // Initial metabolism
+const maxMetabolism = 0.25; // End metabolism (metabolism when age == metabolismScaleTime)
 
 // Movement //
 const maxCreatureSpeed = 300; // Maximum creature speed (maxCreatureSpeed = maxAcceleration / friction)
@@ -139,8 +141,8 @@ const maxChildEnergy = 0.7; // Max % of creatures energy to be given to a single
 
 const minSpawnPower = -0.8; // Minimum output to reproduce (anything lower will be considered 0)
 
-const reproduceAge = 1800; // Minimum number of ticks before a creature can spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
-const minReproduceTime = 900; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
+const reproduceAge = 500; // Minimum number of ticks before a creature can spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+const minReproduceTime = 400; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 // Attacking //
 const minAttackPower = 0.35; // Minimum attack strength (anything lower will be considered 0)
@@ -156,7 +158,7 @@ const maxEyeDistanceChange = 300; // Maxmimum distance an eye can change distanc
 // ADVANCED //
 
 // Neural Network //
-const bias = 1.648; // Multiplied by the weight of a bias axon
+const biases = 3;
 
 const minMutability = { // Minimum mutability in various categories
   brain: 3,
@@ -225,7 +227,7 @@ const nnui = { // Neural network UI config
   xoffset: 1920 - 100,
   yoffset: 70,
   xspacing: 10,
-  yspacing: 100,
+  yspacing: 70,
   size: 18,
   stroke: true,
   maxLineSize: 10,

@@ -66,6 +66,12 @@ function Creature(x, y, spec, specGen, color) {
   this.eyes = makeEyes(false);
   createNeuralNetwork(this, false);
 
+  this.biases = [];
+
+  for (let b = 0; b < biases; b++) {
+    this.biases.push(Math.random() * 2 - 1);
+  }
+
   this.rotation = 0;
   this.species = setSpecies(this, spec, false);
 
@@ -207,6 +213,12 @@ function randomize(creature) {
   creature.species = setSpecies(creature, "undefined", true);
 
   creature.isEating = false;
+
+  creature.biases = [];
+
+  for (let b = 0; b < biases; b++) {
+    creature.biases.push(Math.random() * 2 - 1);
+  }
 
   creature.firstGen = true;
   creature.rotation = seededNoiseB() * 2 * Math.PI;

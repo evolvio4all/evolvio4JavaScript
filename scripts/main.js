@@ -1,9 +1,9 @@
 function main() {
-  if (cropy / zoomLevel > 80000) cropy = -50000 * zoomLevel;
-  else if (cropy / zoomLevel < -80000) cropy = 50000 * zoomLevel;
+  if (cropy / zoomLevel > 70000) cropy = -60000 * zoomLevel;
+  else if (cropy / zoomLevel < -70000) cropy = 60000 * zoomLevel;
 
-  if (cropx / zoomLevel > 140000) cropx = -100000 * zoomLevel;
-  else if (cropx / zoomLevel < -140000) cropx = 100000 * zoomLevel;
+  if (cropx / zoomLevel > 120000 - 1920 * 3) cropx = (-120000 - 1920 * 3) * zoomLevel;
+  else if (cropx / zoomLevel < -120000 - 1920 * 3) cropx = (120000 - 1920 * 3) * zoomLevel;
 
   if (speciesGraphAutoSmooth) {
     speciesGraphSmooth = Math.ceil(1 + tick / 20000);
@@ -105,10 +105,16 @@ function update() {
 
   tick++;
 
-  waterScrollX += waterDirection * 2 - 1;
-  waterScrollY += waterDirection * 2 - 1;
+  waterScrollX += 20;
+  waterScrollY += 20;
 
-  if (Math.abs(waterScrollX) > 1000) waterDirection = !waterDirection;
+  if (waterScrollX >= 23850 - 1920 * 4) {
+    waterScrollX = -23850 - 1920 * 4;
+  }
+
+  if (waterScrollY >= 13475) {
+    waterScrollY = -13475;
+  }
 
   if (tick % speciesGraphDetail == 0) {
     let stackedThisTick = 0;
@@ -206,6 +212,10 @@ function updateCreaturesBrain() {
 
     creature.input = [time, rotation, energy, age, velx, vely];
 
+    for (let i = 0; i < biases; i++) {
+      creature.input.push(creature.biases[i]);
+    }
+
     let vision = see(creature);
     for (let i = 0; i < vision.length; i++) {
       creature.input.push(vision[i]);
@@ -232,7 +242,7 @@ function updateCreaturesFinal() {
     }
 
     if (creature.energy > maxCreatureEnergy) {
-    	creature.energy = maxCreatureEnergy;
+      creature.energy = maxCreatureEnergy;
     }
   }
 }
@@ -278,12 +288,12 @@ function renderClear() {
 }
 
 function renderTiles() {
-  let middleX = (waterScrollX * 20 + 1920 / 2 * 100 - tileSize * mapSize / 2) * zoomLevel;
-  let middleY = (waterScrollY * 10 + 1080 / 2 * 100 - tileSize * mapSize / 2) * zoomLevel;
+  let middleX = (waterScrollX + 1920 / 2 * 100 - tileSize * mapSize / 2) * zoomLevel;
+  let middleY = (waterScrollY + 1080 / 2 * 100 - tileSize * mapSize / 2) * zoomLevel;
 
-  ctx.drawImage(waterTexture, -cropx - middleX - 1920 / 2 * 100 * zoomLevel, -cropy - middleY - 1080 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
-  ctx.drawImage(waterTexture, -cropx - middleX - 1920 / 2 * 100 * zoomLevel, -cropy - middleY + 1080 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
-  ctx.drawImage(waterTexture, -cropx - middleX + 1920 / 2 * 100 * zoomLevel, -cropy - middleY - 1080 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
+  ctx.drawImage(waterTexture, -cropx - middleX - 1919 / 2 * 100 * zoomLevel, -cropy - middleY - 1079 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
+  ctx.drawImage(waterTexture, -cropx - middleX - 1919 / 2 * 100 * zoomLevel, -cropy - middleY + 1080 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
+  ctx.drawImage(waterTexture, -cropx - middleX + 1920 / 2 * 100 * zoomLevel, -cropy - middleY - 1079 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
   ctx.drawImage(waterTexture, -cropx - middleX + 1920 / 2 * 100 * zoomLevel, -cropy - middleY + 1080 / 2 * 100 * zoomLevel, 1920 * 100 * zoomLevel, 1080 * 100 * zoomLevel);
 
   //let hue = 50 + 50 * (Math.sin(tick / yearLength) + 1) / 2;
@@ -461,7 +471,7 @@ function renderSelectedCreature() {
       }
 
       for (let j = 0; j < selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1].length; j++) {
-        ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
+        ctz.fillCircle(nnui.xoffset - (nnui.size + 5) * 11, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset, nnui.size, nnui.stroke);
       }
 
       for (let j = 0; j < selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1].length; j++) {
@@ -485,55 +495,55 @@ function renderSelectedCreature() {
       ctz.strokeStyle = "#ffffff";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.gross.length - 1; i >= 0; i--) {
-        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.gross.splice(0, 1);
-        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.gross[i] * energyGraphMult / 10);
+        if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.gross.splice(0, 1);
+        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.gross[i] * energyGraphMult * energyGraphEnergyTotalMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#aaffff";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.net.length - 1; i >= 0; i--) {
-        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.net.splice(0, 1);
-        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.net[i] * energyGraphMult);
+        if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.net.splice(0, 1);
+        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.net[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#ffaa00";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.metabolism.length - 1; i >= 0; i--) {
-        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.metabolism.splice(0, 1);
-        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.metabolism[i] * energyGraphMult);
+        if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.metabolism.splice(0, 1);
+        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.metabolism[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#ff2233";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.attack.length - 1; i >= 0; i--) {
-        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.attack.splice(0, 1);
-        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.attack[i] * energyGraphMult);
+        if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.attack.splice(0, 1);
+        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.attack[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#aa88ff";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.move.length - 1; i >= 0; i--) {
-        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.move.splice(0, 1);
-        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.move[i] * energyGraphMult);
+        if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.move.splice(0, 1);
+        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.move[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#00ff00";
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.eat.length - 1; i >= 0; i--) {
-        if (i > 1400 / energyGraphWidth) selectedCreature.energyGraph.eat.splice(0, 1);
-        ctz.lineTo(i * energyGraphWidth, 900 - selectedCreature.energyGraph.eat[i] * energyGraphMult);
+        if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.eat.splice(0, 1);
+        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.eat[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#000000";
       ctz.beginPath();
-      ctz.moveTo(0, 900);
-      ctz.lineTo(1400, 900);
+      ctz.moveTo(1920 - energyGraphWidth, 1000);
+      ctz.lineTo(1920, 1000);
       ctz.stroke();
 
       ctz.strokeStyle = "#000000";
@@ -580,7 +590,7 @@ function renderSelectedCreature() {
       }
 
       for (let j = 0; j < selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1].length; j++) {
-        ctz.fillText(selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 10, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
+        ctz.fillText(selectedCreature.network.forget.neurons[selectedCreature.network.forget.neurons.length - 1][j].toFixed(1), nnui.xoffset - (nnui.size + 5) * 11, j * (nnui.size * 2 + nnui.yspacing) + nnui.yoffset + 6);
       }
 
       for (let j = 0; j < selectedCreature.network.decide.neurons[selectedCreature.network.decide.neurons.length - 1].length; j++) {
