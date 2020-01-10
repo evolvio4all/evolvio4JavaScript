@@ -385,12 +385,17 @@ function renderUI() {
     ctz.font = "48px Calibri";
     ctz.lineWidth = 5;
 
-    ctz.textAlign = "left";
-    ctz.strokeText("Year " + (tick / yearLength).toFixed(1), 40, 980);
-    ctz.fillText("Year " + (tick / yearLength).toFixed(1), 40, 980);
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = "#000000";
+    ctx.font = "48px Calibri";
+    ctx.lineWidth = 5;
 
-    ctz.strokeText(population + " Evos", 40, 1040);
-    ctz.fillText(population + " Evos", 40, 1040);
+    ctx.textAlign = "left";
+    ctx.strokeText("Year " + (tick / yearLength).toFixed(1), 40, 980);
+    ctx.fillText("Year " + (tick / yearLength).toFixed(1), 40, 980);
+
+    ctx.strokeText(population + " Evos", 40, 1040);
+    ctx.fillText(population + " Evos", 40, 1040);
 
     if (timescale != 1) {
       ctz.textAlign = "right";
@@ -496,7 +501,7 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.gross.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.gross.splice(0, 1);
-        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.gross[i] * energyGraphMult * energyGraphEnergyTotalMult);
+        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.gross[i] * energyGraphMult * energyGraphEnergyTotalMult);
       }
       ctz.stroke();
 
@@ -504,7 +509,7 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.net.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.net.splice(0, 1);
-        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.net[i] * energyGraphMult);
+        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.net[i] * energyGraphMult);
       }
       ctz.stroke();
 
@@ -512,7 +517,7 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.metabolism.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.metabolism.splice(0, 1);
-        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.metabolism[i] * energyGraphMult);
+        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.metabolism[i] * energyGraphMult);
       }
       ctz.stroke();
 
@@ -520,7 +525,7 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.attack.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.attack.splice(0, 1);
-        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.attack[i] * energyGraphMult);
+        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.attack[i] * energyGraphMult);
       }
       ctz.stroke();
 
@@ -528,7 +533,7 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.move.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.move.splice(0, 1);
-        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.move[i] * energyGraphMult);
+        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.move[i] * energyGraphMult);
       }
       ctz.stroke();
 
@@ -536,14 +541,14 @@ function renderSelectedCreature() {
       ctz.beginPath();
       for (let i = selectedCreature.energyGraph.eat.length - 1; i >= 0; i--) {
         if (i > energyGraphWidth / energyGraphSpacing) selectedCreature.energyGraph.eat.splice(0, 1);
-        ctz.lineTo((1920 - energyGraphWidth) + i * energyGraphSpacing, 1000 - selectedCreature.energyGraph.eat[i] * energyGraphMult);
+        ctz.lineTo((energyGraphRightX - energyGraphWidth) + i * energyGraphSpacing, energyGraphY - selectedCreature.energyGraph.eat[i] * energyGraphMult);
       }
       ctz.stroke();
 
       ctz.strokeStyle = "#000000";
       ctz.beginPath();
-      ctz.moveTo(1920 - energyGraphWidth, 1000);
-      ctz.lineTo(1920, 1000);
+      ctz.moveTo(1920 - energyGraphWidth, energyGraphY);
+      ctz.lineTo(1920, energyGraphY);
       ctz.stroke();
 
       ctz.strokeStyle = "#000000";
@@ -620,7 +625,6 @@ function renderSelectedCreature() {
 function renderSpeciesGraph() {
   if (speciesGraph.length == 0) return;
 
-  ctz.lineWidth = 1;
   ctz.strokeStyle = "black";
   ctz.lineCap = "bevel";
   ctz.lineJoin = "round"
@@ -641,18 +645,19 @@ function renderSpeciesGraph() {
       }
       average /= speciesGraphSmooth;
 
-      ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + j * speciesGraphStretch + speciesGraphDial, 980 - average * speciesGraphMult);
+      ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + j * speciesGraphStretch + speciesGraphDial, speciesGraphY - average * speciesGraphMult);
     }
 
-    ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + speciesGraph[i].length * speciesGraphStretch + speciesGraphDial, 980);
+    ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + speciesGraph[i].length * speciesGraphStretch + speciesGraphDial, speciesGraphY);
 
-    ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + speciesGraphDial, 980);
-    ctz.stroke();
+    ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + speciesGraphDial, speciesGraphY);
     ctz.fill();
   }
 
+  ctz.lineWidth = 1;
+
   ctz.beginPath();
-  ctz.moveTo(0, 980);
-  ctz.lineTo(1920, 980);
+  ctz.moveTo(0, speciesGraphY);
+  ctz.lineTo(1920, speciesGraphY);
   ctz.stroke();
 }

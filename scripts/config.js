@@ -75,7 +75,9 @@ const maxCreatureEnergy = 250; // Maximum creature energy
 const energyGraphMult = 50; // Energy graph height multiplier
 const energyGraphEnergyTotalMult = 0.01; // Energy total height on energy graph relative other lines
 const energyGraphSpacing = 2; // Spacing beween points on the energy graph
-const energyGraphWidth = 1700; // Width of the energy graph (in pixels, from the rightmost point)
+const energyGraphWidth = 1920 - 350 * 2; // Width of the energy graph (in pixels, from the rightmost point)
+const energyGraphRightX = 1920 - 350; // X of the RIGHT SIDE of the energyGraph
+const energyGraphY = 1080 - 50; // Y of the energyGraph
 
 const energy = {
   eat: 0.25, // Energy cost to eat at eatPower
@@ -121,11 +123,14 @@ const speciesColorChange = 20; // Color change between species
 
 const speciesGraphDetail = 50; // Higher = less detail (in ticks). Down to 1. High detail takes up a lot of memory after a while
 let speciesGraphMult = 1; // Height of species graph
-let speciesGraphAutoMult = false; // Is the graph height adjusted automatically (default: true)
+let speciesGraphAutoMult = false; // Is the graph height adjusted automatically (default: false)
 let speciesGraphSmooth = 1; // Smoothness of the species graph, averages the the graph points
 let speciesGraphAutoSmooth = false; // Does the smoothness scale over time (makes the species graph less spikey over time) (default: false)
 let speciesGraphStretch = 1; // How stretched the graph is
-let speciesGraphScrollSpeed = 20;
+let speciesGraphScrollSpeed = 20; // How fast the species graph dial moves per tick (z / x)
+const speciesGraphX = 350; // Does nothing. I'll do it later // TODO
+const speciesGraphY = 1080 - 250; // Y position of speciesGraph
+const speciesGraphWidth = 1920 - 350 * 2; // Does nothing. I'll do it later // TODO
 
 const minCreaturesForTracking = 5; // Minimum number of population needed for a species to be tracked on the species graph (saves memory)
 const speciesAccuracy = 5; // How many times to run a feedforward and detect a species (increases geneticID length by about 25)
@@ -218,9 +223,9 @@ const controls = {
   auto: "up",
   info: "i",
   speciesGraphMode: "s",
-  speciesGraphLeft: "a",
-  speciesGraphRight: "d",
-  speciesGraphDial: "q"
+  speciesGraphLeft: "z",
+  speciesGraphRight: "x",
+  speciesGraphDial: "c"
 };
 
 const nnui = { // Neural network UI config
