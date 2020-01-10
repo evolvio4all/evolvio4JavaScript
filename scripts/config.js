@@ -34,10 +34,16 @@ const everGreenPercentage = 0.8; // % of food tiles (within the central area) th
 const everGreenGrowModifier = 0.7; // % speed evergreen tiles grow compared to normal tiles
 const everGreenMaxFoodModifier = 1.2; // % maximum food is modified by on evergreen tiles
 
-const mapComplexity = 1.7; // How complex the map is. Breaks below 1
-const maxWaterPercentage = 0.3; // Water % past edge
-const edgeDistance = 0.8; // How far from the center does water start forming
-const edgeSmoothness = 0.0; // How smooth the transition from edge to water is. Reduces the appearance of a circular island.
+const firstMapFrequency = 3;
+const firstMapImpact = 1 / 2;
+
+const secondMapFrequency = 2;
+const secondMapImpact = 1 / 4;
+
+const thirdMapFrequency = 9;
+const thirdMapImpact = 1 / 8;
+
+const edgeDistanceImpact = 0.5; // How far from the center does water start forming
 
 const dayLength = 400; // Length of the day (in ticks)
 
@@ -129,7 +135,7 @@ let speciesGraphAutoSmooth = false; // Does the smoothness scale over time (make
 let speciesGraphStretch = 1; // How stretched the graph is
 let speciesGraphScrollSpeed = 20; // How fast the species graph dial moves per tick (z / x)
 const speciesGraphX = 350; // Does nothing. I'll do it later // TODO
-const speciesGraphY = 1080 - 125; // Y position of speciesGraph
+const speciesGraphY = 1080 - 175; // Y position of speciesGraph
 const speciesGraphWidth = 1920 - 350 * 2; // Does nothing. I'll do it later // TODO
 
 const minCreaturesForTracking = 5; // Minimum number of population needed for a species to be tracked on the species graph (saves memory)

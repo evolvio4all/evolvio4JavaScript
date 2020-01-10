@@ -47,12 +47,15 @@ function generateOutline() {
 }
 
 function Tile(x, y) {
-  var tile = noise.simplex2(x / mapSize * mapComplexity, y / mapSize * mapComplexity) - maxWaterPercentage * 2 + 1;
-  tile = Math.min(tile, 1);
-  tile += noise.simplex2(x / mapSize * mapComplexity, y / mapSize * mapComplexity) * edgeSmoothness - maxWaterPercentage * 2 + 1;
+  var tile = noise.perlin2(x / mapSize * firstMapFrequency, y / mapSize * firstMapFrequency) * firstMapImpact;
+  tile += noise.perlin2(x / mapSize * secondMapFrequency, y / mapSize * secondMapFrequency) * secondMapImpact;
+  tile += noise.perlin2(x / mapSize * thirdMapFrequency, y / mapSize * thirdMapFrequency) * thirdMapImpact;
 
   // We increase odds of tile being water if it is further away from center (affected by distanceSmoothing)
-  tile -= (Math.sqrt(Math.pow(x - mapSize / 2, 2) + Math.pow(y - mapSize / 2, 2)) / (mapSize / 2)) / edgeDistance;
+  let xdistance = Math.abs(0.5 - x / mapSize) * 2;
+  let ydistance = Math.abs(0.5 - y / mapSize) * 2;
+
+  tile += 0.2 - (xdistance * xdistance + ydistance * ydistance) * edgeDistanceImpact;
 
   if (tile < 0) {
     this.type = 0;
