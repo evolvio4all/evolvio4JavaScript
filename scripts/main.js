@@ -14,12 +14,11 @@ function main() {
   }
 
   if (speciesGraphAutoDial && speciesGraph.length > 0) {
-    speciesGraphDial = 1920 - tick / speciesGraphDetail;
+    speciesGraphDial = 1920 - tick / speciesGraphDetail * speciesGraphStretch;
   }
 
   checkKey();
 
-  render();
 
   let odate = new Date();
 
@@ -32,35 +31,21 @@ function main() {
   } else if (ndate - odate < minUpdateTime && !fastforward && autoMode) {
     timescale++;
   }
+
+  render();
 }
 
 function simulateUpdates() {
   if (population < creatureLimit) {
     if (Math.abs(timescale) >= 1) { // Can timescale ever go below 1?
-      if (timescale > 0) {
-        if (tick >= tickList.length * ticksPerCapture) {
-          for (let ts = 0; ts < timescale; ts++) {
-            update();
-            highestSimulatedTick = tick;
-          }
-        } else {
-          goToTick(tick + timescale);
-        }
-      } else if (reverseEnabled) {
-        for (let ts = 0; ts < -timescale; ts++) {
-          goToTick(tick - 1);
-        }
+      for (let ts = 0; ts < timescale; ts++) {
+        update();
       }
     } else {
       tc++;
 
-      if (tc >= 1 / Math.abs(timescale)) {
-        if (timescale > 0) {
-          if (tick >= tickList.length * ticksPerCapture) {
-            update();
-            highestSimulatedTick = tick;
-          } else goToTick(tick + 1);
-        } else if (reverseEnabled) goToTick(tick - 1);
+      if (timescale > 0 && tc >= 1 / Math.abs(timescale)) {
+        update();
 
         tc = 0;
       }
@@ -68,42 +53,9 @@ function simulateUpdates() {
   }
 }
 
-function goToTick(toTick) {
-  tick = toTick;
-  if (toTick > highestSimulatedTick) tick = highestSimulatedTick;
-
-  let tickTick = Math.floor(tick / ticksPerCapture);
-  if (tickList[tickTick - 1] == null || tickTick == lastTick) return;
-
-  let varList = tickList[tickTick - 1].split(";;;");
-  creatures = JSON.parse(varList[0]);
-  //map = JSON.parse(varList[1]);
-
-  lastTick = tickTick;
-}
-
-function replaceTick() {
-  tickList.splice(-1);
-  tickList.push(JSON.stringify(creatures, replacer));
-}
-
-function saveTick() {
-  for (let i = 0; i < creatures.length; i++) {
-    let creature = creatures[i];
-    for (let graph in creature.energyGraph) {
-      for (let i = creature.energyGraph[graph].length - 1; i >= 0; i--) {
-        if (i > 140) creature.energyGraph[graph].splice(0, 1);
-      }
-    }
-  }
-
-  tickList.push(JSON.stringify(creatures));
-}
-
 function update() {
-  if (reverseEnabled && tick % ticksPerCapture == (ticksPerCapture - 1) && tick != (ticksPerCapture - 1)) replaceTick();
-
   tick++;
+  highestSimulatedTick = tick;
 
   waterScrollX += 20;
   waterScrollY += 20;
@@ -210,7 +162,9 @@ function updateCreaturesBrain() {
     let velx = creature.velocity.x / maxCreatureSpeed;
     let vely = creature.velocity.y / maxCreatureSpeed;
 
-    creature.input = [time, rotation, energy, age, velx, vely];
+    let size = creature.size;
+
+    creature.input = [time, rotation, energy, age, velx, vely, size];
 
     for (let i = 0; i < biases; i++) {
       creature.input.push(creature.biases[i]);
@@ -625,11 +579,12 @@ function renderSelectedCreature() {
 function renderSpeciesGraph() {
   if (speciesGraph.length == 0) return;
 
+  ctz.lineWidth = 1;
+
   ctz.strokeStyle = "black";
   ctz.lineCap = "bevel";
   ctz.lineJoin = "round"
 
-  let width = 1920 / tick * speciesGraphDetail;
   for (let i = speciesGraph.length - 1; i >= 0; i--) {
     let alpha = 1;
     if (i > 0) {
@@ -651,10 +606,18 @@ function renderSpeciesGraph() {
     ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + speciesGraph[i].length * speciesGraphStretch + speciesGraphDial, speciesGraphY);
 
     ctz.lineTo(speciesGraph[i][0] / speciesGraphDetail * speciesGraphStretch + speciesGraphDial, speciesGraphY);
+    ctz.stroke();
     ctz.fill();
   }
 
-  ctz.lineWidth = 1;
+  if (infoMode) {
+    ctz.beginPath();
+    for (let i = 0; i < 1920 / dayLength * speciesGraphDetail / speciesGraphStretch; i++) {
+      ctz.moveTo(i * dayLength / speciesGraphDetail * speciesGraphStretch + speciesGraphDial % (dayLength / speciesGraphDetail * speciesGraphStretch), speciesGraphY);
+      ctz.lineTo(i * dayLength / speciesGraphDetail * speciesGraphStretch + speciesGraphDial % (dayLength / speciesGraphDetail * speciesGraphStretch), speciesGraphY - speciesGraphLinesHeight);
+    }
+    ctz.stroke();
+  }
 
   ctz.beginPath();
   ctz.moveTo(0, speciesGraphY);

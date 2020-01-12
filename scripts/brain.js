@@ -1,5 +1,5 @@
 // BRAIN INFO //
-const inputs = 6;
+const inputs = 7;
 const outputs = 5 + memories;
 
 const brains = 4;
@@ -19,7 +19,7 @@ for (let i = 0; i < speciesAccuracy; i++) {
 // Creature.prototype creates a neural network composed of layers and axons
 function createNeuralNetwork(creature, noiseGroup) {
   // VARIABLES //
-  creature.inputs = inputs + creature.eyes.length;
+  creature.inputs = inputs + creature.eyes.length + biases;
   creature.outputs = outputs;
   creature.cellStates = outputs;
 
@@ -385,10 +385,12 @@ function mutateNet(creature, network) {
       for (let axon = 0; axon < neuronsInNextLayer; axon++) {
         for (let neuron = 0; neuron < neurons; neuron++) {
           let randomNumber = seededNoiseA(0, 100);
-          if (randomNumber < creature.mutability.brain / 1.2) {
+          if (randomNumber < creature.mutability.brain * 1 / 3) {
             nbrain.axons[layer][neuron][axon] += seededNoiseA(-stepAmount, stepAmount);
-          } else if (randomNumber < creature.mutability.brain) {
+          } else if (randomNumber < creature.mutability.brain * 2 / 3) {
             nbrain.axons[layer][neuron][axon] = 0;
+          } else if (randomNumber < creature.mutability.brain * 3 / 3) {
+            nbrain.axons[layer][neuron][axon] *= seededNoiseA(-stepAmount, stepAmount);
           }
         }
       }

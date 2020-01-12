@@ -57,9 +57,11 @@ function Tile(x, y) {
 
   tile += 0.2 - (xdistance * xdistance + ydistance * ydistance) * edgeDistanceImpact;
 
+  let everGreenNoise = noise.perlin2(x / mapSize * everGreenNoiseFrequency, y / mapSize * everGreenNoiseFrequency) / 2 + noise.perlin2(x / mapSize * everGreenNoiseFrequency * 2, y / mapSize * everGreenNoiseFrequency * 2) / 4;
+
   if (tile < 0) {
     this.type = 0;
-  } else if ((1 - everGreenCentralization) + (seededNoiseA() * everGreenCentralization) < tile && seededNoiseA() < everGreenPercentage) {
+  } else if (0.6 - everGreenNoise * everGreenNoiseImpact < tile && seededNoiseA() < everGreenPercentage) {
     this.type = 2;
   } else {
     this.type = 1;
