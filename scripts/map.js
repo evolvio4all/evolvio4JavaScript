@@ -56,13 +56,14 @@ function Tile(x, y) {
   let ydistance = Math.abs(0.5 - y / mapSize) * 2;
 
   tile += 0.2 - (xdistance * xdistance + ydistance * ydistance) * edgeDistanceImpact;
+  tile = Math.min(tile, 1);
 
-  let everGreenNoise = noise.perlin2(x / mapSize * everGreenNoiseFrequency, y / mapSize * everGreenNoiseFrequency) / 2 + noise.perlin2(x / mapSize * everGreenNoiseFrequency * 2, y / mapSize * everGreenNoiseFrequency * 2) / 4;
+  let everGreenNoise = noise.perlin2(x / mapSize * everGreenNoiseFrequency, y / mapSize * everGreenNoiseFrequency) / 2 + noise.perlin2(x / mapSize * everGreenNoiseFrequency * 2, y / mapSize * everGreenNoiseFrequency * 2);
 
-  if (tile < 0) {
-    this.type = 0;
-  } else if (0.6 - everGreenNoise * everGreenNoiseImpact < tile && seededNoiseA() < everGreenPercentage) {
+  if (tile > everGreenInnerArea && tile < everGreenOuterArea && seededNoiseA() < everGreenPercentage && tile > Math.abs(everGreenNoise) / everGreenProminence) {
     this.type = 2;
+  } else if (tile < 0) {
+    this.type = 0;
   } else {
     this.type = 1;
   }

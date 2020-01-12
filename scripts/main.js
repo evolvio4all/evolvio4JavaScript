@@ -110,7 +110,7 @@ function updateMap() {
           // If tile is grass //
           if (tile.type == 1) {
             // Add grass to tile //
-            tile.food += (winterGrowRate + (Math.sin((tick / dayLength) * 3.14) + 1) / 2 * (springGrowRate - winterGrowRate)) * mapUpdateDelay;
+            tile.food += (winterGrowRate + Math.abs(Math.sin(tick / dayLength * 3.14)) * (springGrowRate - winterGrowRate)) * mapUpdateDelay;
             // If tile is evergreen //
           } else if (tile.type == 2) {
             // Add food to tile //
