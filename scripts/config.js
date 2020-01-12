@@ -31,8 +31,8 @@ const grassSpreadRate = 0.00025; // % difference between tiles grass spread rate
 // evergreen tiles are always grow at the same rate //
 const everGreenNoiseFrequency = 4; // % Frequency of evergreen noise function
 const everGreenProminence = 0.6; // How prominent are evergreen tiles (arbitrary)
-const everGreenInnerArea = 0.2; //
-const everGreenOuterArea = 0.3;
+const everGreenInnerArea = 0.2; // How far from the edge evergreens start to spawn
+const everGreenOuterArea = 0.3; // How far from the center are evergreens spawning
 const everGreenPercentage = 0.6; // % of tiles (within the evergreen area) that are evergreen (always in grow season)
 const everGreenGrowModifier = 0.7; // % speed evergreen tiles grow compared to normal tiles
 const everGreenMaxFoodModifier = 1.2; // % maximum food is modified by on evergreen tiles
