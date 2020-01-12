@@ -51,7 +51,7 @@ const everGreenOuterArea = 0.3; // How far from the center are evergreens spawni
 const everGreenPercentage = 0.6; // % of tiles (within the evergreen area) that are evergreen (always in grow season)
 
 const everGreenGrowRate = 0.02; // grow rate of evergreen tiles
-const everGreenMaxFood = 50; // maximum food on evergreen tiles
+const everGreenMaxFood = 80; // maximum food on evergreen tiles
 const everGreenGrassSpreadRate = 0.00025; // % difference between tiles grass spread rate for evergreen tiles
 
 
@@ -242,6 +242,8 @@ const controls = {
   speciesGraphRight: "x",
   speciesGraphDial: "c"
 };
+
+const maxTileHue = 190;
 
 const nnui = { // Neural network UI config
   xoffset: 1920 - 100,

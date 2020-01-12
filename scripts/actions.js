@@ -16,7 +16,7 @@ function eat(creature, tile) {
     return;
   }
 
-  let eatAmount = eatp * eatPower * (1 - Math.pow(1 - Math.min(tile.food / maxTileFood, 1), eatDiminishingRate));
+  let eatAmount = eatp * eatPower * (1 - Math.pow(1 - Math.min(tile.food / tile.maxFood, 1), eatDiminishingRate));
   tenergy += eatAmount * eatEffeciency;
   creature.energy += tenergy;
 

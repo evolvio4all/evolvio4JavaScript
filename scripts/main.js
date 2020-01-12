@@ -268,7 +268,7 @@ function renderTiles() {
     for (let column = 0; column < mapSize; column++) {
       let tile = map[row][column];
       if (tile != null) {
-        let hue = Math.min(Math.floor(45 + 50 * (tile.food / maxTileFood)), 120);
+        let hue = Math.min(Math.floor(45 + 50 * (tile.food / maxTileFood)), maxTileHue);
 
         //if (tile.type == 1) ctx.fillStyle = huePrefix + saturation + "%, 25%)";
         //else
