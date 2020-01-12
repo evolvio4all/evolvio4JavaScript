@@ -69,7 +69,7 @@ function Tile(x, y) {
   }
 
   if (this.type == 1) this.maxFood = parseFloat((seededNoiseA(0.9 * maxTileFood, maxTileFood)).toFixed(2));
-  else if (this.type == 2) this.maxFood = parseFloat((seededNoiseA(0.9 * maxTileFood, maxTileFood) * everGreenMaxFoodModifier).toFixed(2));
+  else if (this.type == 2) this.maxFood = parseFloat((seededNoiseA(0.9 * maxTileFood, maxTileFood) * everGreenMaxFood).toFixed(2));
   else if (this.type == 0) this.maxFood = 0;
 
   this.food = this.maxFood;
