@@ -83,7 +83,7 @@ function reproduce(creature) {
   let randomNum = seededNoiseA();
 
   // Random number added to desynchronize births (theoretically this would happen over time naturally, but it would take a long time and synchronized birth has an undesired impacts on user-experience)
-  if (creature.age > reproduceAge && creature.reproduceTime > minReproduceTime && randomNum < 0.5) {
+  if (creature.age > reproduceAge && creature.reproduceTime > minReproduceTime && randomNum < 0.13) {
     for (let i = 0; i < creature.children; i++) {
       if (creature.energy > maxCreatureEnergy * creature.childEnergy) {
         let child = new Creature(creature.x + (seededNoiseA() * 2 - 1) * 10, creature.y + (seededNoiseA() * 2 - 1) * 10, creature.species, creature.speciesGeneration, creature.color);
