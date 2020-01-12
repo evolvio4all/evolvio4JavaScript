@@ -69,7 +69,7 @@ function Creature(x, y, spec, specGen, color) {
   this.biases = [];
 
   for (let b = 0; b < biases; b++) {
-    this.biases.push(Math.random() * 2 - 1);
+    this.biases.push(seededNoiseA(-1, 1));
   }
 
   createNeuralNetwork(this, false);
@@ -208,7 +208,7 @@ function randomize(creature) {
   creature.biases = [];
 
   for (let b = 0; b < biases; b++) {
-    creature.biases.push(Math.random() * 2 - 1);
+    creature.biases.push(seededNoiseB(-1, 1));
   }
 
   createNeuralNetwork(creature, true);
@@ -352,13 +352,13 @@ function see(creature) {
     let sight = useEye(eye, creature);
 
     if (sight[1] == "tile") {
-      output.push((45 + 50 * sight[0].food / maxTileFood) / 360);
+      output.push(sight[0].food / maxTileFood * 2 - 1);
     } else if (sight[1] == "water") {
-      output.push(220 / 360);
+      output.push(-1);
     } else if (sight[1] == "creature") {
-      output.push((sight[0].color.split(",")[0].replace("hsl(", "") % 360) / 360);
+      output.push(creature.size / maxCreatureSize * 2 - 1);
     } else if (sight[1] == "oob") {
-      output.push(sight[0]);
+      output.push(-1);
     }
   }
 

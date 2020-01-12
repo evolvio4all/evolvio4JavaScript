@@ -21,7 +21,7 @@ const mapSize = 120; // Size of the map (height and width) in tiles
 const tileSize = 400; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
 
-const maxTileFood = 20; // Maximum food on a tile
+const maxTileFood = 50; // Maximum food on a tile
 
 const springGrowRate = 0.02; // Grow amount in spring season (applies to all tiles)
 const winterGrowRate = -0.005; // Grow amount in winter season (applies to all tiles)
@@ -29,8 +29,9 @@ const winterGrowRate = -0.005; // Grow amount in winter season (applies to all t
 const grassSpreadRate = 0.00025; // % difference between tiles grass spread rate
 
 // evergreen tiles are always grow at the same rate //
-const everGreenCentralization = 0.3; // % How far from the center evergreen tiles are allowed to be
-const everGreenPercentage = 0.8; // % of food tiles (within the central area) that are evergreen (always in grow season)
+const everGreenNoiseFrequency = 4; // % Frequency of evergreen noise function
+const everGreenNoiseImpact = 3; // Impact of the noise on evergreen
+const everGreenPercentage = 0.6; // % of food tiles (within the central area) that are evergreen (always in grow season)
 const everGreenGrowModifier = 0.7; // % speed evergreen tiles grow compared to normal tiles
 const everGreenMaxFoodModifier = 1.2; // % maximum food is modified by on evergreen tiles
 
@@ -45,15 +46,15 @@ const thirdMapImpact = 1 / 8;
 
 const edgeDistanceImpact = 0.5; // How far from the center does water start forming
 
-const dayLength = 400; // Length of the day (in ticks)
+const dayLength = 1000; // Length of the day (in ticks)
 
 const mapUpdateDelay = 15; // How many ticks before the map tiles update
 
 // CREATURES //
 
 // Global //
-const minCreatures = 25; // Minimum number of creatures
-const minFirstGen = 25; // Minimum number of first generation creatures
+const minCreatures = 65; // Minimum number of creatures
+const minFirstGen = 35; // Minimum number of first generation creatures
 
 const creatureLimit = 5000; // Maximum number of creatures (when population = creatureLimit, the game pauses)
 const foodImposedCreatureLimit = 800; // Maximum number of creatures before food stops growing (when population = foodBasedCreatureLimit, food stops growing)
@@ -61,7 +62,7 @@ const foodImposedCreatureLimit = 800; // Maximum number of creatures before food
 const maxCreatureSize = 125; // Maximum creature size (radius)
 const minCreatureSize = 50; // Minimum creature size (radius)
 
-const minEyes = 0; // Minimum number of "eyes" a creature can have
+const minEyes = 1; // Minimum number of "eyes" a creature can have
 const maxEyes = 8; // Maximum number of "eyes" a creature can have
 
 const minEyeDistance = 0; // Minimum eye distance in general (creatures will mutate the angle and distance)
@@ -70,7 +71,7 @@ const maxEyeDistance = tileSize * 5; // Maximum eye distance in general (creatur
 const internalClockSpeed = 60; // Internal clock speed in seconds = internalClockSpeed / 30;
 
 // Initial //
-const minInitEyes = 0; // Minimum "eyes" a first generation creature can have
+const minInitEyes = 1; // Minimum "eyes" a first generation creature can have
 const maxInitEyes = 3; // Maximum "eyes" a first generation creature can have
 
 const initEyeDistanceH = 6; // Maximum distance an "eye" can be from a creature in tiles forward and backward initially
@@ -87,8 +88,8 @@ const energyGraphY = 1080 - 50; // Y of the energyGraph
 
 const energy = {
   eat: 0.25, // Energy cost to eat at eatPower
-  move: 0.03, // Energy cost to move at maxCreatureSpeed
-  rotate: 0.03, // Energy cost to rotate at rotationSpeed
+  move: 0.02, // Energy cost to move at maxCreatureSpeed
+  rotate: 0.02, // Energy cost to rotate at rotationSpeed
   attack: 0.25 // Energy cost to attack at attackPower
 };
 
@@ -102,12 +103,12 @@ const eatDiminishingRate = 3; // Determines how uniformly diminishing returns ar
 
 // Metabolism //
 const metabolismScaleTime = 1800; // How long it takes for metabolism to scale to maxMetabolism; Effectively lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
-const metabolismScaleScale = 10; // Determines how uniformly metabolism increases. 1 is linear; Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
+const metabolismScaleScale = 2; // Determines how uniformly metabolism increases. 1 is linear; Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
 const sizeMetabolismFactor = 0; // % how much size affects metabolism (creature size / maxCreatureSize)
 const weightMetabolismFactor = 0; // % how much energy affects metabolism (creature energy / maxCreatureEnergy)
 
 const minMetabolism = 0.1; // Initial metabolism
-const maxMetabolism = 0.25; // End metabolism (metabolism when age == metabolismScaleTime)
+const maxMetabolism = 0.51; // End metabolism (metabolism when age == metabolismScaleTime)
 
 // Movement //
 const maxCreatureSpeed = 300; // Maximum creature speed (maxCreatureSpeed = maxAcceleration / friction)
@@ -137,6 +138,7 @@ let speciesGraphScrollSpeed = 20; // How fast the species graph dial moves per t
 const speciesGraphX = 350; // Does nothing. I'll do it later // TODO
 const speciesGraphY = 1080 - 175; // Y position of speciesGraph
 const speciesGraphWidth = 1920 - 350 * 2; // Does nothing. I'll do it later // TODO
+const speciesGraphLinesHeight = 25; // Height of the vertical lines on the speciesGraph
 
 const minCreaturesForTracking = 5; // Minimum number of population needed for a species to be tracked on the species graph (saves memory)
 const speciesAccuracy = 5; // How many times to run a feedforward and detect a species (increases geneticID length by about 25)
@@ -161,7 +163,6 @@ const minAttackPower = 0.35; // Minimum attack strength (anything lower will be 
 const attackEffeciency = 0.95; // Attack effeciency %
 const attackPower = 2; // Attack power % (damage)
 
-
 // Mutation //
 const maxEyeAngleChange = (2 * Math.PI) / 24; // Maximum angle an eye can change by in a single mutation
 const maxEyeDistanceChange = 300; // Maxmimum distance an eye can change distance in a single mutation
@@ -169,7 +170,7 @@ const maxEyeDistanceChange = 300; // Maxmimum distance an eye can change distanc
 // ADVANCED //
 
 // Neural Network //
-const biases = 3;
+const biases = 1;
 
 const minMutability = { // Minimum mutability in various categories
   brain: 3,
@@ -182,7 +183,7 @@ const minMutability = { // Minimum mutability in various categories
     distance: 3
   },
   mutability: 5,
-  biases: 10
+  biases: 2
 };
 
 const maxMutability = { // Maximum mutability in various categories
@@ -196,7 +197,7 @@ const maxMutability = { // Maximum mutability in various categories
     distance: 5
   },
   mutability: 20,
-  biases: 30
+  biases: 10
 };
 
 const maxMutabilityChange = 3; // Maximum amount any mutability can change by in a single mutation
@@ -207,7 +208,7 @@ const maxInitialAxonValue = 3; // Maximum weight of an axon intially
 const memories = 2; // # of memories a creature can store (outputs that do nothing, except store a value to be used as an input) — super expensive
 // I have intentions to make this — and most things here — evolution-based (with config values for min, max, and intial min and max)
 
-const stepAmount = 8; // Maximum amount an axon can be changed by in a single mutation
+const stepAmount = 2; // Maximum amount an axon can be changed by in a single mutation
 
 // ZOOM //
 const zoomSpeed = 0.1; // How fast the zoom happens
