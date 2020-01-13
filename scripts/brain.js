@@ -19,7 +19,7 @@ for (let i = 0; i < speciesAccuracy; i++) {
 // Creature.prototype creates a neural network composed of layers and axons
 function createNeuralNetwork(creature, noiseGroup) {
   // VARIABLES //
-  creature.inputs = inputs + creature.eyes.length + biases;
+  creature.inputs = inputs + creature.eyes.length * 2 + biases;
   creature.outputs = outputs;
   creature.cellStates = outputs;
 

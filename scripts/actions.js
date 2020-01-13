@@ -16,7 +16,7 @@ function eat(creature, tile) {
     return;
   }
 
-  let eatAmount = eatp * eatPower * (1 - Math.pow(1 - Math.min(tile.food / maxTileFood, 1), eatDiminishingRate));
+  let eatAmount = eatp * eatPower * (1 - Math.pow(1 - Math.min(tile.food / tile.maxFood, 1), eatDiminishingRate));
   tenergy += eatAmount * eatEffeciency;
   creature.energy += tenergy;
 
@@ -46,7 +46,7 @@ function move(creature) {
   let tenergy = 0;
 
   if (Math.abs(creature.output[1]) > minRotation) {
-    tenergy -= energy.rotate * Math.pow(1 + Math.abs(creature.output[1]), 3);
+    tenergy -= energy.rotate * Math.abs(creature.output[1]);
 
     creature.rotation += creature.output[1] * rotationSpeed;
     creature.rotation = creature.rotation % (2 * Math.PI);
@@ -58,7 +58,7 @@ function move(creature) {
 
   if (Math.abs(creature.output[0]) > minMoveAmount) {
     let acceleration = maxAcceleration * creature.output[0];
-    tenergy -= energy.move * Math.pow(1 + Math.abs(creature.output[0]), 2)
+    tenergy -= energy.move * Math.abs(creature.output[0]);
 
     if (creature.isEating) {
       acceleration *= eatingSpeed;
@@ -80,10 +80,9 @@ function reproduce(creature) {
   }
 
   let tenergy = 0;
-  let randomNum = seededNoiseA();
 
   // Random number added to desynchronize births (theoretically this would happen over time naturally, but it would take a long time and synchronized birth has an undesired impacts on user-experience)
-  if (creature.age > reproduceAge && creature.reproduceTime > minReproduceTime && randomNum < 0.5) {
+  if (seededNoiseA() < 0.25 && creature.age > reproduceAge && creature.reproduceTime > minReproduceTime) {
     for (let i = 0; i < creature.children; i++) {
       if (creature.energy > maxCreatureEnergy * creature.childEnergy) {
         let child = new Creature(creature.x + (seededNoiseA() * 2 - 1) * 10, creature.y + (seededNoiseA() * 2 - 1) * 10, creature.species, creature.speciesGeneration, creature.color);
@@ -119,9 +118,10 @@ function reproduce(creature) {
 
         tenergy -= creature.childEnergy * maxCreatureEnergy;
         creature.energy -= creature.childEnergy * maxCreatureEnergy;
-        creature.reproduceTime = 0;
       } else break;
     }
+
+    creature.reproduceTime = 0;
   }
 
   //creature.energyGraph.spawn.push(parseFloat(tenergy.toFixed(2)));

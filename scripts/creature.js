@@ -219,7 +219,7 @@ function randomize(creature) {
   creature.speciesGeneration = 0;
   creature.rotation = 0;
 
-  creature.species = setSpecies(creature, "undefined", true);
+  creature.species = setSpecies(creature, "undefined", false);
 
   creature.isEating = false;
 
@@ -352,12 +352,16 @@ function see(creature) {
     let sight = useEye(eye, creature);
 
     if (sight[1] == "tile") {
-      output.push(sight[0].food / maxTileFood * 2 - 1);
+      output.push(sight[0].food / maxTileFood - 0.5);
+      output.push(0);
     } else if (sight[1] == "water") {
       output.push(-1);
+      output.push(-1);
     } else if (sight[1] == "creature") {
-      output.push(creature.size / maxCreatureSize * 2 - 1);
+      output.push((1 - creature.size / maxCreatureSize) * 2 - 1);
+      output.push(1);
     } else if (sight[1] == "oob") {
+      output.push(-1);
       output.push(-1);
     }
   }

@@ -110,20 +110,29 @@ function updateMap() {
           // If tile is grass //
           if (tile.type == 1) {
             // Add grass to tile //
-            tile.food += (winterGrowRate + (Math.sin((tick / dayLength) * 3.14) + 1) / 2 * (springGrowRate - winterGrowRate)) * mapUpdateDelay;
+            tile.food += (winterGrowRate + Math.abs(Math.sin(tick / dayLength * 3.14)) * (springGrowRate - winterGrowRate)) * mapUpdateDelay;
             // If tile is evergreen //
           } else if (tile.type == 2) {
             // Add food to tile //
-            tile.food += springGrowRate * everGreenGrowModifier * mapUpdateDelay;
+            tile.food += everGreenGrowRate * mapUpdateDelay;
           }
 
-          // Spread grass to all touching tiles //
-          // Left and right //
-          if (map[row - 1] && map[row - 1][column]) map[row - 1][column].food += Math.max(tile.food - map[row - 1][column].food, 0) * grassSpreadRate * mapUpdateDelay;
-          if (map[row + 1] && map[row + 1][column]) map[row + 1][column].food += Math.max(tile.food - map[row + 1][column].food, 0) * grassSpreadRate * mapUpdateDelay;
-          // Up and down //
-          if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * grassSpreadRate * mapUpdateDelay;
-          if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * grassSpreadRate * mapUpdateDelay;
+
+          if (tile.type == 1) {
+            // Spread grass to all touching tiles //
+            // Left and right //
+            if (map[row - 1] && map[row - 1][column]) map[row - 1][column].food += Math.max(tile.food - map[row - 1][column].food, 0) * grassSpreadRate * mapUpdateDelay;
+            if (map[row + 1] && map[row + 1][column]) map[row + 1][column].food += Math.max(tile.food - map[row + 1][column].food, 0) * grassSpreadRate * mapUpdateDelay;
+            // Up and down //
+            if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * grassSpreadRate * mapUpdateDelay;
+            if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * grassSpreadRate * mapUpdateDelay;
+          } else if (tile.type == 2) {
+            if (map[row - 1] && map[row - 1][column]) map[row - 1][column].food += Math.max(tile.food - map[row - 1][column].food, 0) * everGreenGrassSpreadRate * mapUpdateDelay;
+            if (map[row + 1] && map[row + 1][column]) map[row + 1][column].food += Math.max(tile.food - map[row + 1][column].food, 0) * everGreenGrassSpreadRate * mapUpdateDelay;
+            // Up and down //
+            if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * everGreenGrassSpreadRate * mapUpdateDelay;
+            if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * everGreenGrassSpreadRate * mapUpdateDelay;
+          }
         }
       }
     }
@@ -162,7 +171,7 @@ function updateCreaturesBrain() {
     let velx = creature.velocity.x / maxCreatureSpeed;
     let vely = creature.velocity.y / maxCreatureSpeed;
 
-    let size = creature.size;
+    let size = creature.size / maxCreatureSize;
 
     creature.input = [time, rotation, energy, age, velx, vely, size];
 
@@ -253,15 +262,17 @@ function renderTiles() {
   //let hue = 50 + 50 * (Math.sin(tick / dayLength) + 1) / 2;
   //let huePrefix = "hsl(" + hue + ", ";
 
+  let saturation = 65 + Math.floor(Math.abs(Math.sin(tick / dayLength * 3.14)) * 20)
+
   for (let row = 0; row < mapSize; row++) {
     for (let column = 0; column < mapSize; column++) {
       let tile = map[row][column];
       if (tile != null) {
-        let hue = Math.floor(45 + 50 * (tile.food / maxTileFood));
+        let hue = Math.min(Math.floor(45 + 50 * (tile.food / maxTileFood)), maxTileHue);
 
         //if (tile.type == 1) ctx.fillStyle = huePrefix + saturation + "%, 25%)";
         //else
-        ctx.fillStyle = "hsl(" + hue + ", 80%, 20%)";
+        ctx.fillStyle = "hsl(" + hue + ", " + saturation + "%, 20%)";
         ctx.fillRect(row * multiple - cropx, column * multiple - cropy, multiple + 1, multiple + 1);
       }
     }
@@ -291,16 +302,16 @@ function renderCreatures() {
     if (creature.output[3] >= minAttackPower) {
       ctx.fillStyle = "rgba(255, 0, 0, " + creature.output[3] + ")";
 
-      let pos = [Math.floor((creature.x + Math.cos(creature.rotation) * tileSize) / tileSize), Math.floor((creature.y + Math.sin(creature.rotation) * tileSize) / tileSize)];
+      let pos = [Math.floor(creature.x / tileSize + Math.cos(creature.rotation)), Math.floor(creature.y / tileSize + Math.sin(creature.rotation))];
       ctx.fillRect(pos[0] * zoomLevel * tileSize - cropx, pos[1] * zoomLevel * tileSize - cropy, tileSize * zoomLevel, tileSize * zoomLevel);
     }
 
     ctx.lineWidth = 10 * zoomLevel;
 
     let color = creature.color.split(",");
-    color[1] = Math.floor(creature.energy / maxCreatureEnergy * 100) + "%";
-
+    color[1] = Math.floor(20 + creature.energy / maxCreatureEnergy * 80) + "%";
     ctx.fillStyle = color.join(",");
+
     ctx.fillCircle(creaturex - cropx, creaturey - cropy, creature.size * zoomLevel, true);
 
     ctx.beginPath();
