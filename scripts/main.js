@@ -171,7 +171,7 @@ function updateCreaturesBrain() {
     let velx = creature.velocity.x / maxCreatureSpeed;
     let vely = creature.velocity.y / maxCreatureSpeed;
 
-    let size = creature.size;
+    let size = creature.size / maxCreatureSize;
 
     creature.input = [time, rotation, energy, age, velx, vely, size];
 
@@ -302,16 +302,16 @@ function renderCreatures() {
     if (creature.output[3] >= minAttackPower) {
       ctx.fillStyle = "rgba(255, 0, 0, " + creature.output[3] + ")";
 
-      let pos = [Math.floor((creature.x + Math.cos(creature.rotation) * tileSize) / tileSize), Math.floor((creature.y + Math.sin(creature.rotation) * tileSize) / tileSize)];
+      let pos = [Math.floor(creature.x / tileSize + Math.cos(creature.rotation)), Math.floor(creature.y / tileSize + Math.sin(creature.rotation))];
       ctx.fillRect(pos[0] * zoomLevel * tileSize - cropx, pos[1] * zoomLevel * tileSize - cropy, tileSize * zoomLevel, tileSize * zoomLevel);
     }
 
     ctx.lineWidth = 10 * zoomLevel;
 
     let color = creature.color.split(",");
-    color[1] = Math.floor(creature.energy / maxCreatureEnergy * 100) + "%";
-
+    color[1] = Math.floor(20 + creature.energy / maxCreatureEnergy * 80) + "%";
     ctx.fillStyle = color.join(",");
+
     ctx.fillCircle(creaturex - cropx, creaturey - cropy, creature.size * zoomLevel, true);
 
     ctx.beginPath();

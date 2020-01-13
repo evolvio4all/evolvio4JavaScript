@@ -46,7 +46,7 @@ function move(creature) {
   let tenergy = 0;
 
   if (Math.abs(creature.output[1]) > minRotation) {
-    tenergy -= energy.rotate * Math.pow(1 + Math.abs(creature.output[1]), 3);
+    tenergy -= energy.rotate * Math.abs(creature.output[1]);
 
     creature.rotation += creature.output[1] * rotationSpeed;
     creature.rotation = creature.rotation % (2 * Math.PI);
@@ -58,7 +58,7 @@ function move(creature) {
 
   if (Math.abs(creature.output[0]) > minMoveAmount) {
     let acceleration = maxAcceleration * creature.output[0];
-    tenergy -= energy.move * Math.pow(1 + Math.abs(creature.output[0]), 2)
+    tenergy -= energy.move * Math.abs(creature.output[0]);
 
     if (creature.isEating) {
       acceleration *= eatingSpeed;
