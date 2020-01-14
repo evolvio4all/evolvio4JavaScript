@@ -23,10 +23,10 @@ function createNeuralNetwork(creature, noiseGroup) {
   creature.outputs = outputs;
   creature.cellStates = outputs;
 
-  let forgetLayers = [creature.outputs + creature.cellStates + creature.inputs, 8, creature.outputs];
-  let decideLayers = [creature.outputs + creature.cellStates + creature.inputs, 8, creature.outputs];
-  let modifyLayers = [creature.outputs + creature.inputs, 8, creature.outputs];
-  let layers = [creature.outputs + creature.inputs, 8, creature.outputs];
+  let forgetLayers = [creature.outputs + creature.cellStates + creature.inputs, creature.outputs + (creature.cellStates + creature.inputs) / 2, creature.outputs];
+  let decideLayers = [creature.outputs + creature.cellStates + creature.inputs, creature.outputs + (creature.cellStates + creature.inputs) / 2, creature.outputs];
+  let modifyLayers = [creature.outputs + creature.inputs, creature.outputs + creature.inputs / 2, creature.outputs];
+  let layers = [creature.outputs + creature.inputs, creature.outputs + creature.inputs / 2, creature.outputs];
 
   creature.network = new Network(forgetLayers, decideLayers, modifyLayers, layers, creature.outputs, creature.inputs);
 

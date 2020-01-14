@@ -109,7 +109,7 @@ function seededNoiseA(a, b) {
   let r1 = a || 0;
   let r2 = b || 1;
 
-  let A = 13;
+  let A = 12.5;
   let M = seed;
 
   let Q = M / A;
@@ -125,7 +125,7 @@ function seededNoiseB(a, b) {
   let r1 = a || 0;
   let r2 = b || 1;
 
-  let A = 13;
+  let A = 12.5;
   let M = seed;
 
   let Q = M / A;
