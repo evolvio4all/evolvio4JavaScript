@@ -10,6 +10,10 @@ const ctz = viewport.getContext("2d", {
 
 ctz.lineCap = "round";
 
+let seed = prompt("Seed?");
+
+if (seed == "" || seed == null) seed = Math.floor(Math.random() * 99999);
+
 let tick = 0;
 let tc = 0;
 let timescale = 1;
@@ -98,26 +102,39 @@ function newColor(noiseGroup) {
   return "hsl(" + h + ", " + 100 + "%, " + l + "%)";
 }
 
-let grva = 1;
-let grvb = 1;
+let grva = seed;
+let grvb = seed;
 
 function seededNoiseA(a, b) {
   let r1 = a || 0;
   let r2 = b || 1;
 
-  grva += (Math.abs(seed * Math.tan(grva / Math.sin(grva * seed))) % 1) + 0.1;
+  let A = 13;
+  let M = seed;
 
-  return (Math.abs(seed * Math.tan(grva / Math.sin(grva * seed))) % 1) * (r2 - r1) + r1;
+  let Q = M / A;
+  let R = M % A;
+
+  grva = (A * (grva % Q)) - (R * Math.floor(grva / Q));
+  if (grva < 0) grva += M;
+
+  return (grva / M) * (r2 - r1) + r1;
 }
 
 function seededNoiseB(a, b) {
   let r1 = a || 0;
   let r2 = b || 1;
 
-  grvb++;
-  if (grvb >= 2147483647) grvb = 1;
+  let A = 13;
+  let M = seed;
 
-  return (Math.abs(seed * Math.tan(grvb / Math.sin(grvb * seed))) % 1) * (r2 - r1) + r1;
+  let Q = M / A;
+  let R = M % A;
+
+  grvb = (A * (grvb % Q)) - (R * Math.floor(grvb / Q));
+  if (grvb < 0) grvb += M;
+
+  return (grvb / M) * (r2 - r1) + r1;
 }
 
 function sortByHighestValue(a, b) {
