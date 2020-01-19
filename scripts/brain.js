@@ -64,7 +64,7 @@ function Network(forget, decide, modify, main, out, inp) {
 
 function initNeurons(creature) {
   for (let brain in creature.network) {
-    if (brain == "cellState") break;
+    if (brainNames.indexOf(brain) == -1) continue;
     let nbrain = creature.network[brain];
 
     let layers = nbrain.layers.length;
@@ -82,7 +82,7 @@ function initNeurons(creature) {
 
 function initAxons(creature, noiseGroup) {
   for (let brain in creature.network) {
-    if (brain == "cellState") break;
+    if (brainNames.indexOf(brain) == -1) continue;
     let nbrain = creature.network[brain];
     let layers = nbrain.layers.length - 1;
     nbrain.axons = [];
@@ -374,7 +374,7 @@ function mutateNet(creature, network) {
   }
 
   for (let brain in network) {
-    if (brain == "cellState") break;
+    if (brainNames.indexOf(brain) == -1) continue;
     let nbrain = network[brain];
 
     let layers = nbrain.layers.length - 1;
@@ -400,7 +400,7 @@ function mutateNet(creature, network) {
 
 function copyNeuralNetwork(creature, copy) {
   for (let brain in creature.network) {
-    if (brain == "cellState") break;
+    if (brainNames.indexOf(brain) == -1) continue;
     let netw = copy.network[brain].layers[0] < creature.network[brain].layers[0] ? copy.network[brain] : creature.network[brain];
 
     for (let layer = 0; layer < netw.axons.length; layer++) {

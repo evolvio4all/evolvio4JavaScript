@@ -88,6 +88,8 @@ let speciesGraphOn = false;
 let noiseChain = [];
 
 let keyToggle = true;
+
+let brainNames = ["main", "decide", "modify", "forget"];
 // FUNCTIONS //
 
 function newColor(noiseGroup) {
