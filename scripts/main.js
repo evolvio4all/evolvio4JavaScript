@@ -117,7 +117,6 @@ function updateMap() {
             tile.food += everGreenGrowRate * mapUpdateDelay;
           }
 
-
           if (tile.type == 1) {
             // Spread grass to all touching tiles //
             // Left and right //
@@ -133,17 +132,7 @@ function updateMap() {
             if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * everGreenGrassSpreadRate * mapUpdateDelay;
             if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * everGreenGrassSpreadRate * mapUpdateDelay;
           }
-        }
-      }
-    }
 
-
-    // Loop through map again //
-    for (let row = 0; row < mapSize; row++) {
-      for (let column = 0; column < mapSize; column++) {
-        let tile = map[row][column];
-        if (tile != null && tile.type > 0) {
-          // Limit amount of food in a tile //
           if (tile.food > tile.maxFood) tile.food = tile.maxFood;
           else if (tile.food < 0) tile.food = 0;
         }
