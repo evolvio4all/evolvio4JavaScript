@@ -390,7 +390,7 @@ function mutateNet(creature, network) {
           } else if (randomNumber < creature.mutability.brain * 2 / 3) {
             nbrain.axons[layer][neuron][axon] = 0;
           } else if (randomNumber < creature.mutability.brain * 3 / 3) {
-            nbrain.axons[layer][neuron][axon] *= seededNoiseA(-stepAmount, stepAmount);
+            nbrain.axons[layer][neuron][axon] *= seededNoiseA(-stepMult, stepMult);
           }
         }
       }
