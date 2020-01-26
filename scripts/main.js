@@ -19,7 +19,6 @@ function main() {
 
   checkKey();
 
-
   let odate = new Date();
 
   simulateUpdates();
@@ -31,6 +30,8 @@ function main() {
   } else if (ndate - odate < minUpdateTime && !fastforward && autoMode) {
     timescale++;
   }
+
+  if (selectedCreature == null) brainDisplayMode = false;
 
   render();
 }
@@ -86,13 +87,6 @@ function update() {
     creatureLocations.push([]);
   }
 
-  for (let i = population - 1; i >= 0; i--) {
-    let creature = creatures[i];
-
-    wallLock(creature);
-    creatureLocations[Math.floor(creature.x / tileSize)][Math.floor(creature.y / tileSize)] = creature;
-  }
-
   updateCreatures();
 
   if (tick % ticksPerCapture == 0 && reverseEnabled) saveTick();
@@ -108,6 +102,14 @@ function updateMap() {
         // If tile isn't water //
         if (tile != null && tile.type > 0) {
           // If tile is grass //
+          if (tile.scent > maxTileScent) {
+            tile.scent = maxTileScent;
+          } else if (tile.scent < -maxTileScent) {
+            tile.scent = -maxTileScent;
+          }
+
+          tile.scent /= scentDeplenishRate;
+
           if (tile.type == 1) {
             // Add grass to tile //
             tile.food += (winterGrowRate + Math.abs(Math.sin(tick / dayLength * 3.14)) * (springGrowRate - winterGrowRate)) * mapUpdateDelay;
@@ -142,60 +144,63 @@ function updateMap() {
 }
 
 function updateCreatures() {
-  updateCreaturesBrain();
-  updateCreaturesFinal();
-}
-
-function updateCreaturesBrain() {
   for (let i = population - 1; i >= 0; i--) {
     let creature = creatures[i];
-    if (creature.age > oldest) oldest = creature.age;
-
-    let time = (creature.age % internalClockSpeed) / internalClockSpeed * 2 - 1;
-
-    let rotation = creature.rotation / 6.28318; // 2 * 3.14159 (PI)
-    let energy = creature.energy / maxCreatureEnergy;
-    let age = creature.age / metabolismScaleTime;
-
-    let velx = creature.velocity.x / maxCreatureSpeed;
-    let vely = creature.velocity.y / maxCreatureSpeed;
-
-    let size = creature.size / maxCreatureSize;
-
-    creature.input = [time, rotation, energy, age, velx, vely, size];
-
-    for (let i = 0; i < biases; i++) {
-      creature.input.push(creature.biases[i]);
-    }
-
-    let vision = see(creature);
-    for (let i = 0; i < vision.length; i++) {
-      creature.input.push(vision[i]);
-    }
-
-    creature.output = feedForward(creature, creature.input);
+    updateCreaturesBrain(creature);
+    updateCreaturesFinal(creature);
   }
 }
 
-function updateCreaturesFinal() {
-  for (let i = population - 1; i >= 0; i--) {
-    let creature = creatures[i];
+function updateCreaturesBrain(creature) {
+  if (creature.age > oldest) oldest = creature.age;
 
-    act(creature);
-    clampSize(creatures[i]);
+  let time = (creature.age % internalClockSpeed) / internalClockSpeed * 2 - 1;
 
-    creature.energyGraph.net.push(parseFloat((creature.energy - creature.lastEnergy).toFixed(2)));
-    creature.energyGraph.gross.push(parseFloat(creature.energy.toFixed(2)));
+  let rotation = creature.rotation / 6.28318; // 2 * 3.14159 (PI)
+  let energy = creature.energy / maxCreatureEnergy;
+  let age = creature.age / metabolismScaleTime;
 
-    creature.lastEnergy = creature.energy;
+  let forwardVelocity = Math.sqrt(creature.velocity.x * creature.velocity.x + creature.velocity.y * creature.velocity.y) / maxCreatureSpeed;
 
-    for (let i = 0; i < creature.output.length; i++) {
-      creature.output[i] = parseFloat(creature.output[i].toFixed(2));
-    }
+  let size = creature.size / maxCreatureSize;
 
-    if (creature.energy > maxCreatureEnergy) {
-      creature.energy = maxCreatureEnergy;
-    }
+  let tile = map[Math.floor(creature.x / tileSize + Math.cos(creature.rotation))][Math.floor(creature.y / tileSize + Math.sin(creature.rotation))];
+  let scent = 0;
+  if (tile) {
+    scent = tile.scent / maxTileScent;
+  }
+  creature.input = [time, energy, age, forwardVelocity, scent];
+
+  for (let i = 0; i < biases; i++) {
+    creature.input.push(creature.biases[i]);
+  }
+
+  let vision = see(creature);
+  for (let i = 0; i < vision.length; i++) {
+    creature.input.push(vision[i]);
+  }
+
+  creature.output = feedForward(creature, creature.input);
+}
+
+function updateCreaturesFinal(creature) {
+  wallLock(creature);
+  creatureLocations[Math.floor(creature.x / tileSize)][Math.floor(creature.y / tileSize)] = creature;
+
+  act(creature);
+  clampSize(creature);
+
+  creature.energyGraph.net.push(parseFloat((creature.energy - creature.lastEnergy).toFixed(2)));
+  creature.energyGraph.gross.push(parseFloat(creature.energy.toFixed(2)));
+
+  creature.lastEnergy = creature.energy;
+
+  for (let i = 0; i < creature.output.length; i++) {
+    creature.output[i] = parseFloat(creature.output[i].toFixed(2));
+  }
+
+  if (creature.energy > maxCreatureEnergy) {
+    creature.energy = maxCreatureEnergy;
   }
 }
 
@@ -216,7 +221,10 @@ function wallLock(creature) {
 function clampSize(creature) {
   //if (creature.energy > maxCreatureEnergy) creature.energy = maxCreatureEnergy;
   if (creature.energy <= 0) {
-    if (creature == selectedCreature) selectedCreature = null;
+    if (creature == selectedCreature) {
+      selectedCreature = null;
+      brainDisplayMode = false;
+    }
     die(creature);
   }
 }

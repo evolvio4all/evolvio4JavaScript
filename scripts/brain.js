@@ -1,6 +1,6 @@
 // BRAIN INFO //
-const inputs = 7;
-const outputs = 5 + memories;
+const inputs = 5;
+const outputs = 4 + memories;
 
 const brains = 4;
 
@@ -23,23 +23,18 @@ function createNeuralNetwork(creature, noiseGroup) {
   creature.outputs = outputs;
   creature.cellStates = outputs;
 
-  let forgetLayers = [creature.outputs + creature.cellStates + creature.inputs, creature.outputs + (creature.cellStates + creature.inputs) / 2, creature.outputs];
-  let decideLayers = [creature.outputs + creature.cellStates + creature.inputs, creature.outputs + (creature.cellStates + creature.inputs) / 2, creature.outputs];
-  let modifyLayers = [creature.outputs + creature.inputs, creature.outputs + creature.inputs / 2, creature.outputs];
-  let layers = [creature.outputs + creature.inputs, creature.outputs + creature.inputs / 2, creature.outputs];
+  let forgetLayers = [creature.outputs + creature.cellStates + creature.inputs, 8, creature.outputs];
+  let decideLayers = [creature.outputs + creature.cellStates + creature.inputs, 8, creature.outputs];
+  let modifyLayers = [creature.outputs + creature.inputs, 8, creature.outputs];
+  let layers = [creature.outputs + creature.inputs, 8, creature.outputs];
 
   creature.network = new Network(forgetLayers, decideLayers, modifyLayers, layers, creature.outputs, creature.inputs);
 
   initNeurons(creature); // Creature.prototype initializes the neurons, creating them, Neurons contain a value and are the connection point for axons
   initAxons(creature, noiseGroup); // Axons are basically lines that connect Neurons, each one has a weight, and each neuron has a value, the axon takes the value and multiplies it by the weight
-};
+}
 
 function Network(forget, decide, modify, main, out, inp) {
-  this.main = {
-    layers: main
-  };
-  this.main.layerCount = this.main.layers.length;
-
   this.forget = {
     layers: forget
   };
@@ -54,6 +49,11 @@ function Network(forget, decide, modify, main, out, inp) {
     layers: modify
   };
   this.modify.layerCount = this.modify.layers.length;
+
+  this.main = {
+    layers: main
+  };
+  this.main.layerCount = this.main.layers.length;
 
   this.cellState = [];
   for (let i = 0; i < out; i++) this.cellState.push(0);
@@ -78,7 +78,7 @@ function initNeurons(creature) {
       }
     }
   }
-};
+}
 
 function initAxons(creature, noiseGroup) {
   for (let brain in creature.network) {
@@ -99,9 +99,9 @@ function initAxons(creature, noiseGroup) {
         for (let axon = 0; axon < neuronsInNextLayer; axon++) {
           let weight = 0;
 
-          if (noiseGroup && seededNoiseB() < connectionDensity) {
+          if (noiseGroup && seededNoiseB() < connectionDensity[layer]) {
             weight = seededNoiseB(-maxInitialAxonValue, maxInitialAxonValue);
-          } else if (!noiseGroup && seededNoiseA() < connectionDensity) {
+          } else if (!noiseGroup && seededNoiseA() < connectionDensity[layer]) {
             weight = seededNoiseA(-maxInitialAxonValue, maxInitialAxonValue);
           } else weight = 0;
 
@@ -113,7 +113,7 @@ function initAxons(creature, noiseGroup) {
       nbrain.axons.push(layerWeights);
     }
   }
-};
+}
 
 // Creature.prototype feeds the neuron values through the axons, and all the way to the end of the network.
 function feedForward(creature, input) {
@@ -128,18 +128,22 @@ function feedForward(creature, input) {
   feedMain(creature, network, input, inputCount, outputCount, cellStateLength);
 
   return calculateCellState(creature, network, cellStateLength);
-};
+}
+
+function resetCellState(creature) {
+  creature.network.cellState = new Array(outputs).fill(0);
+}
 
 function feedForget(creature, network, input, inputCount, outputCount, cellStateLength) {
   let nbrain = network.forget;
   let layers = nbrain.layerCount;
 
-  for (let op = 0; op < outputCount; op++) {
-    nbrain.neurons[0][op] = network.output[op] || 0;
+  for (let cs = 0; cs < cellStateLength; cs++) {
+    nbrain.neurons[0][cs] = network.cellState[cs] || 0;
   }
 
-  for (let cs = 0; cs < cellStateLength; cs++) {
-    nbrain.neurons[0][outputCount + cs] = network.cellState[cs] || 0;
+  for (let op = 0; op < outputCount; op++) {
+    nbrain.neurons[0][cellStateLength + op] = network.output[op] || 0;
   }
 
   for (let i = 0; i < inputCount; i++) {
@@ -166,12 +170,12 @@ function feedDecide(creature, network, input, inputCount, outputCount, cellState
   let nbrain = network.decide;
   let layers = nbrain.layerCount;
 
-  for (let op = 0; op < outputCount; op++) {
-    nbrain.neurons[0][op] = network.output[op] || 0;
+  for (let cs = 0; cs < cellStateLength; cs++) {
+    nbrain.neurons[0][cs] = network.cellState[cs] || 0;
   }
 
-  for (let cs = 0; cs < cellStateLength; cs++) {
-    nbrain.neurons[0][outputCount + cs] = network.cellState[cs] || 0;
+  for (let op = 0; op < outputCount; op++) {
+    nbrain.neurons[0][cellStateLength + op] = network.output[op] || 0;
   }
 
   for (let i = 0; i < inputCount; i++) {
@@ -339,6 +343,7 @@ function mutate(creature) {
     if (rand < mutability.eyes.number / 2 && creature.eyes.length < maxEyes) {
       creature.eyes.push(new eye(undefined, undefined, false));
     } else if (rand < mutability.eyes.number && creature.eyes.length > minEyes) {
+      creature.removedEyes.push(i);
       creature.eyes.splice(i, 1);
     }
   }
@@ -401,6 +406,7 @@ function mutateNet(creature, network) {
 function copyNeuralNetwork(creature, copy) {
   for (let brain in creature.network) {
     if (brainNames.indexOf(brain) == -1) continue;
+
     let netw = copy.network[brain].layers[0] < creature.network[brain].layers[0] ? copy.network[brain] : creature.network[brain];
 
     for (let layer = 0; layer < netw.axons.length; layer++) {
