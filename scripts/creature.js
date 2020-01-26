@@ -9,6 +9,8 @@ function Creature(x, y, spec, specGen, color) {
     y: 0
   };
 
+  this.removedEyes = [];
+
   this.mutability = {
     brain: 0,
     children: 0,
@@ -160,6 +162,8 @@ function randomize(creature) {
     y: 0
   };
 
+  this.removedEyes = [];
+
   creature.mutability = {
     brain: seededNoiseB(minMutability.brain, maxMutability.brain),
     children: seededNoiseB(minMutability.children, maxMutability.children),
@@ -268,6 +272,8 @@ function setSpecies(creature, species, noiseGroup) {
     }
   }
 
+  resetCellState(creature);
+
   creature.geneticID = geneticID;
 
   if (species == "undefined" || species === undefined) {
@@ -353,13 +359,13 @@ function see(creature) {
 
     if (sight[1] == "tile") {
       output.push(sight[0].food / maxTileFood - 0.5);
-      output.push(0);
+      output.push(Math.min(Math.floor(45 + 50 * ((sight[0].food + 0.01) / maxTileFood)), maxTileHue) / 360); // Color of tile
     } else if (sight[1] == "water") {
       output.push(-1);
-      output.push(-1);
+      output.push(200 / 360); // Color of water
     } else if (sight[1] == "creature") {
-      output.push((1 - creature.size / maxCreatureSize) * 2 - 1);
-      output.push(1);
+      output.push(creature.size / maxCreatureSize);
+      output.push(parseInt(creature.color.split(",")[0].replace("hsl(", "")) / 360);
     } else if (sight[1] == "oob") {
       output.push(-1);
       output.push(-1);
@@ -379,6 +385,7 @@ function act(creature) {
   reproduce(creature);
   metabolize(creature);
   move(creature);
+  releaseScent(creature);
 
   eat(creature, tile);
 

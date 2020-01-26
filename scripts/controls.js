@@ -48,6 +48,12 @@ function checkKey(key) {
     keyToggle = false;
   }
 
+  if (keyDown(controls.scent) && keyToggle) {
+    scentMode = !scentMode;
+
+    keyToggle = false;
+  }
+
   if (keyDown(controls.speciesGraphMode) && keyToggle) {
     speciesGraphOn = !speciesGraphOn;
 
@@ -66,6 +72,12 @@ function checkKey(key) {
 
   if (keyDown(controls.speciesGraphDial) && keyToggle) {
     speciesGraphAutoDial = true;
+
+    keyToggle = false;
+  }
+
+  if (keyDown(controls.brainDisplayMode) && keyToggle) {
+    brainDisplayMode = !brainDisplayMode;
 
     keyToggle = false;
   }
@@ -131,6 +143,8 @@ window.onmousemove = function(e) {
 
   lcx = mouse.current.x;
   lcy = mouse.current.y;
+
+  hoverSelectedNeuron(e)
 };
 
 window.onwheel = function(e) {

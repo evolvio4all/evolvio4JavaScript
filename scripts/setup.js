@@ -1,6 +1,6 @@
 const display = document.getElementById("canvas");
 const ctx = display.getContext("2d", {
-  alpha: true
+  alpha: false
 });
 
 const viewport = document.getElementById("neuralnet");
@@ -10,9 +10,18 @@ const ctz = viewport.getContext("2d", {
 
 ctz.lineCap = "round";
 
-let seed = prompt("Seed?");
+let seed = NaN;
+let seedSkips = 0;
+while (isNaN(seed)) {
+  seedSkips++;
+  seed = prompt("Seed?");
 
-if (seed == "" || seed == null) seed = Math.floor(Math.random() * 99999);
+  if (seed == "idk" || seedSkips == 3) seed = Math.min(Math.max(Math.floor(Math.random() * 99999), 1));
+
+  seed = parseInt(seed);
+}
+
+let hoveredNeuron = [-1, -1];
 
 let tick = 0;
 let tc = 0;
@@ -33,6 +42,7 @@ let maxNewSpeciesTries = 50;
 let creatures = [];
 let selectedCreature = null;
 
+let brainDisplayMode = false;
 let energyGraph = {
   eat: [],
   move: [],

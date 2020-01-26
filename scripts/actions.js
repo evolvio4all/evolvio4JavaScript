@@ -74,15 +74,15 @@ function move(creature) {
 };
 
 function reproduce(creature) {
-  if (creature.output[4] < minSpawnPower) {
+  /*if (creature.output[4] < minSpawnPower) {
     //creature.energyGraph.spawn.push(0);
     return;
-  }
+  }*/
 
   let tenergy = 0;
 
   // Random number added to desynchronize births (theoretically this would happen over time naturally, but it would take a long time and synchronized birth has an undesired impacts on user-experience)
-  if (seededNoiseA() < 0.25 && creature.age > reproduceAge && creature.reproduceTime > minReproduceTime) {
+  if (seededNoiseA() < 0.05 && creature.age > reproduceAge && creature.reproduceTime > minReproduceTime) {
     for (let i = 0; i < creature.children; i++) {
       if (creature.energy > maxCreatureEnergy * creature.childEnergy) {
         let child = new Creature(creature.x + (seededNoiseA() * 2 - 1) * 10, creature.y + (seededNoiseA() * 2 - 1) * 10, creature.species, creature.speciesGeneration, creature.color);
@@ -150,6 +150,12 @@ function die(creature) {
     population--;
   }
 };
+
+function releaseScent(creature) {
+  if (map[Math.floor(creature.x / tileSize)] && map[Math.floor(creature.x / tileSize)][Math.floor(creature.y / tileSize)]) {
+    map[Math.floor(creature.x / tileSize)][Math.floor(creature.y / tileSize)].scent += creatureScentTrail;
+  }
+}
 
 function attack(creature) {
   let att = creature.output[3];
