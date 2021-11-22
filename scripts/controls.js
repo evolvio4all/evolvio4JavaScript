@@ -1,4 +1,7 @@
-let background = document.body.style.background;
+var background = document.body.style.background;
+
+var lcx = 0;
+var lcy = 0;
 
 function checkKey(key) {
   // checks an incoming key
@@ -30,9 +33,9 @@ function checkKey(key) {
 
     keyToggle = false;
   }
-  if (keyDown(controls.auto) && keyToggle) {
+  if (keyDown(controls.auto) && keyToggle && !autoMode) {
     autoMode = true;
-
+    update(true);
     keyToggle = false;
   }
 
@@ -81,9 +84,15 @@ function checkKey(key) {
 
     keyToggle = false;
   }
+
+  if (keyDown(controls.background) && keyToggle) {
+    uiBackground = !uiBackground;
+
+    keyToggle = false;
+  }
 }
 
-let mouse = {
+var mouse = {
   up: {
     x: 0,
     y: 0
@@ -144,12 +153,15 @@ window.onmousemove = function(e) {
   lcx = mouse.current.x;
   lcy = mouse.current.y;
 
-  hoverSelectedNeuron(e)
+  if (brainDisplayMode) hoverSelectedNeuron(e)
 };
 
+
+var zoomCache = zoomLevel;
 window.onwheel = function(e) {
   zoomCache = zoomLevel;
-  zoomAmount = Math.max(Math.min(-e.deltaY, 1), -1) * zoomSpeed * zoomCache;
+  var zoomAmount = Math.max(Math.min(-e.deltaY, 1), -1) * zoomSpeed * zoomCache;
+
   zoomLevel += zoomAmount;
 
   if (zoomLevel < minZoomLevel) {
@@ -157,23 +169,27 @@ window.onwheel = function(e) {
   } else
   if (zoomLevel > maxZoomLevel) {
     zoomLevel = maxZoomLevel;
-  } else {
-    mouse.current.x = getMousePos(e)[0];
-    mouse.current.y = getMousePos(e)[1];
-
-    let bzoom = {};
-    zoomLevel -= zoomAmount;
-    bzoom.x = (cropx + mouse.current.x) / zoomLevel;
-    bzoom.y = (cropy + mouse.current.y) / zoomLevel;
-
-    let azoom = {};
-    zoomLevel += zoomAmount;
-    azoom.x = (cropx + mouse.current.x) / zoomLevel;
-    azoom.y = (cropy + mouse.current.y) / zoomLevel;
-
-    cropx += (bzoom.x - azoom.x) * zoomLevel;
-    cropy += (bzoom.y - azoom.y) * zoomLevel;
   }
+
+  var trueZoomAmount = zoomLevel - zoomCache;
+
+  mouse.current.x = getMousePos(e)[0];
+  mouse.current.y = getMousePos(e)[1];
+
+  var bzoom = {};
+  zoomLevel -= trueZoomAmount;
+  bzoom.x = (cropx + mouse.current.x) / zoomLevel;
+  bzoom.y = (cropy + mouse.current.y) / zoomLevel;
+
+  var azoom = {};
+
+  zoomLevel += trueZoomAmount;
+
+  azoom.x = (cropx + mouse.current.x) / zoomLevel;
+  azoom.y = (cropy + mouse.current.y) / zoomLevel;
+
+  cropx += (bzoom.x - azoom.x) * zoomLevel;
+  cropy += (bzoom.y - azoom.y) * zoomLevel;
 
   multiple = tileSize * zoomLevel;
 };
@@ -192,7 +208,8 @@ window.onkeyup = function(e) {
   var z = activeKeys.indexOf(e.keyCode);
   toggle = true;
 
-  for (i = activeKeys.length - 1; i >= 0; i--) {
+  var activeKeysLength = activeKeys.length - 1
+  for (let i = activeKeysLength; i >= 0; i--) {
     activeKeys.splice(z, 1);
 
     activeKeys.indexOf(e.keyCode);

@@ -1,26 +1,24 @@
 function eat(creature, tile) {
-  let eatp = creature.output[2];
+  creature.isEating = true;
 
-  if (eatp < minEatPower) {
-    creature.energyGraph.eat.push(0);
-    creature.eating = false;
-    return;
-  } else creature.isEating = true;
-
-
-  let tenergy = -energy.eat * eatp;
+  //lose energy cost to eat
+  var tenergy = -energy.eat;
 
   if (tile == null) {
     creature.energy += tenergy;
-    creature.energyGraph.eat.push(parseFloat(tenergy.toFixed(2)));
+    creature.energyGraph.eat.push(tenergy);
     return;
   }
 
-  let eatAmount = eatp * eatPower * (1 - Math.pow(1 - Math.min(tile.food / tile.maxFood, 1), eatDiminishingRate));
+  var eatAmount = 0;
+
+  if (creature.output[3] >= 0) eatAmount = eatPower * Math.pow(tile.food / tile.maxFood, 1 / eatDiminishingRate);
+  else eatAmount = -pukePower;
+
   tenergy += eatAmount * eatEffeciency;
   creature.energy += tenergy;
 
-  creature.energyGraph.eat.push(parseFloat(tenergy.toFixed(2)));
+  creature.energyGraph.eat.push(tenergy);
 
   if (tile.food - eatAmount < 0) {
     tile.food = 0;
@@ -30,48 +28,62 @@ function eat(creature, tile) {
 };
 
 function metabolize(creature) {
-  let timeScalar = Math.min(Math.pow(creature.age / metabolismScaleTime, metabolismScaleScale), 1);
-  let sizeScalar = (1 - sizeMetabolismFactor) + ((creature.size - minCreatureSize) / maxCreatureSize) * sizeMetabolismFactor;
-  let weightScalar = (1 - weightMetabolismFactor) + (creature.energy / maxCreatureEnergy) * weightMetabolismFactor;
+  var timeScalar = Math.min(Math.pow(creature.age / metabolismScaleTime, metabolismScaleScale), 1);
+  var sizeScalar = (1 - sizeMetabolismFactor) + ((creature.size - minCreatureSize) / maxCreatureSize) * sizeMetabolismFactor;
+  var weightScalar = (1 - weightMetabolismFactor) + (creature.energy / maxCreatureEnergy) * weightMetabolismFactor;
 
-  let tenergy = -(maxMetabolism - minMetabolism) * timeScalar * sizeScalar * weightScalar - minMetabolism;
+  var tenergy = -(maxMetabolism - minMetabolism) * timeScalar * sizeScalar * weightScalar - minMetabolism;
   creature.energy += tenergy;
 
-  creature.energyGraph.metabolism.push(parseFloat(tenergy.toFixed(2)));
+  creature.energyGraph.metabolism.push(tenergy);
 };
 
-function move(creature) {
+function move(creature, tile) {
   if (!creature.rotateTime) creature.rotateTime = 1;
 
-  let tenergy = 0;
+  var tenergy = 0;
 
-  if (Math.abs(creature.output[1]) > minRotation) {
-    tenergy -= energy.rotate * Math.abs(creature.output[1]);
+  var forwardAcceleration = maxAcceleration * creature.output[0];
+  var horizontalAcceleration = maxAcceleration * creature.output[1] * horizontalAccelerationModifier;
 
-    creature.rotation += creature.output[1] * rotationSpeed;
-    creature.rotation = creature.rotation % (2 * Math.PI);
+  var xMoveAmount = Math.cos(creature.rotation + Math.PI / 2) * horizontalAcceleration + Math.cos(creature.rotation) * forwardAcceleration;
+  var yMoveAmount = Math.sin(creature.rotation + Math.PI / 2) * horizontalAcceleration + Math.sin(creature.rotation) * forwardAcceleration;
+
+  if (creature.isEating) {
+    xMoveAmount *= eatingSpeed;
+    yMoveAmount *= eatingSpeed;
   }
 
-  let f = (1 - friction);
-  creature.velocity.x *= f;
-  creature.velocity.y *= f;
+  if (tile == null) {
+    xMoveAmount *= swimmingSpeed;
+    yMoveAmount *= swimmingSpeed;
+  }
 
-  if (Math.abs(creature.output[0]) > minMoveAmount) {
-    let acceleration = maxAcceleration * creature.output[0];
-    tenergy -= energy.move * Math.abs(creature.output[0]);
+  creature.velocity.x += xMoveAmount;
+  creature.velocity.y += yMoveAmount;
 
-    if (creature.isEating) {
-      acceleration *= eatingSpeed;
-    }
+  tenergy -= energy.move;
+  creature.energy += tenergy;
 
-    creature.velocity.x += Math.cos(creature.rotation) * acceleration;
-    creature.velocity.y += Math.sin(creature.rotation) * acceleration;
+  creature.energyGraph.move.push(tenergy);
+};
+
+function rotate(creature) {
+  var tenergy = 0;
+
+  tenergy -= energy.rotate;
+
+  creature.rotation += rotationSpeed * creature.output[2];
+  creature.rotation = creature.rotation % (2 * Math.PI);
+
+  for (let i = 0; i < creature.eyes.length; i++) {
+    var eye = creature.eyes[i];
+
+    eye.googleAngle += rotationSpeed * creature.output[2];
   }
 
   creature.energy += tenergy;
-
-  creature.energyGraph.move.push(parseFloat(tenergy.toFixed(2)));
-};
+}
 
 function reproduce(creature) {
   /*if (creature.output[4] < minSpawnPower) {
@@ -79,57 +91,102 @@ function reproduce(creature) {
     return;
   }*/
 
-  let tenergy = 0;
+  var nearbyMembers = 1;
+  //var tenergy = 0;
+  if (creature.reproductiveMembers > 1) {
+    var searchArea = Math.PI * reproduceRange * reproduceRange;
+    var searchRing = 0;
+    var angle = 0;
+
+    for (let j = 0; j < searchArea; j++) {
+      angle += 1 / (2 * Math.PI * searchRing);
+      angle = angle % (Math.PI * 2);
+      var searchX = Math.floor(searchRing * Math.cos(angle));
+      var searchY = Math.floor(searchRing * Math.sin(angle));
+      if (creatureLocations[searchX] && creatureLocations[searchX][searchY]) {
+        var targetCreaturesList = creatureLocations[searchX][searchY];
+
+        for (let i = 0; i < targetCreaturesList.length; i++) {
+          var targetCreature = targetCreaturesList[i];
+
+          if (targetCreature && targetCreature != creature) {
+            if (creature.reproductiveMembers == targetCreature.reproductiveMembers) {
+              nearbyMembers++;
+            }
+          }
+        }
+      }
+
+      if (j == Math.PI * searchRing * searchRing / 4) searchRing++;
+    }
+  }
+
 
   // Random number added to desynchronize births (theoretically this would happen over time naturally, but it would take a long time and synchronized birth has an undesired impacts on user-experience)
-  if (seededNoiseA() < 0.05 && creature.age > reproduceAge && creature.reproduceTime > minReproduceTime) {
+  if (creature.reproductiveMembers >= nearbyMembers) {
+    var startEnergy = creature.energy;
+
     for (let i = 0; i < creature.children; i++) {
-      if (creature.energy > maxCreatureEnergy * creature.childEnergy) {
-        let child = new Creature(creature.x + (seededNoiseA() * 2 - 1) * 10, creature.y + (seededNoiseA() * 2 - 1) * 10, creature.species, creature.speciesGeneration, creature.color);
+      let birthCost = (creature.size / maxCreatureSize * childSizeCost + creature.eyes.length * childEyeCost + childEnergy);
 
-        child.eyes = [];
+      if (creature.energy >= birthCost) {
+        //tenergy -= birthCost;
+        creature.energy -= birthCost;
 
-        let eyes = creature.eyes.length;
-        for (let i = 0; i < eyes; i++) {
-          let eyeCopy = creature.eyes[i];
-          child.eyes.push(new eye(eyeCopy.angle, eyeCopy.distance, false));
-        }
-
-        child.mutability = {};
-        for (let value in creature.mutability) {
-          child.mutability[value] = creature.mutability[value];
-        }
-
-        child.energy = maxCreatureEnergy * creature.childEnergy * birthEffeciency;
-        child.children = creature.children;
-        child.childEnergy = creature.childEnergy;
-        child.size = creature.size;
-        child.generation = creature.generation + 1;
-
-        mutate(child);
-
-        createNeuralNetwork(child, false);
-        copyNeuralNetwork(child, creature);
-
-        mutateNet(child, child.network);
-        child.rotation = seededNoiseA() * 2 * Math.PI;
-
-        creatures.push(child);
-
-        tenergy -= creature.childEnergy * maxCreatureEnergy;
-        creature.energy -= creature.childEnergy * maxCreatureEnergy;
+        creature.reproduceTime = 0;
       } else break;
-    }
 
-    creature.reproduceTime = 0;
+      makeChild(creature);
+    }
   }
 
   //creature.energyGraph.spawn.push(parseFloat(tenergy.toFixed(2)));
 };
 
+function makeChild(creature) {
+  var child = new Creature(creature.x + seededNoiseA(-tileSize, tileSize), creature.y + seededNoiseA(-tileSize, tileSize), creature.species, creature.speciesGeneration, creature.color);
+
+  child.energy = childEnergy * birthEffeciency;
+
+  child.scentTrail = [...JSON.parse(JSON.stringify(creature.scentTrail))];
+
+  child.eyes = [...JSON.parse(JSON.stringify(creature.eyes))];
+
+  child.mutability = JSON.parse(JSON.stringify(creature.mutability));
+
+  child.biases = [...JSON.parse(JSON.stringify(creature.biases))];
+
+  child.reproductiveMembers = creature.reproductiveMembers;
+
+  child.children = creature.children;
+  child.size = creature.size;
+  child.generation = creature.generation + 1;
+  child.species = creature.species;
+
+  mutate(child);
+  copyNeuralNetwork(child, creature);
+
+  var rand = seededNoiseA();
+  if (rand < childMutationChance) {
+    if (rand < 0.01) {
+      for (var u = 0; u < 10; u++) {
+        mutateNet(child, child.network);
+      }
+    } else {
+      mutateNet(child, child.network);
+    }
+  }
+
+  child.species = setSpecies(child, creature.species);
+
+  child.rotation = seededNoiseA(0, 2 * Math.PI);
+
+  creatures.push(child);
+}
+
 function die(creature) {
   if (specieslist[creature.species]) {
-    let con = specieslist[creature.species].contains.indexOf(creature);
+    var con = specieslist[creature.species].contains.indexOf(creature);
     specieslist[creature.species].contains.splice(con, 1);
 
     if (specieslist[creature.species].contains.length === 0) {
@@ -144,39 +201,47 @@ function die(creature) {
   } else {
     if (creature.firstGen) firstGen--;
 
-    let pos = creatures.indexOf(creature);
+    var pos = creatures.indexOf(creature);
     creatures.splice(pos, 1);
 
     population--;
   }
 };
 
-function releaseScent(creature) {
-  if (map[Math.floor(creature.x / tileSize)] && map[Math.floor(creature.x / tileSize)][Math.floor(creature.y / tileSize)]) {
-    map[Math.floor(creature.x / tileSize)][Math.floor(creature.y / tileSize)].scent += creatureScentTrail;
-  }
+function releaseScent(creature, tile) {
+  tile.scent[0] += creature.scentTrail[0] * (maxCreatureScentTrail - minCreatureScentTrail) + minCreatureScentTrail;
+  tile.scent[1] += creature.scentTrail[1] * (maxCreatureScentTrail - minCreatureScentTrail) + minCreatureScentTrail;
+  tile.scent[2] += creature.scentTrail[2] * (maxCreatureScentTrail - minCreatureScentTrail) + minCreatureScentTrail;
+}
+
+function releaseRedScent(creature, tile) {
+  tile.scent[0] += scentPlacementRate * creature.output[6];
+}
+
+function releaseGreenScent(creature, tile) {
+  tile.scent[1] += scentPlacementRate * creature.output[7];
+}
+
+function releaseBlueScent(creature, tile) {
+  tile.scent[2] += scentPlacementRate * creature.output[8];
 }
 
 function attack(creature) {
-  let att = creature.output[3];
+  var tenergy = -energy.attack;
 
-  if (att < minAttackPower) {
-    creature.energyGraph.attack.push(0);
-    return;
-  }
+  if (creature.age < minAttackAge || creature.reproduceTime < minAttackAge) return;
 
-  let tenergy = -energy.attack * att;
+  for (let i = 0; i < creatures.length; i++) {
+    var targetCreature = creatures[i];
 
-  let attackPositionX = Math.floor((creature.x / tileSize) + Math.cos(creature.rotation));
-  let attackPositionY = Math.floor((creature.y / tileSize) + Math.sin(creature.rotation));
+    if (targetCreature && targetCreature != creature &&
+      targetCreature.x > creature.x - attackRadius && targetCreature.x < creature.x + attackRadius &&
+      targetCreature.y > creature.y - attackRadius && targetCreature.y < creature.y + attackRadius) {
 
-  if (creatureLocations[attackPositionX]) {
-    let targetCreature = creatureLocations[attackPositionX][attackPositionY] || null;
-    if (targetCreature && targetCreature != creature) {
-      let sizeDiff = Math.max(creature.size - targetCreature.size, 0) / maxCreatureSize + 0.2;
-      targetCreature.energy -= att * attackPower * sizeDiff;
+      var sizeDiff = Math.max(creature.size - targetCreature.size, 0) / maxCreatureSize + 0.2;
 
-      tenergy += att * attackPower * sizeDiff * attackEffeciency;
+      targetCreature.energy -= attackPower * sizeDiff;
+      if (!targetCreature.isAttacking) tenergy += attackPower * sizeDiff * attackEffeciency + Math.min(targetCreature.energy, 0);
     }
   }
 
@@ -186,9 +251,9 @@ function attack(creature) {
 };
 
 function adjustEyes(creature) {
-  let eyes = creature.eyes;
+  var eyes = creature.eyes;
   for (let i = 0; i < eyes.length; i++) {
-    let eye = eyes[i];
+    var eye = eyes[i];
 
     eye.tween = creature.output[outputs + i];
   }
