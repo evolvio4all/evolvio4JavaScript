@@ -71,8 +71,12 @@ function Tile(x, y) {
     this.type = 1;
   }
 
+<<<<<<< HEAD
   this.scent = [0, 0, 0];
   this.scentBuffer = [0, 0, 0];
+=======
+  this.scent = 0;
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
   if (this.type == 1) this.maxFood = parseFloat((seededNoiseA(0.9 * maxTileFood, maxTileFood)).toFixed(2));
   else if (this.type == 2) this.maxFood = parseFloat((seededNoiseA(0.9 * everGreenMaxFood, everGreenMaxFood)).toFixed(2));

@@ -10,8 +10,11 @@ function Creature(x, y, spec, specGen, color) {
     y: 0
   };
 
+<<<<<<< HEAD
   this.reproductiveMembers = 1;
 
+=======
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
   this.removedEyes = [];
 
   this.mutability = {
@@ -214,9 +217,13 @@ function randomize(creature) {
     y: 0
   };
 
+<<<<<<< HEAD
   creature.removedEyes = [];
 
   creature.reproductiveMembers = 1;
+=======
+  this.removedEyes = [];
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
   creature.mutability = {
     brain: seededNoiseB(minMutability.brain, maxMutability.brain),
@@ -317,6 +324,8 @@ function setSpecies(creature, species) {
     }
   }
 
+  resetCellState(creature);
+
   creature.geneticID = geneticID;
 
   if (species == "undefined" || species === undefined) {
@@ -408,6 +417,7 @@ function act(creature) {
   var pos = getPosition(creature);
   var tile = map[pos[0]][pos[1]];
 
+<<<<<<< HEAD
   tickCreature(creature);
   metabolize(creature);
 
@@ -418,6 +428,20 @@ function act(creature) {
     if (Math.abs(creature.output[i]) > 0.05 && Math.abs(creature.output[i]) > largest) {
       action = i;
       largest = Math.abs(creature.output[i]);
+=======
+    if (sight[1] == "tile") {
+      output.push(sight[0].food / maxTileFood - 0.5);
+      output.push(Math.min(Math.floor(45 + 50 * ((sight[0].food + 0.01) / maxTileFood)), maxTileHue) / 360); // Color of tile
+    } else if (sight[1] == "water") {
+      output.push(-1);
+      output.push(200 / 360); // Color of water
+    } else if (sight[1] == "creature") {
+      output.push(creature.size / maxCreatureSize);
+      output.push(parseInt(creature.color.split(",")[0].replace("hsl(", "")) / 360);
+    } else if (sight[1] == "oob") {
+      output.push(-1);
+      output.push(-1);
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
     }
   }
 
@@ -429,8 +453,16 @@ function act(creature) {
   if (action == 4) attack(creature);
   else creature.energyGraph.attack.push(0);
 
+<<<<<<< HEAD
   if (Math.abs(creature.output[0]) > minMovePower) move(creature);
   else creature.energyGraph.move.push(0);
+=======
+  attack(creature);
+  reproduce(creature);
+  metabolize(creature);
+  move(creature);
+  releaseScent(creature);
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
   if (tile != null) {
     releaseRedScent(creature, tile);

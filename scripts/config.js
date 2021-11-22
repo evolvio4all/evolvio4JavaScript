@@ -1,4 +1,5 @@
 // GLOBAL //
+<<<<<<< HEAD
 var seed = prompt("input seed"); // Determines everything.
 console.log(seed);
 //All random numbers are seeded based on this seed.
@@ -12,6 +13,12 @@ var infoMode = true; // shows and hides info (neural network and graph)
 var autoMode = false; // automatically calculate timescale (max 40ms to 60ms update time)
 var scentMode = false; // show or hide scent map
 var brainDisplayMode = false; // show or hide the neural display of the brain
+=======
+let debugMode = false; // Shows debug info (angle, left and right turn outputs, and tile food)
+let infoMode = true; // shows and hides info (neural network and graph)
+let autoMode = false; // automatically calculate timescale (max 40ms to 60ms update time)
+let scentMode = false; // show or hide scent map
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 const minUpdateTime = 60; // Time between updates before the timescale is increased by 1 (automode, lower = less CPU use)
 const maxUpdateTime = 75; // Time between updates before the timescale is decreased by 1 (automode, lower = less CPU use)
@@ -25,6 +32,7 @@ const ticksPerCapture = 1000; // Number of ticks between frame captures. Only wi
 const bias = 0.00; // Bias added to each Neuron after activation function
 
 // MAP //
+<<<<<<< HEAD
 const mapSize = 180; // Size of the map (height and width) in tiles
 const tileSize = 800; // Size of the tiles in pixels (at a zoom level of 1)
 const selectSizeAddition = 100; // How far around creatures can you click to select them
@@ -50,27 +58,65 @@ const thirdMapImpact = 1 / 8; // Impact of the third noise map on the overall ma
 const edgeDistanceImpact = 0.5; // How far from the center does water start forming (higher = more water, lower = more land)
 const centerDistanceImpact = 0.1 // How far from the center does land start forming (higher = more water, lower = more land)
 const waterRatio = 0.4; // Water amount. Very close to a percentage but not exact (higher = more water)
+=======
+const mapSize = 150; // Size of the map (height and width) in tiles
+const tileSize = 400; // Size of the tiles in pixels (at a zoom level of 1)
+const selectSizeAddition = 100; // How far around creatures can you click to select them
+
+const maxTileFood = 100; // Maximum food on a tile
+
+const springGrowRate = 0.003; // Grow amount in spring season (applies to all tiles)
+const winterGrowRate = 0.0; // Grow amount in winter season (applies to all tiles)
+
+const grassSpreadRate = 0.0003; // % difference between tiles grass spread rate
+
+const firstMapFrequency = 4; // Frequency of the first noise mapSize
+const firstMapImpact = 1 / 2; // Impact of the first noise map on the overall map
+
+const secondMapFrequency = 8; // Frequency of the second noise mapSize
+const secondMapImpact = 1 / 4; // Impact of the second noise map on the overall map
+
+const thirdMapFrequency = 24; // Frequency of the third noise mapSize
+const thirdMapImpact = 1 / 8; // Impact of the third noise map on the overall map
+
+const edgeDistanceImpact = 1; // How far from the center does water start forming (higher = more water, less land)
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 const foodUpdateDelay = 15; // How many ticks between food tiles update
 const scentUpdateDelay = 5; // How many ticks scent tile updates
 
 // evergreen tiles are always grow at the same rate //
 const everGreenNoiseFrequency = 4; // Frequency of evergreen noise function
+<<<<<<< HEAD
 const everGreenProminence = 1; // How prominent are evergreen tiles (arbitrary)
+=======
+const everGreenProminence = 0.6; // How prominent are evergreen tiles (arbitrary)
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 const everGreenInnerArea = 0.2; // How far from the edge evergreens start to spawn
 const everGreenOuterArea = 0.3; // How far from the center are evergreens spawning
 const everGreenPercentage = 0.7; // % of tiles (within the evergreen area) that are evergreen (always in grow season)
 
+<<<<<<< HEAD
 const everGreenGrowRate = springGrowRate * 1.2; // grow rate of evergreen tiles
 const everGreenMaxFood = maxTileFood * 2; // maximum food on evergreen tiles
 const everGreenGrassSpreadRate = grassSpreadRate * 1.2; // % difference between tiles grass spread rate for evergreen tiles
+=======
+const everGreenGrowRate = springGrowRate * 2; // grow rate of evergreen tiles
+const everGreenMaxFood = maxTileFood * 2; // maximum food on evergreen tiles
+const everGreenGrassSpreadRate = grassSpreadRate; // % difference between tiles grass spread rate for evergreen tiles
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 
 // CREATURES //
 
 // Global //
+<<<<<<< HEAD
 const minCreatures = 10; // Minimum number of creatures
 const minFirstGen = 35; // Minimum number of first generation creatures
+=======
+const minCreatures = 50; // Minimum number of creatures
+const minFirstGen = 50; // Minimum number of first generation creatures
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 const creatureLimit = 5000; // Maximum number of creatures (when population = creatureLimit, the game pauses)
 const foodImposedCreatureLimit = 800; // Maximum number of creatures before food stops growing (when population = foodBasedCreatureLimit, food stops growing)
@@ -87,8 +133,12 @@ const maxEyes = 8; // Maximum number of "eyes" a creature can have
 const minEyeDistance = tileSize * 1; // Minimum eye distance in general (creatures will mutate the angle and distance)
 const maxEyeDistance = tileSize * 18; // Maximum eye distance in general (creatures will mutate the angle and distance)
 
+<<<<<<< HEAD
 const fastInternalClockSpeed = 13; // Internal clock speed in seconds = internalClockSpeed / 30;
 const slowInternalClockSpeed = 113;
+=======
+const internalClockSpeed = 15; // Internal clock speed in seconds = internalClockSpeed / 30;
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 // Initial //
 const minInitEyeCount = 1; // Minimum number of eyes "eyes" a first generation creature can have
@@ -116,7 +166,11 @@ const energyGraphY = 1080 - 180; // Y of the energyGraph
 
 const energy = {
   eat: 0.25, // Energy cost to eat at eatPower
+<<<<<<< HEAD
   move: 0.15, // Energy cost to move at maxCreatureSpeed
+=======
+  move: 0.2, // Energy cost to move at maxCreatureSpeed
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
   rotate: 0.05, // Energy cost to rotate at rotationSpeed
   attack: 0.25 // Energy cost to attack at attackPower
 };
@@ -133,6 +187,7 @@ const pukePower = 0.25;
 const eatDiminishingRate = 1; // Determines how uniformly diminishing returns are applied on eating; Higher is less diminishing; 0 is none; 1 is linear; (based on food on the tile / maxTileFood). Math.pow(tile.food / maxTileFood, eatDiminishingReturns)
 
 // Metabolism //
+<<<<<<< HEAD
 const metabolismScaleTime = 3600; // How long it takes for metabolism to scale to maxMetabolism; Effectively lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
 const metabolismScaleScale = 1.5; // Determines how uniformly metabolism increases. 1 is linear; Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
 const sizeMetabolismFactor = 0.2; // % how much size affects metabolism (creature size / maxCreatureSize)
@@ -144,6 +199,20 @@ const maxMetabolism = 1; // End metabolism (metabolism when age == metabolismSca
 // Movement //
 const maxCreatureSpeed = 400; // Maximum creature speed (maxCreatureSpeed = maxAcceleration / friction)
 const minMovePower = 0.1; // Minimum amount a creature is allowed to move as a percentage of maxCreatureSpeed
+=======
+const metabolismScaleTime = 4800; // How long it takes for metabolism to scale to maxMetabolism; Effectively lifespan of a creature in ticks (metabolismScaleTime / 30 = metabolismScaleTime in seconds)
+const metabolismScaleScale = 3; // Determines how uniformly metabolism increases. 1 is linear; Higher = lower metabolism for longer. Math.pow(age / metabolismScaleTime, metabolismScaleScale)
+const sizeMetabolismFactor = 0; // % how much size affects metabolism (creature size / maxCreatureSize)
+const weightMetabolismFactor = 0; // % how much energy affects metabolism (creature energy / maxCreatureEnergy)
+
+const minMetabolism = 0.1; // Initial metabolism
+const maxMetabolism = 0.7; // End metabolism (metabolism when age == metabolismScaleTime)
+
+// Movement //
+const maxCreatureSpeed = 100; // Maximum creature speed (maxCreatureSpeed = maxAcceleration / friction)
+const minMoveAmount = 0.2; // Minimum amount a creature is allowed to move as a percentage of maxCreatureSpeed
+const friction = 0.09; // The friction applied each tick (percentage of velocity lost to friction; friction = maxAcceleration / maxCreatureSpeed)
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 const staticFriction = { // The flat friction applied each tick on each surface
   water: 0.02,
@@ -151,11 +220,16 @@ const staticFriction = { // The flat friction applied each tick on each surface
   evergreen: 0.2
 };
 
+<<<<<<< HEAD
 const velocityFriction = { // The friction applied each tick on each surface based on velocity (percentage)
   water: 0.2,
   grass: 0.03,
   evergreen: 0.03
 };
+=======
+const swimmingSpeed = 0.7; // Movement speed % in water
+const eatingSpeed = 0.3; // Movement speed % while eating
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 const maxAcceleration = 40; // Maximum creature acceleration
 const horizontalAccelerationModifier = 0.8; // How fast a creature can accelerate side-ways, as a percentage of maxAcceleration
@@ -170,7 +244,21 @@ const minRotation = 0.1; // Minimum rotation amount as a percentage of rotation 
 const speciesDiversity = 70; // Diversity of each species
 const speciesColorChange = 55; // Color change between species
 
+<<<<<<< HEAD
 var speciesGraphDetail = 30; // Higher = less detail (in ticks). Down to 1. High detail takes up a lot of memory after a while
+=======
+const speciesGraphDetail = 50; // Higher = less detail (in ticks). Down to 1. High detail takes up a lot of memory after a while
+let speciesGraphMult = 1; // Height of species graph
+let speciesGraphAutoMult = false; // Is the graph height adjusted automatically (default: false)
+let speciesGraphSmooth = 2; // Smoothness of the species graph, averages the the graph points
+let speciesGraphAutoSmooth = false; // Does the smoothness scale over time (makes the species graph less spikey over time) (default: false)
+let speciesGraphStretch = 1; // How stretched the graph is
+let speciesGraphScrollSpeed = 20; // How fast the species graph dial moves per tick (z / x)
+const speciesGraphX = 350; // Does nothing. I'll do it later // TODO
+const speciesGraphY = 1080 - 5; // Y position of speciesGraph
+const speciesGraphWidth = 1920 - 350 * 2; // Does nothing. I'll do it later // TODO
+const speciesGraphLinesHeight = 10; // Height of the vertical lines on the speciesGraph
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 var speciesGraphMult = 1; // Height of species graph
 var speciesGraphAutoMult = true; // Is the graph height adjusted automatically (default: false)
@@ -204,11 +292,23 @@ const childEyeCost = 1; // How much it costs for a child to have more eyes
 const minSpawnPower = -0.9; // Minimum output to reproduce (anything lower will be considered 0)
 
 const reproduceAge = 900; // Minimum number of ticks before a creature can spawn children (reproduceAge / 30 = minimum reproduce age in seconds)
+<<<<<<< HEAD
 const minReproduceTime = 400; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
 
 const reproduceRange = 5; // Maximum range creatures can reproduce with eachother within
 const minReproductiveMembers = 1; // Minimum reproductiveMembers a species can have
 const maxReproductiveMembers = 2; // Max reproductiveMembers a species can have
+=======
+const minReproduceTime = 600; // Minimum number of ticks between spawns (minReproduceTime / 30 = minimum time between spawns in seconds)
+
+// Scent //
+const scentDeplenishRate = 1.02; // Should be 1 or greater, how fast scent deplenishes
+const maxTileScent = 25; // Maximum amount of scent for a single tile
+const creatureScentTrail = 0.1; // Amount creatures add to tile scent per tick
+
+// Attacking //
+const minAttackPower = 0.5; // Minimum attack strength (anything lower will be considered 0)
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 const childMutationChance = 0.1; // Chance a child will mutate at all
 
@@ -228,9 +328,13 @@ const minAttackPower = 0.5; // Minimum attack strength (anything lower will be c
 
 const attackRadius = 1 * tileSize; // Attack radius. Somewhat misleading, it's actually a box not a circle
 const attackEffeciency = 0.95; // Attack effeciency %
+<<<<<<< HEAD
 const attackPower = 5; // Attack power % (damage)
 
 const minAttackAge = 150; // Minimum age before a creature can attack
+=======
+const attackPower = 15; // Attack power % (damage)
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 // Mutation //
 const maxEyeAngleChange = (2 * Math.PI) / 24; // Maximum angle an eye can change by in a single mutation
@@ -242,11 +346,18 @@ const maxEyeDistanceChange = 300; // Maxmimum distance an eye can change distanc
 const biases = 1;
 
 const minMutability = { // Minimum mutability in various categories
+<<<<<<< HEAD
   brain: 0.01,
   children: 2,
   childEnergy: 2,
   members: 2,
   size: 5,
+=======
+  brain: 1,
+  children: 3,
+  childEnergy: 3,
+  size: 3,
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
   eyes: {
     number: 1,
     angle: 1,
@@ -257,10 +368,16 @@ const minMutability = { // Minimum mutability in various categories
 };
 
 const maxMutability = { // Maximum mutability in various categories
+<<<<<<< HEAD
   brain: 0.05,
   children: 5,
   childEnergy: 5,
   members: 5,
+=======
+  brain: 5,
+  children: 20,
+  childEnergy: 10,
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
   size: 20,
   eyes: {
     number: 10,
@@ -273,14 +390,24 @@ const maxMutability = { // Maximum mutability in various categories
 
 const maxMutabilityChange = 0.5; // Maximum amount any mutability can change by in a single mutation
 
+<<<<<<< HEAD
 const connectionDensity = [0.08, 1]; // % axons connected in each layer of the brain
 const maxAxonsPerNeuron = 2; // Maximum number of connections a neuron can make to a neuron in the next layer. (I don't think this is implemented)
 const maxInitialAxonValue = 4; // Maximum weight of an axon intially
+=======
+const connectionDensity = [0.2, 0.3]; // % axons connected in each layer of the brain
+const maxInitialAxonValue = 6; // Maximum weight of an axon intially
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 const memories = [3, 3]; // dimensions of memories a creature can store
 // I have intentions to make this — and most things here — evolution-based (with config values for min, max, and intial min and max)
 
+<<<<<<< HEAD
 const stepAdd = 0.2; // Maximum amount an axon can be changed by (additive)
+=======
+const stepAmount = 4; // Maximum amount an axon can be changed by (additive)
+const stepMult = 3; // Maximum amount an axon can be changed by (multiplicative)
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 // ZOOM //
 const zoomSpeed = 0.1; // How fast the zoom happens
@@ -308,13 +435,18 @@ const controls = {
   speciesGraphRight: "x",
   speciesGraphDial: "c",
   scent: "f",
+<<<<<<< HEAD
   brainDisplayMode: "b",
   background: "n"
+=======
+  brainDisplayMode: "b"
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 };
 
 const maxTileHue = 190;
 
 const nnui = { // Neural network UI config
+<<<<<<< HEAD
   xoffset: 1480,
   yoffset: 90,
   xspacing: 200,
@@ -328,6 +460,21 @@ const nnui = { // Neural network UI config
   cellStatex: 1480 - 40,
   cellStatey: 90,
   size: 6,
+=======
+  xoffset: 20,
+  yoffset: 20,
+  xspacing: 920,
+  yspacing: 9,
+  brainspacingx: 0,
+  brainspacingy: 180,
+  verticalSpacingHidden: 3,
+  verticalSpacingOut: 4,
+  cellStatex: 380,
+  cellStatey: 20,
+  outputx: 420,
+  outputy: 20,
+  size: 3,
+>>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
   stroke: true,
   maxLineSize: 10,
   minLineSize: 5
