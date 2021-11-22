@@ -1,38 +1,10 @@
-<<<<<<< HEAD
 seed = hashString(seed)();
-=======
-const display = document.getElementById("canvas");
-const ctx = display.getContext("2d", {
-  alpha: false
-});
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 const axonTypes = ["+", "*", "/", "-"];
 
 var hoveredNeuron = [-1, -1];
 
-<<<<<<< HEAD
 var varAOK = true;
-=======
-let seed = NaN;
-let seedSkips = 0;
-while (isNaN(seed)) {
-  seedSkips++;
-  seed = prompt("Seed?");
-
-  if (seed == "idk" || seedSkips == 3) seed = Math.min(Math.max(Math.floor(Math.random() * 99999), 1));
-
-  seed = parseInt(seed);
-}
-
-let hoveredNeuron = [-1, -1];
-
-let tick = 0;
-let tc = 0;
-let timescale = 1;
-let population = 0;
-let oldest = 0;
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
 var tick = 0;
 var tc = 0;
@@ -53,14 +25,9 @@ var maxNewSpeciesTries = 200;
 var creatures = [];
 var selectedCreature = null;
 
-<<<<<<< HEAD
 var updating = false;
 
 var energyGraph = {
-=======
-let brainDisplayMode = false;
-let energyGraph = {
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
   eat: [],
   move: [],
   metabolism: [],
@@ -112,15 +79,9 @@ var speciesGraphOn = false;
 
 var noiseChain = [];
 
-<<<<<<< HEAD
 var keyToggle = true;
 
 var brainNames = ["main"];
-=======
-let keyToggle = true;
-
-let brainNames = ["main", "decide", "modify", "forget"];
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 // FUNCTIONS //
 
 function newColor(noiseGroup) {
@@ -135,44 +96,6 @@ function newColor(noiseGroup) {
   return "hsl(" + h + ", " + 100 + "%, " + l + "%)";
 }
 
-<<<<<<< HEAD
-=======
-let grva = seed;
-let grvb = seed;
-
-function seededNoiseA(a, b) {
-  let r1 = a || 0;
-  let r2 = b || 1;
-
-  let A = 12.5;
-  let M = seed;
-
-  let Q = M / A;
-  let R = M % A;
-
-  grva = (A * (grva % Q)) - (R * Math.floor(grva / Q));
-  if (grva < 0) grva += M;
-
-  return (grva / M) * (r2 - r1) + r1;
-}
-
-function seededNoiseB(a, b) {
-  let r1 = a || 0;
-  let r2 = b || 1;
-
-  let A = 12.5;
-  let M = seed;
-
-  let Q = M / A;
-  let R = M % A;
-
-  grvb = (A * (grvb % Q)) - (R * Math.floor(grvb / Q));
-  if (grvb < 0) grvb += M;
-
-  return (grvb / M) * (r2 - r1) + r1;
-}
-
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 function sortByHighestValue(a, b) {
   var aMax = 0;
   var bMax = 0;

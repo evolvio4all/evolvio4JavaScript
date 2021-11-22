@@ -84,15 +84,12 @@ function checkKey(key) {
 
     keyToggle = false;
   }
-<<<<<<< HEAD
 
   if (keyDown(controls.background) && keyToggle) {
     uiBackground = !uiBackground;
 
     keyToggle = false;
   }
-=======
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 }
 
 var mouse = {
@@ -156,11 +153,7 @@ window.onmousemove = function(e) {
   lcx = mouse.current.x;
   lcy = mouse.current.y;
 
-<<<<<<< HEAD
   if (brainDisplayMode) hoverSelectedNeuron(e)
-=======
-  hoverSelectedNeuron(e)
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 };
 
 

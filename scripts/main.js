@@ -9,12 +9,7 @@ function main() {
 
   checkKey();
 
-<<<<<<< HEAD
   odate = new Date();
-=======
-  let odate = new Date();
-
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
   simulateUpdates();
   ndate = new Date();
 
@@ -23,13 +18,6 @@ function main() {
   } else if (ndate - odate < minUpdateTime && !fastforward && autoMode) {
     timescale++;
   }
-<<<<<<< HEAD
-=======
-
-  if (selectedCreature == null) brainDisplayMode = false;
-
-  render();
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 }
 
 function simulateUpdates() {
@@ -87,15 +75,7 @@ function update() {
   }
 
   updateMap();
-<<<<<<< HEAD
   updateCreatureLocations();
-=======
-
-  creatureLocations = [];
-  for (let f = 0; f < mapSize; f++) {
-    creatureLocations.push([]);
-  }
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
   updateCreatures();
 }
@@ -116,7 +96,6 @@ function updateScentBuffer() {
 
         // If tile isn't water //
         if (tile != null && tile.type > 0) {
-<<<<<<< HEAD
           for (let x = 0; x < tile.scent.length; x++) {
             tile.scentBuffer[x] = tile.scent[x];
           }
@@ -200,42 +179,6 @@ function updateMapFood() {
             if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * everGreenGrassSpreadRate * foodUpdateDelay;
           }
 
-=======
-          // If tile is grass //
-          if (tile.scent > maxTileScent) {
-            tile.scent = maxTileScent;
-          } else if (tile.scent < -maxTileScent) {
-            tile.scent = -maxTileScent;
-          }
-
-          tile.scent /= scentDeplenishRate;
-
-          if (tile.type == 1) {
-            // Add grass to tile //
-            tile.food += (winterGrowRate + Math.abs(Math.sin(tick / dayLength * 3.14)) * (springGrowRate - winterGrowRate)) * mapUpdateDelay;
-            // If tile is evergreen //
-          } else if (tile.type == 2) {
-            // Add food to tile //
-            tile.food += everGreenGrowRate * mapUpdateDelay;
-          }
-
-          if (tile.type == 1) {
-            // Spread grass to all touching tiles //
-            // Left and right //
-            if (map[row - 1] && map[row - 1][column]) map[row - 1][column].food += Math.max(tile.food - map[row - 1][column].food, 0) * grassSpreadRate * mapUpdateDelay;
-            if (map[row + 1] && map[row + 1][column]) map[row + 1][column].food += Math.max(tile.food - map[row + 1][column].food, 0) * grassSpreadRate * mapUpdateDelay;
-            // Up and down //
-            if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * grassSpreadRate * mapUpdateDelay;
-            if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * grassSpreadRate * mapUpdateDelay;
-          } else if (tile.type == 2) {
-            if (map[row - 1] && map[row - 1][column]) map[row - 1][column].food += Math.max(tile.food - map[row - 1][column].food, 0) * everGreenGrassSpreadRate * mapUpdateDelay;
-            if (map[row + 1] && map[row + 1][column]) map[row + 1][column].food += Math.max(tile.food - map[row + 1][column].food, 0) * everGreenGrassSpreadRate * mapUpdateDelay;
-            // Up and down //
-            if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * everGreenGrassSpreadRate * mapUpdateDelay;
-            if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * everGreenGrassSpreadRate * mapUpdateDelay;
-          }
-
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
           if (tile.food > tile.maxFood) tile.food = tile.maxFood;
           else if (tile.food < 0) tile.food = 0;
         }
@@ -244,7 +187,6 @@ function updateMapFood() {
   }
 }
 
-<<<<<<< HEAD
 function updateCreatureLocations() {
   creatureLocations.length = 0;
   for (let x = 0; x < mapSize; x++) {
@@ -345,75 +287,19 @@ function updateCreatureStates(creature) {
 
   if (action == 4) creature.isAttacking = true;
   else creature.isAttacking = false;
-=======
-function updateCreatures() {
-  for (let i = population - 1; i >= 0; i--) {
-    let creature = creatures[i];
-    updateCreaturesBrain(creature);
-    updateCreaturesFinal(creature);
-  }
-}
-
-function updateCreaturesBrain(creature) {
-  if (creature.age > oldest) oldest = creature.age;
-
-  let time = (creature.age % internalClockSpeed) / internalClockSpeed * 2 - 1;
-
-  let rotation = creature.rotation / 6.28318; // 2 * 3.14159 (PI)
-  let energy = creature.energy / maxCreatureEnergy;
-  let age = creature.age / metabolismScaleTime;
-
-  let forwardVelocity = Math.sqrt(creature.velocity.x * creature.velocity.x + creature.velocity.y * creature.velocity.y) / maxCreatureSpeed;
-
-  let size = creature.size / maxCreatureSize;
-
-  let tile = map[Math.floor(creature.x / tileSize + Math.cos(creature.rotation))][Math.floor(creature.y / tileSize + Math.sin(creature.rotation))];
-  let scent = 0;
-  if (tile) {
-    scent = tile.scent / maxTileScent;
-  }
-  creature.input = [time, energy, age, forwardVelocity, scent];
-
-  for (let i = 0; i < biases; i++) {
-    creature.input.push(creature.biases[i]);
-  }
-
-  let vision = see(creature);
-  for (let i = 0; i < vision.length; i++) {
-    creature.input.push(vision[i]);
-  }
-
-  creature.output = feedForward(creature, creature.input);
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 }
 
 function updateCreaturesFinal(creature) {
   wallLock(creature);
-<<<<<<< HEAD
-=======
-  creatureLocations[Math.floor(creature.x / tileSize)][Math.floor(creature.y / tileSize)] = creature;
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
 
   act(creature);
   clampSize(creature);
 
-<<<<<<< HEAD
   creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
   creature.energyGraph.gross.push(creature.energy);
 
   creature.lastEnergy = creature.energy;
 
-=======
-  creature.energyGraph.net.push(parseFloat((creature.energy - creature.lastEnergy).toFixed(2)));
-  creature.energyGraph.gross.push(parseFloat(creature.energy.toFixed(2)));
-
-  creature.lastEnergy = creature.energy;
-
-  for (let i = 0; i < creature.output.length; i++) {
-    creature.output[i] = parseFloat(creature.output[i].toFixed(2));
-  }
-
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
   if (creature.energy > maxCreatureEnergy) {
     creature.energy = maxCreatureEnergy;
   }
@@ -438,10 +324,6 @@ function clampSize(creature) {
   if (creature.energy <= 0) {
     if (creature == selectedCreature) {
       selectedCreature = null;
-<<<<<<< HEAD
-=======
-      brainDisplayMode = false;
->>>>>>> 1cc95a939c7066b5b033ad899774213f12554ad1
     }
     die(creature);
   }
