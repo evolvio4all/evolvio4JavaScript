@@ -1,7 +1,9 @@
-let map = [];
-let outline = [];
-let spawnTiles = [];
+var map = [];
+var outline = [];
+var spawnTiles = [];
+var creatureLocations = [];
 
+console.log(seed);
 noise.seed(seededNoiseA()); // We seed our noise generator
 
 function generateMap() {
@@ -10,7 +12,8 @@ function generateMap() {
     creatureLocations.push([]);
 
     for (let y = 0; y < mapSize; y++) {
-      let tile = new Tile(x, y);
+      creatureLocations[x].push([]);
+      var tile = new Tile(x, y);
       if (tile.type == 0) {
         tile = null;
       }
@@ -52,13 +55,13 @@ function Tile(x, y) {
   tile += noise.perlin2(x / mapSize * thirdMapFrequency, y / mapSize * thirdMapFrequency) * thirdMapImpact;
 
   // We increase odds of tile being water if it is further away from center (affected by distanceSmoothing)
-  let xdistance = Math.abs(0.5 - x / mapSize) * 2;
-  let ydistance = Math.abs(0.5 - y / mapSize) * 2;
+  var xdistance = Math.abs(0.5 - x / mapSize) * 2;
+  var ydistance = Math.abs(0.5 - y / mapSize) * 2;
 
-  tile += 0.2 - (xdistance * xdistance + ydistance * ydistance) * edgeDistanceImpact;
+  tile += 0.2 - (xdistance * xdistance + ydistance * ydistance) * edgeDistanceImpact - Math.abs(1 - (xdistance * xdistance + ydistance * ydistance)) * centerDistanceImpact + (0.5 - waterRatio);
   tile = Math.min(tile, 1);
 
-  let everGreenNoise = noise.perlin2(x / mapSize * everGreenNoiseFrequency, y / mapSize * everGreenNoiseFrequency) / 2 + noise.perlin2(x / mapSize * everGreenNoiseFrequency * 2, y / mapSize * everGreenNoiseFrequency * 2);
+  var everGreenNoise = noise.perlin2(x / mapSize * everGreenNoiseFrequency, y / mapSize * everGreenNoiseFrequency) / 2 + noise.perlin2(x / mapSize * everGreenNoiseFrequency * 2, y / mapSize * everGreenNoiseFrequency * 2);
 
   if (tile > everGreenInnerArea && tile < everGreenOuterArea && seededNoiseA() < everGreenPercentage && tile > Math.abs(everGreenNoise) / everGreenProminence) {
     this.type = 2;
@@ -68,7 +71,8 @@ function Tile(x, y) {
     this.type = 1;
   }
 
-  this.scent = 0;
+  this.scent = [0, 0, 0];
+  this.scentBuffer = [0, 0, 0];
 
   if (this.type == 1) this.maxFood = parseFloat((seededNoiseA(0.9 * maxTileFood, maxTileFood)).toFixed(2));
   else if (this.type == 2) this.maxFood = parseFloat((seededNoiseA(0.9 * everGreenMaxFood, everGreenMaxFood)).toFixed(2));

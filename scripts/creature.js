@@ -1,5 +1,6 @@
 function Creature(x, y, spec, specGen, color) {
-  let tile = Math.floor(seededNoiseA(0, spawnTiles.length));
+  //console.log("setting variables");
+  var tile = Math.floor(seededNoiseA(0, spawnTiles.length));
 
   this.x = x || spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
   this.y = y || spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
@@ -9,6 +10,8 @@ function Creature(x, y, spec, specGen, color) {
     y: 0
   };
 
+  this.reproductiveMembers = 1;
+
   this.removedEyes = [];
 
   this.mutability = {
@@ -16,6 +19,7 @@ function Creature(x, y, spec, specGen, color) {
     children: 0,
     childEnergy: 0,
     size: 0,
+    members: 0,
     eyes: {
       number: 0,
       angle: 0,
@@ -49,6 +53,8 @@ function Creature(x, y, spec, specGen, color) {
 
   this.color = color || newColor(false);
 
+  this.scentTrail = [seededNoiseA(), seededNoiseA(), seededNoiseA()];
+
   this.genes = [this.color, this.children, this.childEnergy];
 
   this.maxSpeed = maxCreatureSpeed;
@@ -59,32 +65,35 @@ function Creature(x, y, spec, specGen, color) {
   this.generation = 0;
   this.speciesGeneration = specGen || 0;
 
-  this.isEating = false;
-
-
   this.firstGen = false;
+
+  //console.log("making eyes");
+  this.eyes = makeEyes(false);
 
   population++;
 
-  this.eyes = makeEyes(false);
-
   this.biases = [];
-
+  //console.log('setting bias');
   for (let b = 0; b < biases; b++) {
     this.biases.push(seededNoiseA(-1, 1));
   }
 
-  createNeuralNetwork(this, false);
+  //console.log('creating neural network')
+  createNeuralNetwork(this, false, false);
 
-  this.rotation = 0;
-  this.species = setSpecies(this, spec, false);
+  //console.log('set species')
+  this.rotation = 1;
+  this.species = "";
+  this.isEating = false;
 
-  this.rotation = seededNoiseA() * 2 * Math.PI;
+  this.rotation = seededNoiseA(0, 2 * Math.PI);
 }
 
 function tickCreature(creature) {
   creature.age++;
   creature.reproduceTime++;
+
+  creature.isEating = false;
 };
 
 function select(creature) {
@@ -96,63 +105,106 @@ function select(creature) {
 };
 
 function makeEyes(noiseGroup) {
-  let eyes = [];
+  var eyes = [];
   if (noiseGroup) {
-    var numEyes = Math.floor(seededNoiseB(minInitEyes, maxInitEyes + 1));
+    var numEyes = Math.floor(seededNoiseB(minInitEyeCount, maxInitEyeCount + 1));
   } else {
-    var numEyes = Math.floor(seededNoiseA(minInitEyes, maxInitEyes + 1));
+    var numEyes = Math.floor(seededNoiseA(minInitEyeCount, maxInitEyeCount + 1));
   }
 
   for (let i = 0; i < numEyes; i++) {
-    eyes.push(new eye(undefined, undefined, noiseGroup));
+    eyes.push(new Eye(undefined, undefined, undefined, undefined, noiseGroup));
   }
 
   return eyes;
 }
 
-function eye(angle, distance, noiseGroup) {
+function Eye(angle, spangle, distance, samples, noiseGroup) {
   if (noiseGroup) {
-    this.x = Math.round(seededNoiseB(-initEyeDistanceH, initEyeDistanceH)) * tileSize;
-    this.y = Math.round(seededNoiseB(-initEyeDistanceV, initEyeDistanceV)) * tileSize;
+    this.angleSamples = samples ? samples.angle : Math.floor(seededNoiseB(minAngleSampleCount, maxAngleSampleCount));
+    this.distanceSamples = samples ? samples.distance : Math.floor(seededNoiseB(minDistanceSampleCount, maxDistanceSampleCount));
+    this.angle = angle || seededNoiseB(0, 2 * Math.PI);
+    this.distance = distance || seededNoiseB(minInitEyeDistance, maxInitEyeDistance);
+    this.spreadAngle = spangle || seededNoiseB(0, Math.PI * maxSpreadAngle);
   } else {
-    this.x = Math.round(seededNoiseA(-initEyeDistanceH, initEyeDistanceH)) * tileSize;
-    this.y = Math.round(seededNoiseA(-initEyeDistanceV, initEyeDistanceV)) * tileSize;
+    this.angleSamples = samples ? samples.angle : Math.floor(seededNoiseA(minAngleSampleCount, maxAngleSampleCount));
+    this.distanceSamples = samples ? samples.distance : Math.floor(seededNoiseA(minDistanceSampleCount, maxDistanceSampleCount));
+    this.angle = angle || seededNoiseA(0, 2 * Math.PI);
+    this.distance = distance || seededNoiseA(minInitEyeDistance, maxInitEyeDistance);
+    this.spreadAngle = spangle || seededNoiseA(0, Math.PI * maxSpreadAngle);
   }
 
-  this.angle = angle || Math.atan2(this.y, this.x);
-  this.distance = distance || Math.sqrt(this.x * this.x + this.y * this.y);
+  this.googleAngle = Math.random() * 2 * Math.PI;
 
-  this.tween = 1;
+  this.distanceTween = 0;
+  this.angleTween = 0;
 }
 
 function useEye(eyeTo, thisCreature) {
-  let out;
-  let tile;
+  var lineCoords = {
+    x1: thisCreature.x,
+    y1: thisCreature.y,
+    x2: thisCreature.x + Math.cos(thisCreature.rotation + eyeTo.angle) * eyeTo.distance,
+    y2: thisCreature.y + Math.sin(thisCreature.rotation + eyeTo.angle) * eyeTo.distance
+  };
 
-  eyeTo.tween = 1;
-  let pos = [Math.floor((thisCreature.x + Math.cos(thisCreature.rotation + eyeTo.angle) * eyeTo.distance) / tileSize), Math.floor((thisCreature.y + Math.sin(thisCreature.rotation + eyeTo.angle) * eyeTo.distance) / tileSize)];
-  let row = map[pos[0]];
+  for (let i = 0; i < creatures.length; i++) {
+    let creature = creatures[i];
+    if (creature == thisCreature) continue;
+    if (Math.dist(thisCreature.x, thisCreature.y, creature.x, creature.y) > eyeTo.distance) continue;
 
-  if (row) {
-    tile = row[pos[1]];
-    if (tile === undefined) return [0, "oob"];
-  } else return [0, "oob"];
-
-  for (let tween = 0; tween < 1; tween += 0.1) {
-    pos = [Math.floor((thisCreature.x + Math.cos(thisCreature.rotation + eyeTo.angle) * eyeTo.distance * tween) / tileSize), Math.floor((thisCreature.y + Math.sin(thisCreature.rotation + eyeTo.angle) * eyeTo.distance * tween) / tileSize)];
-    if (creatureLocations[pos[0]] && creatureLocations[pos[0]][pos[1]] && creatureLocations[pos[0]][pos[1]] != thisCreature) {
-      eyeTo.tween = tween;
-      return [creatureLocations[pos[0]][pos[1]], "creature"];
+    if (lineCircle(lineCoords.x1, lineCoords.y1, lineCoords.x2, lineCoords.y2, creature.x, creature.y, creature.size)) {
+      return [{
+        creature: creature,
+        distance: Math.dist(thisCreature.x, thisCreature.y, creature.x, creature.y) / eyeTo.distance
+      }, "creature"];
     }
   }
 
-  if (tile === null) return [0, "water"];
+  let row = map[Math.floor(lineCoords.x2 / tileSize)];
+  if (row) var tile = row[Math.floor(lineCoords.y2 / tileSize)];
 
-  if (tile.type > 0) return [tile, "tile"];
+  if (tile === null) return [0, "water"];
+  else if (tile === undefined) return [-1, "oob"];
+  else if (tile.type > 0) return [tile, "tile"];
+
+  return seeing;
+}
+
+function see(creature) {
+  var output = [];
+  for (let i = 0; i < creature.eyes.length; i++) {
+    var eye = creature.eyes[i];
+    var sight = useEye(eye, creature);
+
+    if (sight[1] == "tile") {
+      output.push(1);
+      output.push(Math.min(Math.floor(45 + 50 * sight[0].food / maxTileFood), maxTileHue) / 360); // Color of tile
+    } else if (sight[1] == "water") {
+      output.push(1);
+      output.push(-1); // Color of water
+    } else if (sight[1] == "creature") {
+      output.push(sight[0].distance);
+      output.push(parseInt(sight[0].creature.color.split(",")[0].replace("hsl(", "")) / 360);
+    } else if (sight[1] == "oob") {
+      output.push(1);
+      output.push(-1);
+    }
+  }
+
+  return output;
+}
+
+function changeGoogleAngle(creature) {
+  for (let i = 0; i < creature.eyes.length; i++) {
+    var eye = creature.eyes[i];
+
+    eye.googleAngle += 0.2 * (Math.random() * 2 - 0.9) * (creature.output[0] / (1 + Math.abs(creature.output[2])));
+  }
 }
 
 function randomize(creature) {
-  let tile = Math.floor(seededNoiseB(0, spawnTiles.length));
+  var tile = Math.floor(seededNoiseB(0, spawnTiles.length));
 
   creature.x = spawnTiles[tile].x * tileSize + tileSize / 2 || 0;
   creature.y = spawnTiles[tile].y * tileSize + tileSize / 2 || 0;
@@ -162,13 +214,16 @@ function randomize(creature) {
     y: 0
   };
 
-  this.removedEyes = [];
+  creature.removedEyes = [];
+
+  creature.reproductiveMembers = 1;
 
   creature.mutability = {
     brain: seededNoiseB(minMutability.brain, maxMutability.brain),
     children: seededNoiseB(minMutability.children, maxMutability.children),
     childEnergy: seededNoiseB(minMutability.childEnergy, maxMutability.childEnergy),
     size: seededNoiseB(minMutability.size, maxMutability.size),
+    members: seededNoiseB(minMutability.members, maxMutability.members),
     eyes: {
       number: seededNoiseB(minMutability.eyes.number, maxMutability.eyes.number),
       angle: seededNoiseB(minMutability.eyes.angle, maxMutability.eyes.angle),
@@ -190,14 +245,14 @@ function randomize(creature) {
     gross: []
   };
 
+  creature.scentTrail = [seededNoiseB(), seededNoiseB(), seededNoiseB()];
+
   creature.size = seededNoiseB(minCreatureSize, maxCreatureSize);
 
-  creature.energy = maxCreatureEnergy / 2;
-  creature.lastEnergy = maxCreatureEnergy / 2;
-
+  creature.energy = maxCreatureEnergy;
+  creature.lastEnergy = maxCreatureEnergy;
   creature.age = 0;
   creature.reproduceTime = 0;
-  creature.childEnergy = seededNoiseB(minChildEnergy, maxChildEnergy);
   creature.children = Math.floor(seededNoiseB(minChildren, maxChildren));
   creature.color = newColor(true);
 
@@ -215,7 +270,7 @@ function randomize(creature) {
     creature.biases.push(seededNoiseB(-1, 1));
   }
 
-  createNeuralNetwork(creature, true);
+  createNeuralNetwork(creature, true, true);
 
   creature.geneticID = "";
   creature.generation = 0;
@@ -223,48 +278,38 @@ function randomize(creature) {
   creature.speciesGeneration = 0;
   creature.rotation = 0;
 
-  creature.species = setSpecies(creature, "undefined", false);
+  creature.species = setSpecies(creature, "undefined");
 
   creature.isEating = false;
 
   creature.firstGen = true;
-  creature.rotation = seededNoiseB() * 2 * Math.PI;
+  creature.rotation = seededNoiseB(0, 2 * Math.PI);
 
   firstGen++;
+
+  reproduce(creature);
+  creature.energy = maxCreatureEnergy;
 };
 
 function getPosition(creature) {
-  let x = Math.floor(creature.x / tileSize);
-  let y = Math.floor(creature.y / tileSize);
+  var x = Math.floor(creature.x / tileSize);
+  var y = Math.floor(creature.y / tileSize);
 
   return [x, y];
 };
 
-function setSpecies(creature, species, noiseGroup) {
-  let geneticID = [];
-  let prefix = "";
-  let spGen = creature.speciesGeneration;
+function setSpecies(creature, species) {
+  var geneticID = [];
+  var prefix = "";
+  var prefix2 = "";
+  var spGen = creature.speciesGeneration;
 
   creature.spIn = species;
 
-  let network = creature.network;
+  var network = creature.network;
+
   for (let j = 0; j < speciesAccuracy; j++) {
     feedForward(creature, testInput[j]);
-
-    let forgetOutputs = network.forget.neurons[network.forget.neurons.length - 1];
-    for (let i = 0; i < forgetOutputs.length; i++) {
-      geneticID.push(forgetOutputs[i]);
-    }
-
-    let decideOutputs = network.decide.neurons[network.decide.neurons.length - 1];
-    for (let i = 0; i < decideOutputs.length; i++) {
-      geneticID.push(decideOutputs[i]);
-    }
-
-    let modifyOutputs = network.modify.neurons[network.modify.neurons.length - 1];
-    for (let i = 0; i < modifyOutputs.length; i++) {
-      geneticID.push(modifyOutputs[i]);
-    }
 
     let mainOutputs = network.main.neurons[network.main.neurons.length - 1];
     for (let i = 0; i < mainOutputs.length; i++) {
@@ -272,56 +317,57 @@ function setSpecies(creature, species, noiseGroup) {
     }
   }
 
-  resetCellState(creature);
-
   creature.geneticID = geneticID;
 
   if (species == "undefined" || species === undefined) {
-    let tries = 0;
+    var tries = 0;
     while ((specieslist[species] !== undefined && tries < maxNewSpeciesTries) || species == "undefined" || species === undefined) {
       tries++;
-      if (noiseGroup) prefix = Math.floor(seededNoiseB(0, prefixes.length));
-      else prefix = Math.floor(seededNoiseA(0, prefixes.length));
-      species = prefixes[prefix] + " " + suffixes[0];
+      prefix = Math.floor(seededNoiseB(0, prefixes.length));
+      prefix2 = Math.floor(seededNoiseB(0, prefixes.length));
+
+      species = prefixes[prefix] + "-" + prefixes[prefix2];
     }
 
     if (tries == maxNewSpeciesTries) species = "Dud " + suffixes[0];
   } else {
-    let minGeneDiff = Infinity;
-    let newSpecies;
+    var minGeneDiff = Infinity;
+    var newSpecies;
 
     for (let specie in specieslist) {
-      if (specieslist[specie].contains.length > 0 && specie.split(" ")[0] == species.split(" ")[0]) {
-        let geneDiff = arrayDifference(creature.geneticID, specieslist[specie].geneticID);
+      var geneDiff = arrayDifference(creature.geneticID, specieslist[specie].geneticID);
+      if (geneDiff < minGeneDiff) {
+        minGeneDiff = geneDiff;
 
-        if (geneDiff < minGeneDiff) {
-          minGeneDiff = geneDiff;
-
-          newSpecies = specie;
-        }
+        newSpecies = specie;
       }
     }
 
     if (minGeneDiff < speciesDiversity) {
-      species = newSpecies.split(" ")[0];
+      species = newSpecies;
       creature.speciesChange = "cause of similarity";
     } else {
-      species = species.split(" ")[0];
-      creature.speciesGeneration++;
+      var speciesStart = species.split("-")[0];
 
-      let tempcolor = creature.color.replace("hsl(", "").replace(")", "").split(",");
-      tempcolor[0] = Math.floor((parseInt(tempcolor[0]) + speciesColorChange * minGeneDiff / speciesDiversity * seededNoiseA(-1, 1)) % 360);
+      var tries = 0;
+      while (specieslist[species] !== undefined && tries < maxNewSpeciesTries) {
+        tries++;
+
+        prefix = Math.floor(seededNoiseA(0, prefixes.length));
+
+        species = speciesStart + "-" + prefixes[prefix];
+      }
+
+      if (tries == maxNewSpeciesTries) species = "Dud " + prefixes[prefix];
+
+      var tempcolor = creature.color.replace("hsl(", "").replace(")", "").split(",");
+
+      if (minGeneDiff === Infinity) minGeneDiff = 0;
+
+      tempcolor[0] = Math.floor(Math.abs(parseInt(tempcolor[0]) + speciesColorChange * minGeneDiff / speciesDiversity * seededNoiseA(-1, 1)) % 360);
       creature.color = "hsl(" + tempcolor.join(",") + ")";
 
       creature.speciesChange = "cause of diversity";
-    }
-
-    if (creature.speciesGeneration < 40) {
-      for (let i = 0; i < Math.floor(creature.speciesGeneration / suffixes.length) + 1; i++) {
-        species += " " + suffixes[Math.min(creature.speciesGeneration - suffixes.length * i, suffixes.length - 1)];
-      }
-    } else {
-      species += " " + creature.speciesGeneration;
     }
   }
 
@@ -329,19 +375,27 @@ function setSpecies(creature, species, noiseGroup) {
     specieslist[species] = {};
     specieslist[species].contains = [];
 
-    specieslist[species].geneticID = creature.geneticID;
+    specieslist[species].geneticID = [...creature.geneticID];
   }
 
   specieslist[species].contains.push(creature);
 
   if (specieslist[species].contains.length > minCreaturesForTracking && specieslist[species].graphIndex == undefined) {
     specieslist[species].graphIndex = currentSpeciesGraphIndex;
-    speciesGraph[specieslist[species].graphIndex] = [];
+    speciesGraph[specieslist[species].graphIndex] = [{
+      originTick: tick,
+      eyes: creature.eyes.length,
+      speciesName: species
+    }];
     speciesColors[specieslist[species].graphIndex] = creature.color;
     speciesCountList[specieslist[species].graphIndex] = specieslist[species].contains;
 
     currentSpeciesGraphIndex++;
   }
+
+  creature.grvb = grvb;
+
+  resetMemories(creature);
 
   return species;
 };
@@ -350,60 +404,85 @@ Math.clamp = function(num, min, max) {
   return Math.min(Math.max(num, min), max);
 };
 
-function see(creature) {
-  let eyes = creature.eyes.length;
-  let output = [];
-  for (let i = 0; i < eyes; i++) {
-    let eye = creature.eyes[i];
-    let sight = useEye(eye, creature);
+function act(creature) {
+  var pos = getPosition(creature);
+  var tile = map[pos[0]][pos[1]];
 
-    if (sight[1] == "tile") {
-      output.push(sight[0].food / maxTileFood - 0.5);
-      output.push(Math.min(Math.floor(45 + 50 * ((sight[0].food + 0.01) / maxTileFood)), maxTileHue) / 360); // Color of tile
-    } else if (sight[1] == "water") {
-      output.push(-1);
-      output.push(200 / 360); // Color of water
-    } else if (sight[1] == "creature") {
-      output.push(creature.size / maxCreatureSize);
-      output.push(parseInt(creature.color.split(",")[0].replace("hsl(", "")) / 360);
-    } else if (sight[1] == "oob") {
-      output.push(-1);
-      output.push(-1);
+  tickCreature(creature);
+  metabolize(creature);
+
+  var largest = 0;
+  var action = -1;
+
+  for (let i = 2; i < 5; i++) {
+    if (Math.abs(creature.output[i]) > 0.05 && Math.abs(creature.output[i]) > largest) {
+      action = i;
+      largest = Math.abs(creature.output[i]);
     }
   }
 
-  return output;
-}
+  if (action == 2) rotate(creature);
 
-function act(creature) {
-  let pos = getPosition(creature);
-  let tile = map[pos[0]][pos[1]];
+  if (action == 3) eat(creature, tile);
+  else creature.energyGraph.eat.push(0);
 
-  tickCreature(creature);
+  if (action == 4) attack(creature);
+  else creature.energyGraph.attack.push(0);
 
-  attack(creature);
-  reproduce(creature);
-  metabolize(creature);
-  move(creature);
-  releaseScent(creature);
+  if (Math.abs(creature.output[0]) > minMovePower) move(creature);
+  else creature.energyGraph.move.push(0);
 
-  eat(creature, tile);
+  if (tile != null) {
+    releaseRedScent(creature, tile);
+    releaseGreenScent(creature, tile);
+    releaseBlueScent(creature, tile);
 
-  if (tile == null) {
-    creature.velocity.x *= swimmingSpeed;
-    creature.velocity.y *= swimmingSpeed;
+    releaseScent(creature, tile);
+  }
+
+  creature.action = action;
+
+  if (creature.velocity.x + creature.velocity.y >= maxCreatureSpeed) {
+    creature.velocity.x -= maxAcceleration;
+    creature.velocity.y -= maxAcceleration;
   }
 
   creature.x += creature.velocity.x;
   creature.y += creature.velocity.y;
 
-  creature.x = parseFloat(creature.x.toFixed(2));
-  creature.y = parseFloat(creature.y.toFixed(2));
+  var frictionFromSurface;
+  var frictionFromVelocity;
+  if (tile) {
+    if (tile.type == 1) {
+      frictionFromSurface = staticFriction.grass;
+      frictionFromVelocity = velocityFriction.grass;
+    } else if (tile.type == 2) {
+      frictionFromSurface = staticFriction.evergreen;
+      frictionFromVelocity = velocityFriction.evergreen;
+    }
+  } else {
+    frictionFromSurface = staticFriction.water;
+    frictionFromVelocity = velocityFriction.water;
+  }
+
+  var fS = frictionFromSurface;
+  var fV = (1 - frictionFromVelocity);
+  creature.velocity.x -= fS * (creature.velocity.x >= 0 ? 1 : -1);
+  creature.velocity.y -= fS * (creature.velocity.y >= 0 ? 1 : -1);
+
+  creature.velocity.x *= fV;
+  creature.velocity.y *= fV;
+
+  if (creature.output[5] >= minSpawnPower && creature.age > reproduceAge && creature.reproduceTime > minReproduceTime) reproduce(creature);
+
+  changeGoogleAngle(creature);
 }
 
 function spawnCreatures(num) {
   for (let i = 0; i < num; i++) {
+    //console.log("creating new creature")
     creatures.push(new Creature());
+    //console.log("re-randomizing it for counting purposes")
     die(creatures[i]);
   }
 }
