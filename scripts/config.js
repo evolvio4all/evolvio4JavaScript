@@ -8,6 +8,9 @@ console.log(seed);
 //you may see different behavior in the simulation after changing some parameters that would normally seem safe (i.e. speciesDiversity)
 
 var debugMode = false; // Shows debug info (angle, left and right turn outputs, and tile food)
+
+var DEV_DEBUG_MODE = false;
+
 var infoMode = true; // shows and hides info (neural network and graph)
 var autoMode = false; // automatically calculate timescale (max 40ms to 60ms update time)
 var scentMode = false; // show or hide scent map
@@ -31,8 +34,8 @@ const selectSizeAddition = 100; // How far around creatures can you click to sel
 
 const maxTileFood = 80; // Maximum food on a tile
 
-const springGrowRate = 0.003; // Grow amount in spring season (applies to all tiles)
-const winterGrowRate = 0.001; // Grow amount in winter season (applies to all tiles)
+const springGrowRate = 0.001; // Grow amount in spring season (applies to all tiles)
+const winterGrowRate = 0.000; // Grow amount in winter season (applies to all tiles)
 
 const grassSpreadRate = 0.0003; // % difference between tiles grass spread rate
 const dayLength = 900; // Length of the day (in ticks)
@@ -75,11 +78,11 @@ const minFirstGen = 35; // Minimum number of first generation creatures
 const creatureLimit = 5000; // Maximum number of creatures (when population = creatureLimit, the game pauses)
 const foodImposedCreatureLimit = 800; // Maximum number of creatures before food stops growing (when population = foodBasedCreatureLimit, food stops growing)
 
-const maxCreatureSize = 37; // Maximum creature size (radius)
+const maxCreatureSize = 66; // Maximum creature size (radius)
 const minCreatureSize = 22; // Minimum creature size (radius)
 
-const eyeSize = 0.1; // scalar
-const pupilSize = 0.2; // scalar NOT relative to eye size
+const eyeSize = 0.12; // scalar
+const pupilSize = 0.12; // scalar NOT relative to eye size
 
 const minEyes = 1; // Minimum number of "eyes" a creature can have
 const maxEyes = 8; // Maximum number of "eyes" a creature can have
@@ -116,8 +119,8 @@ const energyGraphY = 1080 - 180; // Y of the energyGraph
 
 const energy = {
   eat: 0.25, // Energy cost to eat at eatPower
-  move: 0.15, // Energy cost to move at maxCreatureSpeed
-  rotate: 0.05, // Energy cost to rotate at rotationSpeed
+  move: 0.25, // Energy cost to move at maxCreatureSpeed
+  rotate: 0.15, // Energy cost to rotate at rotationSpeed
   attack: 0.25 // Energy cost to attack at attackPower
 };
 
@@ -167,10 +170,10 @@ const rotationSpeed = 0.3; // Maximum rotation speed in radians per tick
 const minRotation = 0.1; // Minimum rotation amount as a percentage of rotation speed
 
 // Species //
-const speciesDiversity = 70; // Diversity of each species
+const speciesDiversity = 18; // Diversity of each species
 const speciesColorChange = 55; // Color change between species
 
-var speciesGraphDetail = 30; // Higher = less detail (in ticks). Down to 1. High detail takes up a lot of memory after a while
+var speciesGraphDetail = 37; // Higher = less detail (in ticks). Down to 1. High detail takes up a lot of memory after a while
 
 var speciesGraphMult = 1; // Height of species graph
 var speciesGraphAutoMult = true; // Is the graph height adjusted automatically (default: false)
@@ -188,8 +191,8 @@ var speciesGraphHeight = 140; // How tall is the graph (is using automult)
 
 var speciesGraphLinesHeight = 10; // Height of the vertical lines on the speciesGraph
 
-const minCreaturesForTracking = 9; // Minimum number of population needed for a species to be tracked on the species graph (saves memory)
-const speciesAccuracy = 5; // How many times to run a feedforward and detect a species (increases memory usage)
+const minCreaturesForTracking = 19; // Minimum number of population needed for a species to be tracked on the species graph (saves memory)
+const speciesAccuracy = 15; // How many times to run a feedforward and detect a species (increases memory usage)
 
 // Reproduction //
 const birthEffeciency = 0.95; // Birth effeciency %
@@ -198,7 +201,7 @@ const minChildren = 1; // Minimum children a creature is allowed to produce
 const maxChildren = 6; // Maximum children a creature is allowed to produce
 
 const childEnergy = 15; // How much energy a child will start with
-const childSizeCost = 20; // How much it costs for a child to be bigger
+const childSizeCost = 5; // How much it costs for a child to be bigger
 const childEyeCost = 1; // How much it costs for a child to have more eyes
 
 const minSpawnPower = -0.9; // Minimum output to reproduce (anything lower will be considered 0)
@@ -273,9 +276,9 @@ const maxMutability = { // Maximum mutability in various categories
 
 const maxMutabilityChange = 0.5; // Maximum amount any mutability can change by in a single mutation
 
-const connectionDensity = [0.08, 1]; // % axons connected in each layer of the brain
+const connectionDensity = [1, 1, 1, 1]; // % axons connected in each layer of the brain
 const maxAxonsPerNeuron = 2; // Maximum number of connections a neuron can make to a neuron in the next layer. (I don't think this is implemented)
-const maxInitialAxonValue = 4; // Maximum weight of an axon intially
+const maxInitialAxonValue = 16; // Maximum weight of an axon intially
 
 const memories = [3, 3]; // dimensions of memories a creature can store
 // I have intentions to make this — and most things here — evolution-based (with config values for min, max, and intial min and max)
@@ -317,11 +320,11 @@ const maxTileHue = 190;
 const nnui = { // Neural network UI config
   xoffset: 1480,
   yoffset: 90,
-  xspacing: 200,
+  xspacing: 100,
   yspacing: 7,
   brainspacingx: 0,
-  brainspacingy: 40,
-  verticalSpacingHidden: 3,
+  brainspacingy: 0,
+  verticalSpacingHidden: 8,
   verticalSpacingOut: 8.5,
   outputx: 1480 - 40,
   outputy: 400,
@@ -340,6 +343,6 @@ const ui = {
   height: 1080
 }
 
-const directionalDisplayLineLength = 20;
+const directionalDisplayLineLength = 10;
 
 var uiBackground = false;

@@ -1,6 +1,6 @@
 seed = hashString(seed)();
 
-const axonTypes = ["+", "*", "/", "-"];
+const axonTypes = ["+", "*", "%", "^", ">", "<"];
 
 var hoveredNeuron = [-1, -1];
 

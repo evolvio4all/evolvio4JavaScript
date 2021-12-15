@@ -22,12 +22,9 @@ for (let i = 0; i < speciesAccuracy; i++) {
 function createNeuralNetwork(creature, noiseGroup, setValues) {
   // VARIABLES //
   creature.inputs = inputs + creature.eyes.length * 2;
-
   creature.outputs = outputs;
-  let mainLayers = [creature.inputs + memoryCount, 5, creature.outputs];
-
+  let mainLayers = [creature.inputs + memoryCount, 12, creature.outputs];
   creature.network = new Network(mainLayers, creature.outputs, creature.inputs);
-
   initMemory(creature, memories);
   initNeurons(creature); // Creature.prototype initializes the neurons, creating them, Neurons contain a value and are the connection point for axons
   initAxons(creature, noiseGroup, setValues); // Axons are basically lines that connect Neurons, each one has a weight, and each neuron has a value, the axon takes the value and multiplies it by the weight
@@ -78,7 +75,7 @@ function initMemory(creature, memories) {
 function initNeurons(creature) {
   let nbrain = creature.network.main;
 
-  let layers = nbrain.layers.length;
+  let layers = nbrain.layerCount;
   nbrain.neurons = [];
   for (let layer = 0; layer < layers; layer++) {
     nbrain.neurons.push([]);
@@ -92,11 +89,11 @@ function initNeurons(creature) {
 
 function initAxons(creature, noiseGroup, setValues) {
   let nbrain = creature.network.main;
-  let layers = nbrain.layers.length - 1;
+  let layers = nbrain.layerCount;
   nbrain.axons = [];
   nbrain.types = [];
 
-  for (let layer = 0; layer < layers; layer++) {
+  for (let layer = 0; layer < layers - 1; layer++) {
     let layerWeights = [];
     let layerTypes = [];
 
@@ -157,9 +154,7 @@ function feedForward(creature, input) {
   let network = creature.network;
   feedMain(creature, input);
 
-  network.output = [...network.main.neurons[network.main.layerCount - 1]];
-
-  return network.output;
+  return network.output = [...network.main.neurons[network.main.layerCount - 1]];
 }
 
 function feedMain(creature, input) {
@@ -216,14 +211,19 @@ function processBrain(creature) {
         }
 
         let type = nbrain.types[layer][neuron][axon];
+        let axonValue = nbrain.axons[layer][neuron][axon];
+        let neuronValue = nbrain.neurons[layer][neuron]
+
         if (type == "+") {
-          value += (nbrain.neurons[layer][neuron] + nbrain.axons[layer][neuron][axon]);
+          value += (neuronValue + axonValue);
         } else if (type == "*") {
-          value += (nbrain.neurons[layer][neuron] * nbrain.axons[layer][neuron][axon]);
-        } else if (type == "/") {
-          value += (nbrain.neurons[layer][neuron] / nbrain.axons[layer][neuron][axon]);
-        } else if (type == "-") {
-          value += (nbrain.neurons[layer][neuron] - nbrain.axons[layer][neuron][axon]);
+          value += (neuronValue * axonValue);
+        } else if (type == "%") {
+          value += (neuronValue % (axonValue || 0.0001));
+        } else if (type == "<") {
+          if (neuronValue < axonValue) value += neuronValue;
+        } else if (type == ">") {
+          if (neuronValue > axonValue) value += neuronValue;
         }
         // add all neuron values times weight of their respective axon
       }
@@ -338,20 +338,14 @@ function mutateNet(creature, network) {
     for (let axon = 0; axon < neuronsInNextLayer; axon++) {
       for (let neuron = 0; neuron < neurons; neuron++) {
         let randomNumber = seededNoiseA(0, 100);
-        if (randomNumber < creature.mutability.brain * 1 / 7) {
+        if (randomNumber < creature.mutability.brain * 1 / 4) {
           nbrain.axons[layer][neuron][axon] += seededNoiseA(-stepAdd, stepAdd);
-        } else if (randomNumber < creature.mutability.brain * 2 / 7) {
+        } else if (randomNumber < creature.mutability.brain * 2 / 4) {
           nbrain.axons[layer][neuron][axon] *= Math.floor(seededNoiseA(-4, 4));
-        } else if (randomNumber < creature.mutability.brain * 3 / 7) {
+        } else if (randomNumber < creature.mutability.brain * 3 / 4) {
           nbrain.axons[layer][neuron][axon] %= seededNoiseA(0, 8);
-        } else if (randomNumber < creature.mutability.brain * 4 / 7) {
-          nbrain.types[layer][neuron][axon] = "+";
-        } else if (randomNumber < creature.mutability.brain * 5 / 7) {
-          nbrain.types[layer][neuron][axon] = "-";
-        } else if (randomNumber < creature.mutability.brain * 6 / 7) {
-          nbrain.types[layer][neuron][axon] = "/";
-        } else if (randomNumber < creature.mutability.brain * 7 / 7) {
-          nbrain.types[layer][neuron][axon] = "*";
+        } else if (randomNumber < creature.mutability.brain * 4 / 4) {
+          nbrain.types[layer][neuron][axon] = axonTypes[Math.floor(seededNoiseA(0, axonTypes.length - 0.01))];
         }
       }
     }

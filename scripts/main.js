@@ -14,10 +14,12 @@ function main() {
   ndate = new Date();
 
   if (ndate - odate > maxUpdateTime && !fastforward && autoMode && timescale > 1) {
-    timescale--;
+    timescale -= (ndate - odate) / maxUpdateTime;
   } else if (ndate - odate < minUpdateTime && !fastforward && autoMode) {
     timescale++;
   }
+
+  render();
 }
 
 function simulateUpdates() {
@@ -46,17 +48,6 @@ function update() {
 
   highestSimulatedTick = tick;
 
-  waterScrollX += 20;
-  waterScrollY += 20;
-
-  if (waterScrollX >= 23850 - 1920 * 4) {
-    waterScrollX = -23850 - 1920 * 4;
-  }
-
-  if (waterScrollY >= 13475) {
-    waterScrollY = -13475;
-  }
-
   if (tick % speciesGraphDetail == 0) {
     var stackedThisTick = 0;
 
@@ -75,6 +66,7 @@ function update() {
   }
 
   updateMap();
+
   updateCreatureLocations();
 
   updateCreatures();
@@ -241,14 +233,15 @@ function updateCreaturesBrain(creature) {
 
   var size = creature.size / maxCreatureSize;
 
-  var scent = 0;
   var tile;
 
   var nose = [0, 0, 0];
 
-  var tiles;
-  if (map[Math.floor(creature.x / tileSize + Math.cos(creature.rotation))] && map[Math.floor(creature.x / tileSize + Math.cos(creature.rotation))][Math.floor(creature.y / tileSize + Math.sin(creature.rotation))]) {
-    tile = map[Math.floor(creature.x / tileSize + Math.cos(creature.rotation))][Math.floor(creature.y / tileSize + Math.sin(creature.rotation))];
+  var columnInFront = Math.floor(creature.x / tileSize + Math.cos(creature.rotation));
+  var rowInFront = Math.floor(creature.y / tileSize + Math.sin(creature.rotation));
+
+  if (map[columnInFront] && map[columnInFront][rowInFront]) {
+    tile = map[columnInFront][rowInFront];
 
     nose = [tile.scent[0] / maxTileScent, tile.scent[1] / maxTileScent, tile.scent[2] / maxTileScent];
   }
@@ -262,15 +255,16 @@ function updateCreaturesBrain(creature) {
 
   creature.output = feedForward(creature, creature.input);
 
+  updateMemory(creature);
+}
+
+function updateMemory(creature) {
   var memoryLayer = creature.network.memories;
   for (let i = 0; i < memories.length - 1; i++) {
     memoryLayer = memoryLayer[Math.floor((creature.output[9 + i] + 1) / 2 * (memories[i] / 1.001))];
   }
 
-  memoryLayer[Math.floor(
-    (creature.output[9 + memories.length - 1] + 1) / 2 *
-    (memories[memories.length - 1] / 1.001)
-  )] = creature.output[9 + memories.length];
+  memoryLayer[Math.floor((creature.output[9 + memories.length - 1] + 1) / 2 * (memories[memories.length - 1] / 1.001))] = creature.output[9 + memories.length];
 }
 
 function updateCreatureStates(creature) {
@@ -290,12 +284,17 @@ function updateCreatureStates(creature) {
 }
 
 function updateCreaturesFinal(creature) {
+  var DEBUG_VARIABLE_INDEX = creatures.indexOf(creature);
+  if (tick == 233096 && DEBUG_VARIABLE_INDEX == 36) DEV_DEBUG_MODE = true;
+
   wallLock(creature);
 
   act(creature);
+
   clampSize(creature);
 
   creature.energyGraph.net.push(creature.energy - creature.lastEnergy);
+
   creature.energyGraph.gross.push(creature.energy);
 
   creature.lastEnergy = creature.energy;
@@ -325,6 +324,7 @@ function clampSize(creature) {
     if (creature == selectedCreature) {
       selectedCreature = null;
     }
+
     die(creature);
   }
 }
