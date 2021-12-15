@@ -431,9 +431,9 @@ function renderInput(creature, brain, brainNum, brainName) {
   var verticalSpacing = (1080 / (nnui.size + nnui.yspacing) - 1) / (creature.inputs + (outputs + 1) * 2);
 
   for (let n = 0; n < brain.neurons[0].length; n++) {
-    var lightness = Math.floor((brain.neurons[0][n] + 1) / 2 * 100);
+    var hueV = Math.floor((brain.neurons[0][n] + 1) / 2 * 100);
 
-    ctx.fillStyle = "hsla(" + lightness + ", 80%, 50%," + Math.abs(brain.neurons[0][n]) + ")";
+    ctx.fillStyle = "hsl(" + hueV + ", 80%," + Math.floor(Math.abs(brain.neurons[0][n] * 55)) + "%)";
     ctx.strokeStyle = "gray";
     ctx.lineWidth = 1;
 
@@ -518,9 +518,9 @@ function renderBrain(brain, brainNum, brainName) {
 
       ctx.lineWidth = 1;
 
-      var lightness = Math.floor((brain.neurons[l][n] + 1) / 2 * 100);
+      var hueV = Math.floor((brain.neurons[l][n] + 1) / 2 * 100);
 
-      ctx.fillStyle = "hsla(" + lightness + ", 80%, 50%," + Math.abs(brain.neurons[l][n]) + ")";
+      ctx.fillStyle = "hsl(" + hueV + ", 80%, " + Math.floor(Math.abs(brain.neurons[l][n] * 55)) + "%)";
       ctx.strokeStyle = "gray";
 
       ctx.beginPath();
