@@ -401,18 +401,23 @@ function renderInput(creature, brain, brainNum, brainName) {
       var type = brain.types[0][n][a];
 
       if (type == "+") {
-        value += (neuronValue + axonValue);
+        value = (neuronValue + axonValue);
+        hue = [60, 180];
       } else if (type == "*") {
-        value += (neuronValue * axonValue);
+        value = (neuronValue * axonValue);
+        hue = [0, 100];
       } else if (type == "%") {
-        value += (neuronValue % (axonValue || 0.0001));
+        value = (neuronValue % (axonValue || 0.0001));
+        hue = [140, 140];
       } else if (type == "<") {
-        if (neuronValue < axonValue) value += neuronValue;
+        if (neuronValue < axonValue) value = neuronValue;
+        hue = [240, 300];
       } else if (type == ">") {
-        if (neuronValue > axonValue) value += neuronValue;
+        if (neuronValue > axonValue) value = neuronValue;
+        hue = [240, 300];
       }
 
-      ctx.strokeStyle = "hsla(" + (value <= 0 ? 0 : 100) + ", 80%, 50%," + Math.abs(value / 4) + ")";
+      ctx.strokeStyle = "hsla(" + (value <= 0 ? hue[0] : hue[1]) + ", 80%, 50%," + Math.abs(value / 4) + ")";
       ctx.lineWidth = Math.sqrt(Math.abs(brain.axons[0][n][a])) * 3;
 
       ctx.beginPath();
