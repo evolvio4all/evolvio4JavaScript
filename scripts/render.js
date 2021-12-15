@@ -399,6 +399,7 @@ function renderInput(creature, brain, brainNum, brainName) {
       var axonValue = brain.axons[0][n][a];
 
       var type = brain.types[0][n][a];
+      var hue = [0, 100];
 
       if (type == "+") {
         value = (neuronValue + axonValue);
