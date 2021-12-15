@@ -143,6 +143,15 @@ function updateMapScent() {
 
 function updateMapFood() {
   if (tick % foodUpdateDelay === 0 && population < foodImposedCreatureLimit) {
+    var seasonModifier = Math.abs(Math.sin(tick / (dayLength * seasonLength) * 3.14));
+    var spreadModifier = (winterGrowRateScalar + seasonModifier * (springGrowRateScalar - winterGrowRateScalar));
+
+    var grassGrowAmount = (winterPassiveGrowRate + seasonModifier * (springPassiveGrowRate - winterPassiveGrowRate)) * foodUpdateDelay;
+    var everGreenGrowAmount = everGreenGrowRate * foodUpdateDelay;
+
+    var grassSpreadAmount = grassSpreadRate * spreadModifier * foodUpdateDelay;
+    var everGreenSpreadAmount = everGreenGrassSpreadRate * spreadModifier * foodUpdateDelay;
+
     for (let row = 0; row < mapSize; row++) {
       for (let column = 0; column < mapSize; column++) {
         var tile = map[row][column];
@@ -151,24 +160,24 @@ function updateMapFood() {
           if (tile.type == 1) { // If tile is grass //
 
             // add food based on season //
-            tile.food += (winterGrowRate + Math.abs(Math.sin(tick / dayLength * 3.14)) * (springGrowRate - winterGrowRate)) * foodUpdateDelay;
+            tile.food += grassGrowAmount;
 
             // Spread grass to all touching tiles //
             // Left and right //
-            if (map[row - 1] && map[row - 1][column]) map[row - 1][column].food += Math.max(tile.food - map[row - 1][column].food, 0) * grassSpreadRate * foodUpdateDelay;
-            if (map[row + 1] && map[row + 1][column]) map[row + 1][column].food += Math.max(tile.food - map[row + 1][column].food, 0) * grassSpreadRate * foodUpdateDelay;
+            if (map[row - 1] && map[row - 1][column]) map[row - 1][column].food += Math.max(tile.food - map[row - 1][column].food, 0) * grassSpreadAmount;
+            if (map[row + 1] && map[row + 1][column]) map[row + 1][column].food += Math.max(tile.food - map[row + 1][column].food, 0) * grassSpreadAmount;
             // Up and down //
-            if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * grassSpreadRate * foodUpdateDelay;
-            if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * grassSpreadRate * foodUpdateDelay;
+            if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * grassSpreadAmount;
+            if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * grassSpreadAmount;
           } else if (tile.type == 2) { // If tile is evergreen //
             // add food //
-            tile.food += everGreenGrowRate * foodUpdateDelay;
+            tile.food += everGreenGrowAmount;
             // Left and right //
-            if (map[row - 1] && map[row - 1][column]) map[row - 1][column].food += Math.max(tile.food - map[row - 1][column].food, 0) * everGreenGrassSpreadRate * foodUpdateDelay;
-            if (map[row + 1] && map[row + 1][column]) map[row + 1][column].food += Math.max(tile.food - map[row + 1][column].food, 0) * everGreenGrassSpreadRate * foodUpdateDelay;
+            if (map[row - 1] && map[row - 1][column]) map[row - 1][column].food += Math.max(tile.food - map[row - 1][column].food, 0) * everGreenSpreadAmount;
+            if (map[row + 1] && map[row + 1][column]) map[row + 1][column].food += Math.max(tile.food - map[row + 1][column].food, 0) * everGreenSpreadAmount;
             // Up and down //
-            if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * everGreenGrassSpreadRate * foodUpdateDelay;
-            if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * everGreenGrassSpreadRate * foodUpdateDelay;
+            if (map[row][column + 1]) map[row][column + 1].food += Math.max(tile.food - map[row][column + 1].food, 0) * everGreenSpreadAmount;
+            if (map[row][column - 1]) map[row][column - 1].food += Math.max(tile.food - map[row][column - 1].food, 0) * everGreenSpreadAmount;
           }
 
           if (tile.food > tile.maxFood) tile.food = tile.maxFood;
