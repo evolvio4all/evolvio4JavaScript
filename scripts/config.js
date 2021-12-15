@@ -34,11 +34,15 @@ const selectSizeAddition = 100; // How far around creatures can you click to sel
 
 const maxTileFood = 80; // Maximum food on a tile
 
-const springGrowRate = 0.001; // Grow amount in spring season (applies to all tiles)
-const winterGrowRate = 0.000; // Grow amount in winter season (applies to all tiles)
+const springPassiveGrowRate = 0.000; // Grow amount in spring season (applies to all tiles)
+const winterPassiveGrowRate = 0.000; // Grow amount in winter season (applies to all tiles)
 
-const grassSpreadRate = 0.0003; // % difference between tiles grass spread rate
+const springGrowRateScalar = 1.0; // grass spread rate multiplied by this during spring
+const winterGrowRateScalar = 0.2; // grass spread rate multiplied by this during winter
+
+const grassSpreadRate = 0.001; // % difference between tiles grass spread rate
 const dayLength = 900; // Length of the day (in ticks)
+const seasonLength = 8; // season length in days, season starts at 0, peaks at 1 in the middle, returns to 0
 
 // Generation //
 const firstMapFrequency = 5; // Frequency of the first noise mapSize
@@ -64,7 +68,7 @@ const everGreenInnerArea = 0.2; // How far from the edge evergreens start to spa
 const everGreenOuterArea = 0.3; // How far from the center are evergreens spawning
 const everGreenPercentage = 0.7; // % of tiles (within the evergreen area) that are evergreen (always in grow season)
 
-const everGreenGrowRate = springGrowRate * 1.2; // grow rate of evergreen tiles
+const everGreenGrowRate = springPassiveGrowRate * 1.2; // grow rate of evergreen tiles
 const everGreenMaxFood = maxTileFood * 2; // maximum food on evergreen tiles
 const everGreenGrassSpreadRate = grassSpreadRate * 1.2; // % difference between tiles grass spread rate for evergreen tiles
 

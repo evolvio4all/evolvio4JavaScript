@@ -22,21 +22,10 @@ function renderClear() {
 }
 
 function renderTiles() {
-  //var middleX = (waterScrollX + 1920 / 2 * 400 - tileSize * mapSize / 2) * zoomLevel;
-  //var middleY = (waterScrollY + 1080 / 2 * 400 - tileSize * mapSize / 2) * zoomLevel;
-
   ctx.fillStyle = "#249D9F";
   ctx.fillRect(0, 0, display.width, display.height);
 
-  //ctx.drawImage(waterTexture, -cropx - middleX - 1919 / 2 * tileSize * zoomLevel, -cropy - middleY - 1079 / 2 * tileSize * zoomLevel, 1920 * tileSize * zoomLevel, 1080 * tileSize * zoomLevel);
-  //ctx.drawImage(waterTexture, -cropx - middleX - 1919 / 2 * tileSize * zoomLevel, -cropy - middleY + 1080 / 2 * tileSize * zoomLevel, 1920 * tileSize * zoomLevel, 1080 * tileSize * zoomLevel);
-  //ctx.drawImage(waterTexture, -cropx - middleX + 1920 / 2 * tileSize * zoomLevel, -cropy - middleY - 1079 / 2 * tileSize * zoomLevel, 1920 * tileSize * zoomLevel, 1080 * tileSize * zoomLevel);
-  //ctx.drawImage(waterTexture, -cropx - middleX + 1920 / 2 * tileSize * zoomLevel, -cropy - middleY + 1080 / 2 * tileSize * zoomLevel, 1920 * tileSize * zoomLevel, 1080 * tileSize * zoomLevel);
-
-  //var hue = 50 + 50 * (Math.sin(tick / dayLength) + 1) / 2;
-  //var huePrefix = "hsl(" + hue + ", ";
-
-  var saturation = 65 + Math.floor(Math.abs(Math.sin(tick / dayLength * 3.14)) * 20);
+  var saturation = 85;
 
   for (let row = 0; row < mapSize; row++) {
     for (let column = 0; column < mapSize; column++) {
