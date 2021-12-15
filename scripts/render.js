@@ -15,8 +15,6 @@ function render() {
   renderUI();
   if (speciesGraphOn) renderSpeciesGraph();
   renderSelectedCreature();
-
-  requestAnimationFrame(render);
 }
 
 function renderClear() {
@@ -206,7 +204,7 @@ function renderUI() {
 function renderSelectedCreature() {
   if (selectedCreature !== null) {
     ctx.font = "32px Calibri";
-    ctx.lineWidth = 20 * zoomLevel;
+    ctx.lineWidth = 4 * zoomLevel;
 
     ctx.strokeStyle = "#ffffff"
     ctx.beginPath();
@@ -214,7 +212,7 @@ function renderSelectedCreature() {
     ctx.lineTo(selectedCreature.x * zoomLevel + Math.cos(selectedCreature.rotation) * (selectedCreature.size + directionalDisplayLineLength) * zoomLevel - cropx, selectedCreature.y * zoomLevel - cropy + Math.sin(selectedCreature.rotation) * (selectedCreature.size + directionalDisplayLineLength) * zoomLevel);
     ctx.stroke();
 
-    ctx.lineWidth = 12 * zoomLevel;
+    ctx.lineWidth = 3 * zoomLevel;
 
     ctx.strokeStyle = "#ff0000";
     ctx.beginPath();
@@ -223,13 +221,13 @@ function renderSelectedCreature() {
     ctx.stroke();
 
     ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 20 * zoomLevel;
+    ctx.lineWidth = 4 * zoomLevel;
     ctx.beginPath();
     ctx.moveTo(selectedCreature.x * zoomLevel - cropx, selectedCreature.y * zoomLevel - cropy);
-    ctx.lineTo((selectedCreature.x + selectedCreature.velocity.x * 5) * zoomLevel - cropx, (selectedCreature.y + selectedCreature.velocity.y * 5) * zoomLevel - cropy);
+    ctx.lineTo((selectedCreature.x + selectedCreature.velocity.x * 0.5) * zoomLevel - cropx, (selectedCreature.y + selectedCreature.velocity.y * 0.5) * zoomLevel - cropy);
     ctx.stroke();
 
-    ctx.lineWidth = 10 * zoomLevel;
+    ctx.lineWidth = 2 * zoomLevel;
 
     ctx.fillStyle = "black";
     ctx.strokeStyle = "white";
@@ -352,9 +350,6 @@ function renderSelectedCreature() {
 var brainsTotalHeight = 0;
 
 function renderSelectedBrain(creature) {
-  ctx.fillStyle = "hsl(0, 0%, 0%)";
-  ctx.fillRect(nnui.xoffset - 60, nnui.yoffset - 20, nnui.xspacing * 2 + 80, 1080);
-
   ctx.fillStyle = "hsl(0, 0%, 100%)";
   ctx.font = "24px Arial";
   ctx.textAlign = "center";
@@ -409,8 +404,26 @@ function renderInput(creature, brain, brainNum, brainName) {
       if (hoveredNeuron[0] == "main" && 1 == hoveredNeuron[1] && a != hoveredNeuron[2]) continue;
       if (hoveredNeuron[0] != "main" && hoveredNeuron[1] == 1) continue;
 
-      //ctx.strokeStyle = "hsla(0, 0%, " + (brain.axons[0][n][a] * brain.neurons[0][n] <= 0 ? 0 : 100) + "%," + Math.abs(brain.axons[0][n][a] * brain.neurons[0][n] / 3) + ")";
-      ctx.strokeStyle = "hsla(" + (brain.axons[0][n][a] * brain.neurons[0][n] <= 0 ? 0 : 100) + ", 80%, 50%," + Math.abs(brain.axons[0][n][a] * brain.neurons[0][n]) + ")";
+      let value = 0;
+
+      var neuronValue = brain.neurons[0][n];
+      var axonValue = brain.axons[0][n][a];
+
+      var type = brain.types[0][n][a];
+
+      if (type == "+") {
+        value += (neuronValue + axonValue);
+      } else if (type == "*") {
+        value += (neuronValue * axonValue);
+      } else if (type == "%") {
+        value += (neuronValue % (axonValue || 0.0001));
+      } else if (type == "<") {
+        if (neuronValue < axonValue) value += neuronValue;
+      } else if (type == ">") {
+        if (neuronValue > axonValue) value += neuronValue;
+      }
+
+      ctx.strokeStyle = "hsla(" + (value <= 0 ? 0 : 100) + ", 80%, 50%," + Math.abs(value / 4) + ")";
       ctx.lineWidth = Math.sqrt(Math.abs(brain.axons[0][n][a])) * 3;
 
       ctx.beginPath();
@@ -455,16 +468,16 @@ function renderBrain(brain, brainNum, brainName) {
   var pastOutputs = false;
   var pastCellState = false;
   for (let l = 1; l < brain.neurons.length; l++) {
-    var verticalSpacingNext = 0;
+    var verticalSpacingNext = nnui.verticalSpacingHidden;
 
     var verticalSpacing = nnui.verticalSpacingHidden; //biggestLayer / (brain.neurons[l].length - 1);
 
-    if (l + 1 < brain.neurons.length) {
-      verticalSpacingNext = nnui.verticalSpacingOut; //biggestLayer / (brain.neurons[l + 1].length - 1);
-    }
-
     if (l == brain.neurons.length - 1) {
       verticalSpacing = nnui.verticalSpacingOut;
+    }
+
+    if (l == brain.neurons.length - 2) {
+      verticalSpacingNext = nnui.verticalSpacingOut;
     }
 
     for (let n = 0; n < brain.neurons[l].length; n++) {
@@ -473,7 +486,32 @@ function renderBrain(brain, brainNum, brainName) {
           if (hoveredNeuron[0] == "main" && l == hoveredNeuron[1] && n != hoveredNeuron[2]) continue;
           if (hoveredNeuron[0] == "main" && l + 1 == hoveredNeuron[1] && a != hoveredNeuron[2]) continue;
 
-          ctx.strokeStyle = "hsla(" + (brain.axons[l][n][a] * brain.neurons[l][n] <= 0 ? 0 : 100) + ", 80%, 50%," + Math.abs(brain.axons[l][n][a] * brain.neurons[l][n]) + ")";
+          let value = 0;
+
+          var neuronValue = brain.neurons[l][n];
+          var axonValue = brain.axons[l][n][a];
+
+          var type = brain.types[l][n][a];
+          var hue = [0, 100];
+
+          if (type == "+") {
+            value = (neuronValue + axonValue);
+            hue = [60, 180];
+          } else if (type == "*") {
+            value = (neuronValue * axonValue);
+            hue = [0, 100];
+          } else if (type == "%") {
+            value = (neuronValue % (axonValue || 0.0001));
+            hue = [140, 140];
+          } else if (type == "<") {
+            if (neuronValue < axonValue) value = neuronValue;
+            hue = [240, 300];
+          } else if (type == ">") {
+            if (neuronValue > axonValue) value = neuronValue;
+            hue = [240, 300];
+          }
+
+          ctx.strokeStyle = "hsla(" + (value <= 0 ? hue[0] : hue[1]) + ", 80%, 50%," + Math.abs(value / 4) + ")";
           ctx.lineWidth = Math.sqrt(Math.abs(brain.axons[l][n][a])) * 3;
 
           ctx.beginPath();
@@ -643,9 +681,9 @@ function hoverSelectedNeuron(e) {
     for (let l = 0; l < brain.neurons.length; l++) {
       var verticalSpacing = (1080 / (nnui.size + nnui.yspacing) - 1) / (selectedCreature.inputs + (outputs + 1) * 2);
 
-      if (l == 2) {
+      if (l == brain.neurons.length - 1) {
         verticalSpacing = nnui.verticalSpacingOut;
-      } else if (l == 1) {
+      } else if (l > 0) {
         verticalSpacing = nnui.verticalSpacingHidden;
       }
 

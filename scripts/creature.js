@@ -321,15 +321,19 @@ function setSpecies(creature, species) {
 
   if (species == "undefined" || species === undefined) {
     var tries = 0;
-    while ((specieslist[species] !== undefined && tries < maxNewSpeciesTries) || species == "undefined" || species === undefined) {
+    while (tries < maxNewSpeciesTries) {
       tries++;
       prefix = Math.floor(seededNoiseB(0, prefixes.length));
       prefix2 = Math.floor(seededNoiseB(0, prefixes.length));
 
       species = prefixes[prefix] + "-" + prefixes[prefix2];
+
+      if (specieslist[species] == undefined) break;
     }
 
     if (tries == maxNewSpeciesTries) species = "Dud " + suffixes[0];
+
+    creature.speciesChange = "cause of progenerator";
   } else {
     var minGeneDiff = Infinity;
     var newSpecies;
