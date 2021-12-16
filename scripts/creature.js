@@ -1,4 +1,4 @@
-function Creature(x, y, spec, specGen, color) {
+function Creature(x, y, spec, specGen, color, eyes) {
   //console.log("setting variables");
   var tile = Math.floor(seededNoiseA(0, spawnTiles.length));
 
@@ -68,7 +68,7 @@ function Creature(x, y, spec, specGen, color) {
   this.firstGen = false;
 
   //console.log("making eyes");
-  this.eyes = makeEyes(false);
+  this.eyes = eyes ? [...JSON.parse(JSON.stringify(eyes))] : makeEyes(false);
 
   population++;
 
@@ -272,6 +272,8 @@ function randomize(creature) {
 
   createNeuralNetwork(creature, true, true);
 
+  creature.isEating = false;
+
   creature.geneticID = "";
   creature.generation = 0;
   creature.species = "undefined";
@@ -280,7 +282,6 @@ function randomize(creature) {
 
   creature.species = setSpecies(creature, "undefined");
 
-  creature.isEating = false;
 
   creature.firstGen = true;
   creature.rotation = seededNoiseB(0, 2 * Math.PI);
@@ -384,19 +385,6 @@ function setSpecies(creature, species) {
 
   specieslist[species].contains.push(creature);
 
-  if (specieslist[species].contains.length > minCreaturesForTracking && specieslist[species].graphIndex == undefined) {
-    specieslist[species].graphIndex = currentSpeciesGraphIndex;
-    speciesGraph[specieslist[species].graphIndex] = [{
-      originTick: tick,
-      eyes: creature.eyes.length,
-      speciesName: species
-    }];
-    speciesColors[specieslist[species].graphIndex] = creature.color;
-    speciesCountList[specieslist[species].graphIndex] = specieslist[species].contains;
-
-    currentSpeciesGraphIndex++;
-  }
-
   creature.grvb = grvb;
 
   resetMemories(creature);
@@ -477,7 +465,7 @@ function act(creature) {
   creature.velocity.x *= fV;
   creature.velocity.y *= fV;
 
-  if (creature.output[5] >= minSpawnPower && creature.age > reproduceAge && creature.reproduceTime > minReproduceTime) reproduce(creature);
+  if (creature.output[5] >= minSpawnPower && creature.age + seededNoiseA(0, 50) > reproduceAge && creature.reproduceTime + seededNoiseA(0, 50) > minReproduceTime) reproduce(creature);
 
   changeGoogleAngle(creature);
 }

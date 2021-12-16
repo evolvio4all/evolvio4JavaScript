@@ -14,7 +14,7 @@ const testInput = [];
 for (let i = 0; i < speciesAccuracy; i++) {
   testInput.push([]);
   for (let j = 0; j < inputs; j++) {
-    testInput[i].push(1);
+    testInput[i].push(seededNoiseB(-1, 1));
   }
 }
 
@@ -23,7 +23,7 @@ function createNeuralNetwork(creature, noiseGroup, setValues) {
   // VARIABLES //
   creature.inputs = inputs + creature.eyes.length * 2;
   creature.outputs = outputs;
-  let mainLayers = [creature.inputs + memoryCount, 12, creature.outputs];
+  let mainLayers = [creature.inputs + memoryCount, 12, 8, 12, creature.outputs];
   creature.network = new Network(mainLayers, creature.outputs, creature.inputs);
   initMemory(creature, memories);
   initNeurons(creature); // Creature.prototype initializes the neurons, creating them, Neurons contain a value and are the connection point for axons
