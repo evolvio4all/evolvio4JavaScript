@@ -51,6 +51,21 @@ function update() {
   if (tick % speciesGraphDetail == 0) {
     var stackedThisTick = 0;
 
+    for (var species in specieslist) {
+      if (specieslist[species].graphIndex == undefined && specieslist[species].contains.length > minCreaturesForTracking) {
+        specieslist[species].graphIndex = currentSpeciesGraphIndex;
+        speciesGraph[specieslist[species].graphIndex] = [{
+          originTick: tick,
+          eyes: specieslist[species].contains[0].eyes.length,
+          speciesName: species
+        }];
+        speciesColors[specieslist[species].graphIndex] = specieslist[species].contains[0].color;
+        speciesCountList[specieslist[species].graphIndex] = specieslist[species].contains;
+
+        currentSpeciesGraphIndex++;
+      }
+    }
+
     for (let j = 0; j < speciesCountList.length; j++) {
       if (speciesCountList[j].length == 0) continue;
 

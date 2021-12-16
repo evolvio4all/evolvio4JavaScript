@@ -82,8 +82,8 @@ const minFirstGen = 35; // Minimum number of first generation creatures
 const creatureLimit = 5000; // Maximum number of creatures (when population = creatureLimit, the game pauses)
 const foodImposedCreatureLimit = 800; // Maximum number of creatures before food stops growing (when population = foodBasedCreatureLimit, food stops growing)
 
-const maxCreatureSize = 66; // Maximum creature size (radius)
-const minCreatureSize = 22; // Minimum creature size (radius)
+const maxCreatureSize = 132; // Maximum creature size (radius)
+const minCreatureSize = 44; // Minimum creature size (radius)
 
 const eyeSize = 0.12; // scalar
 const pupilSize = 0.12; // scalar NOT relative to eye size
@@ -174,8 +174,8 @@ const rotationSpeed = 0.3; // Maximum rotation speed in radians per tick
 const minRotation = 0.1; // Minimum rotation amount as a percentage of rotation speed
 
 // Species //
-const speciesDiversity = 18; // Diversity of each species
-const speciesColorChange = 55; // Color change between species
+const speciesDiversity = 3; // Diversity of each species
+const speciesColorChange = 10; // Color change between species
 
 var speciesGraphDetail = 37; // Higher = less detail (in ticks). Down to 1. High detail takes up a lot of memory after a while
 

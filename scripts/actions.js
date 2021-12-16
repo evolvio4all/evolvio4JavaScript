@@ -144,13 +144,11 @@ function reproduce(creature) {
 };
 
 function makeChild(creature) {
-  var child = new Creature(creature.x + seededNoiseA(-tileSize, tileSize), creature.y + seededNoiseA(-tileSize, tileSize), creature.species, creature.speciesGeneration, creature.color);
+  var child = new Creature(creature.x + seededNoiseA(-tileSize, tileSize), creature.y + seededNoiseA(-tileSize, tileSize), creature.species, creature.speciesGeneration, creature.color, creature.eyes);
 
   child.energy = childEnergy * birthEffeciency;
 
   child.scentTrail = [...JSON.parse(JSON.stringify(creature.scentTrail))];
-
-  child.eyes = [...JSON.parse(JSON.stringify(creature.eyes))];
 
   child.mutability = JSON.parse(JSON.stringify(creature.mutability));
 
