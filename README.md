@@ -5,12 +5,15 @@ This version of *evolv\.io* is made with **[JavaScript](https://developer.mozill
 
 *evolv\.io* uses a neural net and evolution in order to simulate creatures evolving over time.
 
+
 # Controls: 
 
 up = run as fast as possible
+
 down = 1x speed
 
 right = increase speed
+
 left = decrease speed
 
 
